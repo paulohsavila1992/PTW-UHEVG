@@ -1953,12 +1953,12 @@
         // CONFIGURAÇÃO DO FIREBASE
         // ================================================================
         const firebaseConfig = {
-            apiKey: "AIzaSyDMCFLSKH-Ug61qb-x-b4IUMOP7E6_7r1M",
-            authDomain: "permissao-trabalho-uhevg-95a56.firebaseapp.com",
-            projectId: "permissao-trabalho-uhevg-95a56",
-            storageBucket: "permissao-trabalho-uhevg-95a56.firebasestorage.app",
-            messagingSenderId: "4949368740",
-            appId: "1:4949368740:web:0090e62d1fe1961e1c6b31"
+            apiKey: "AIzaSyC7TxxgjMVX3lsb4nget2gbdU6nR-3IcM",
+            authDomain: "permissao-trabalho-uhevg.firebaseapp.com",
+            projectId: "permissao-trabalho-uhevg",
+            storageBucket: "permissao-trabalho-uhevg.firebasestorage.app",
+            messagingSenderId: "236218702254",
+            appId: "1:236218702254:web:6e93684d044ff7c0ee503f"
         };
         // ================================================================
 
@@ -2352,7 +2352,7 @@
                         const updatedUser = cachedUsuarios.find(u => u.id === currentUser.id);
                         if (updatedUser) {
                             currentUser = updatedUser;
-                            sessionStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
+                            localStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
                         }
                         loadSelects();
                         if (document.getElementById('pageUsuarios').classList.contains('active')) loadUsuarios();
@@ -2599,7 +2599,7 @@
                 const user = cachedUsuarios.find(x => x.usuario === u && x.senha === p);
                 if (user) {
                     currentUser = user;
-                    sessionStorage.setItem('ptd_currentUser', JSON.stringify(user));
+                    localStorage.setItem('ptd_currentUser', JSON.stringify(user));
                     document.getElementById('loginPage').style.display = 'none';
                     document.getElementById('appContainer').style.display = 'block';
                     updateUserInterface();
@@ -2620,7 +2620,7 @@
 
         function logout() {
             currentUser = null;
-            sessionStorage.removeItem('ptd_currentUser');
+            localStorage.removeItem('ptd_currentUser');
             document.getElementById('appContainer').style.display = 'none';
             document.getElementById('loginPage').style.display = 'flex';
             document.getElementById('loginUsername').value = '';
@@ -2813,7 +2813,7 @@
             try {
                 await updateDoc('usuarios', currentUser.id, { assinatura: nova });
                 currentUser.assinatura = nova;
-                sessionStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
+                localStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
                 document.getElementById('novaAssinatura').value = '';
                 document.getElementById('confirmarAssinatura').value = '';
                 checkAssinatura();
@@ -3467,25 +3467,46 @@
             document.querySelectorAll('input[name="bloqueio"]').forEach(radio => {
                 radio.addEventListener('change', toggleBloqueios);
             });
-            const savedUser = sessionStorage.getItem('ptd_currentUser');
+            const savedUser = localStorage.getItem('ptd_currentUser');
             if (savedUser) currentUser = JSON.parse(savedUser);
             initFirebase().then(() => {
-                if (currentUser) {
-                    const userExists = cachedUsuarios.find(u => u.id === currentUser.id);
-                    if (userExists) {
-                        currentUser = userExists;
-                        document.getElementById('loginPage').style.display = 'none';
-                        document.getElementById('appContainer').style.display = 'block';
-                        updateUserInterface();
-                        updateStats();
-                        updateNotificationBadges(); setupQRListener();
-                        navigationHistory = ['home'];
-                        updateBackButton();
-                    } else {
-                        sessionStorage.removeItem('ptd_currentUser');
-                        currentUser = null;
+                // Aguardar um pouco para os dados carregarem do Firebase
+                setTimeout(() => {
+                    if (currentUser) {
+                        const userExists = cachedUsuarios.find(u => u.id === currentUser.id);
+                        if (userExists) {
+                            currentUser = userExists;
+                            document.getElementById('loginPage').style.display = 'none';
+                            document.getElementById('appContainer').style.display = 'block';
+                            updateUserInterface();
+                            updateStats();
+                            updateNotificationBadges(); setupQRListener();
+                            navigationHistory = ['home'];
+                            updateBackButton();
+                        } else if (cachedUsuarios.length === 0) {
+                            // Dados ainda não carregaram, tentar novamente
+                            setTimeout(() => {
+                                const retryUser = cachedUsuarios.find(u => u.id === currentUser.id);
+                                if (retryUser) {
+                                    currentUser = retryUser;
+                                    document.getElementById('loginPage').style.display = 'none';
+                                    document.getElementById('appContainer').style.display = 'block';
+                                    updateUserInterface();
+                                    updateStats();
+                                    updateNotificationBadges(); setupQRListener();
+                                    navigationHistory = ['home'];
+                                    updateBackButton();
+                                } else {
+                                    localStorage.removeItem('ptd_currentUser');
+                                    currentUser = null;
+                                }
+                            }, 1000);
+                        } else {
+                            localStorage.removeItem('ptd_currentUser');
+                            currentUser = null;
+                        }
                     }
-                }
+                }, 500);
             });
         });
     </script>
