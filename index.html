@@ -1,0 +1,3493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Permissão de Trabalho Digital - UHE Volta Grande</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <!-- QR Code Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary: #00f0ff;
+            --primary-dark: #00b8c4;
+            --secondary: #ff00aa;
+            --accent: #7b2dff;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3366;
+            --bg-dark: #0a0a1a;
+            --bg-card: #12122a;
+            --bg-card-hover: #1a1a3a;
+            --bg-input: #1e1e3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0c0;
+            --border-color: #2a2a5a;
+            --glow-primary: 0 0 20px rgba(0, 240, 255, 0.3);
+            --glow-secondary: 0 0 20px rgba(255, 0, 170, 0.3);
+            --sidebar-width: 280px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 16px; }
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(0, 240, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(123, 45, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(255, 0, 170, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: -1;
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--primary-dark); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .loading-overlay.hidden { display: none; }
+        .loading-spinner {
+            width: 50px; height: 50px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text {
+            margin-top: 20px;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+        .sync-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 8px 15px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        .sync-indicator.online { border-color: var(--success); }
+        .sync-indicator.offline { border-color: var(--danger); }
+        .sync-indicator.syncing { border-color: var(--warning); }
+        .sync-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+        .sync-indicator.offline .sync-dot { background: var(--danger); }
+        .sync-indicator.syncing .sync-dot { background: var(--warning); animation: pulse 1s infinite; }
+        
+        /* Login */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .login-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease;
+        }
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .login-logo h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.2rem, 4vw, 1.6rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        .login-logo p {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+        }
+        .firebase-status {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            display: none;
+        }
+        .firebase-status.connected {
+            display: block;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+        .firebase-status.error {
+            display: block;
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: var(--glow-primary);
+        }
+        .form-group input::placeholder { color: var(--text-secondary); }
+        .form-group select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2300f0ff' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; padding-right: 40px; }
+        
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            touch-action: manipulation;
+        }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--bg-dark);
+            width: 100%;
+        }
+        .btn-primary:hover:not(:disabled), .btn-primary:active:not(:disabled) { box-shadow: var(--glow-primary); transform: translateY(-2px); }
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        .btn-secondary:hover, .btn-secondary:active { background: rgba(0, 240, 255, 0.1); }
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #00cc6a);
+            color: var(--bg-dark);
+        }
+        .btn-success:hover, .btn-success:active { box-shadow: 0 0 20px rgba(0, 255, 136, 0.3); }
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #cc2952);
+            color: var(--text-primary);
+        }
+        .btn-danger:hover, .btn-danger:active { box-shadow: 0 0 20px rgba(255, 51, 102, 0.3); }
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #cc8800);
+            color: var(--bg-dark);
+        }
+        .btn-sm { padding: 10px 16px; font-size: 0.75rem; }
+        .btn-xs { padding: 8px 12px; font-size: 0.7rem; }
+        
+        /* App Container */
+        .app-container { display: none; }
+        
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: auto;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 200;
+            flex-direction: column;
+        }
+        .mobile-header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            min-height: 56px;
+        }
+        .mobile-header-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: rgba(0, 240, 255, 0.03);
+            border-top: 1px solid var(--border-color);
+        }
+        .mobile-user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 0;
+        }
+        .mobile-user-avatar {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+        .mobile-user-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .mobile-logout {
+            padding: 8px 14px;
+            background: rgba(255, 51, 102, 0.15);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .mobile-logout:hover, .mobile-logout:active { background: var(--danger); color: white; }
+        .menu-toggle {
+            width: 48px; height: 48px;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            transition: background 0.3s ease;
+            flex-shrink: 0;
+        }
+        .menu-toggle:hover, .menu-toggle:active { background: rgba(0, 240, 255, 0.2); }
+        .mobile-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--primary);
+            text-align: center;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0 10px;
+        }
+        .btn-back {
+            width: 48px; height: 48px;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--primary);
+            font-size: 1.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        .btn-back:hover, .btn-back:active { background: rgba(0, 240, 255, 0.2); border-color: var(--primary); }
+        .btn-back.hidden { visibility: hidden; }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0; top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            overflow-y: auto;
+            z-index: 300;
+            transition: transform 0.3s ease;
+        }
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 250;
+        }
+        .sidebar-overlay.active { display: block; }
+        .sidebar-logo {
+            text-align: center;
+            padding: 15px 0 25px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        .sidebar-logo h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .sidebar-logo p {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        .sidebar-close {
+            display: none;
+            position: absolute;
+            top: 15px; right: 15px;
+            width: 40px; height: 40px;
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            color: var(--danger);
+            font-size: 1.3rem;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar-close:hover { background: var(--danger); color: white; }
+        .nav-menu { list-style: none; }
+        .nav-item { margin-bottom: 4px; position: relative; }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+        .nav-link:hover, .nav-link:active { background: rgba(0, 240, 255, 0.1); color: var(--primary); }
+        .nav-link.active {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(123, 45, 255, 0.1));
+            color: var(--primary);
+            border-left: 3px solid var(--primary);
+        }
+        .nav-section {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 18px 14px 8px;
+            font-weight: 600;
+        }
+        .nav-badge {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--danger);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            padding: 25px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.2rem, 3vw, 1.6rem);
+            font-weight: 600;
+        }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .user-avatar {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .user-details h4 { font-size: 0.9rem; font-weight: 600; }
+        .user-details p { font-size: 0.75rem; color: var(--text-secondary); }
+        .btn-logout {
+            padding: 10px 16px;
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        .btn-logout:hover, .btn-logout:active { background: var(--danger); color: white; }
+        
+        /* Pages */
+        .page { display: none; animation: fadeIn 0.4s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+        }
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        /* Home Grid */
+        .home-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .home-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .home-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .home-card:hover, .home-card:active {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+            box-shadow: var(--glow-primary);
+        }
+        .home-card:hover::before, .home-card:active::before { opacity: 1; }
+        .home-card-icon {
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(123, 45, 255, 0.1));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        .home-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .home-card p { color: var(--text-secondary); font-size: 0.8rem; line-height: 1.4; display: none; }
+        .home-card .notif-count {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--danger);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px 15px;
+            text-align: center;
+        }
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.5rem, 5vw, 2.2rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label { color: var(--text-secondary); font-size: 0.8rem; margin-top: 3px; }
+        
+        /* Permission List Cards */
+        .permission-list { display: flex; flex-direction: column; gap: 12px; }
+        .permission-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .permission-card:hover {
+            border-color: var(--primary);
+            transform: translateX(5px);
+        }
+        .permission-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .permission-card-num {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--primary);
+        }
+        .permission-card-date {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .permission-card-desc {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        .permission-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .permission-card-info {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .permission-card-info strong { color: var(--text-primary); }
+        .permission-card.expired { border-left: 4px solid var(--danger); }
+        .permission-card.warning { border-left: 4px solid var(--warning); }
+        
+        /* Tables */
+        .table-container { overflow-x: auto; margin: 0 -20px; padding: 0 20px; }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; }
+        th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; }
+        th {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: rgba(0, 240, 255, 0.05);
+            white-space: nowrap;
+        }
+        tr:hover, tr:active { background: rgba(0, 240, 255, 0.03); }
+        tr { cursor: pointer; transition: background 0.3s ease; }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(10, 10, 26, 0.95);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: flex-start;
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            animation: modalIn 0.3s ease;
+            margin: auto;
+        }
+        .modal-large { max-width: 700px; }
+        .modal-xl { max-width: 900px; }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.05), rgba(123, 45, 255, 0.03));
+            border-radius: 15px 15px 0 0;
+        }
+        .modal-header h3 { font-family: 'Orbitron', sans-serif; font-size: 1rem; }
+        .modal-close {
+            width: 38px; height: 38px;
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            color: var(--danger);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .modal-close:hover, .modal-close:active { background: var(--danger); color: white; }
+        .modal-body { padding: 20px; max-height: 60vh; overflow-y: auto; }
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        /* Sections */
+        .section {
+            background: rgba(0, 240, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .section-code {
+            background: var(--primary);
+            color: var(--bg-dark);
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        .form-group.full-width { grid-column: 1 / -1; }
+        
+        /* CHECKBOX GROUP */
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: all 0.2s ease;
+            min-height: 48px;
+        }
+        .checkbox-item:active,
+        .checkbox-item.checked {
+            background: rgba(0, 240, 255, 0.15);
+            border-color: var(--primary);
+        }
+        .checkbox-item input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            min-height: 24px;
+            accent-color: var(--primary);
+            cursor: pointer;
+            margin: 0;
+        }
+        
+        /* RADIO GROUP */
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: all 0.2s ease;
+            min-height: 48px;
+        }
+        .radio-item:active,
+        .radio-item.checked {
+            background: rgba(0, 240, 255, 0.15);
+            border-color: var(--primary);
+        }
+        .radio-item input[type="radio"] {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            min-height: 24px;
+            accent-color: var(--primary);
+            cursor: pointer;
+            margin: 0;
+        }
+        
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        .badge-success { background: rgba(0, 255, 136, 0.15); color: var(--success); border: 1px solid var(--success); }
+        .badge-warning { background: rgba(255, 170, 0, 0.15); color: var(--warning); border: 1px solid var(--warning); }
+        .badge-danger { background: rgba(255, 51, 102, 0.15); color: var(--danger); border: 1px solid var(--danger); }
+        .badge-info { background: rgba(0, 240, 255, 0.15); color: var(--primary); border: 1px solid var(--primary); }
+        
+        /* Item Lists */
+        .item-list {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            max-height: 180px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .item-list-item {
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            gap: 10px;
+        }
+        .item-list-item:last-child { border-bottom: none; }
+        .item-list-item:hover, .item-list-item:active { background: rgba(0, 240, 255, 0.05); }
+        .item-list-item span { flex: 1; word-break: break-word; }
+        .item-list-item .btn-remove {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            padding: 5px;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        
+        /* Password */
+        .password-wrapper { position: relative; }
+        .password-wrapper input { padding-right: 50px; }
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 5px;
+            font-size: 1.1rem;
+        }
+        .password-toggle:hover, .password-toggle:active { color: var(--primary); }
+        
+        /* Signature */
+        .signature-display {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.8rem;
+            letter-spacing: 8px;
+            text-align: center;
+            padding: 25px;
+            background: var(--bg-input);
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        .signature-dots { color: var(--primary); }
+        
+        /* Safety Grid */
+        .safety-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        .safety-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .safety-card:hover, .safety-card:active {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-primary);
+        }
+        .safety-card h4 { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; margin-top: 8px; }
+        
+        /* Charts */
+        .chart-container { position: relative; height: 250px; margin: 15px 0; }
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        /* Signature Box */
+        .signature-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .signature-box.signed { border-color: var(--success); background: rgba(0, 255, 136, 0.05); }
+        .signature-info { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 150px; }
+        .signature-name { font-weight: 600; font-size: 0.9rem; }
+        .signature-role { font-size: 0.8rem; color: var(--text-secondary); }
+        .signature-timestamp { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--success); }
+        
+        /* Transfer Status */
+        .transfer-status {
+            padding: 12px;
+            background: var(--bg-input);
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+        .transfer-status.pending { border-left: 3px solid var(--warning); }
+        .transfer-status.completed { border-left: 3px solid var(--success); }
+        
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 130px;
+            right: 15px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: calc(100% - 30px);
+        }
+        .toast {
+            padding: 12px 18px;
+            border-radius: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+        .toast-success { border-color: var(--success); }
+        .toast-error { border-color: var(--danger); }
+        .toast-warning { border-color: var(--warning); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        /* Selectable List */
+        .selectable-list {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+        }
+        .selectable-item {
+            padding: 14px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            min-height: 50px;
+        }
+        .selectable-item:last-child { border-bottom: none; }
+        .selectable-item:hover, .selectable-item:active { background: rgba(0, 240, 255, 0.1); }
+        .selectable-item input[type="checkbox"] { 
+            accent-color: var(--primary); 
+            width: 22px; 
+            height: 22px;
+            min-width: 22px;
+            min-height: 22px;
+        }
+        
+        /* Notification Card */
+        .notification-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .notification-card:hover, .notification-card:active {
+            border-color: var(--primary);
+            transform: translateX(3px);
+        }
+        .notification-card.pending { border-left: 4px solid var(--warning); }
+        .notification-icon {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, rgba(255, 170, 0, 0.2), rgba(255, 170, 0, 0.1));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .notification-content { flex: 1; min-width: 0; }
+        .notification-content h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+        .notification-content p {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            word-break: break-word;
+        }
+        .notification-time {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        
+        /* Bloqueio Detail */
+        .bloqueio-item {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .bloqueio-item:last-child { margin-bottom: 0; }
+        .bloqueio-item p { margin: 5px 0; font-size: 0.9rem; }
+        .bloqueio-item strong { color: var(--primary); }
+        
+        /* Responsive - Tablets */
+        @media (min-width: 768px) {
+            .form-grid { grid-template-columns: repeat(2, 1fr); }
+            .stats-grid { grid-template-columns: repeat(5, 1fr); }
+            .home-card p { display: block; }
+            .home-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+            .chart-grid { grid-template-columns: repeat(2, 1fr); }
+            .toast-container { top: 140px; }
+        }
+        
+        /* Responsive - Mobile */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-close { display: flex; }
+            .main-content { margin-left: 0; padding-top: 130px; }
+            .mobile-header { display: flex; }
+            .header { display: none; }
+            .sync-indicator { bottom: 10px; left: 10px; font-size: 0.7rem; padding: 6px 12px; }
+        }
+        
+        @media (max-width: 480px) {
+            .login-box { padding: 30px 20px; }
+            .main-content { padding: 120px 12px 20px; }
+            .card { padding: 15px; }
+            .modal { border-radius: 12px; margin: 10px; }
+            .modal-body { padding: 15px; }
+            .modal-header, .modal-footer { padding: 15px; }
+            .section { padding: 15px; }
+            .stats-grid { gap: 10px; }
+            .stat-card { padding: 15px 10px; }
+            .home-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .home-card { padding: 15px; }
+            .home-card-icon { width: 40px; height: 40px; font-size: 1.2rem; margin-bottom: 10px; }
+            .home-card h3 { font-size: 0.75rem; }
+            .safety-grid { gap: 10px; }
+            .safety-card { padding: 15px 10px; }
+            .safety-card h4 { font-size: 0.7rem; }
+            .toast-container { top: 125px; right: 10px; left: 10px; max-width: none; }
+            .toast { font-size: 0.85rem; padding: 10px 14px; }
+            th, td { padding: 10px 8px; font-size: 0.8rem; }
+            .mobile-header-bottom { padding: 6px 12px; }
+            .mobile-user-name { font-size: 0.8rem; }
+            .mobile-logout { padding: 6px 12px; font-size: 0.75rem; }
+            .checkbox-item { padding: 10px 12px; font-size: 0.9rem; }
+            .radio-item { padding: 10px 12px; font-size: 0.9rem; }
+        }
+        
+        /* Print Styles */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+                font-size: 12pt;
+            }
+            .grid-bg, .sidebar, .mobile-header, .header, .modal-close, .modal-footer, 
+            .sync-indicator, .toast-container, .btn, .no-print { 
+                display: none !important; 
+            }
+            .modal-overlay {
+                position: static !important;
+                background: white !important;
+                display: block !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+            .modal {
+                position: static !important;
+                max-width: 100% !important;
+                border: none !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                background: white !important;
+            }
+            .modal-header {
+                background: white !important;
+                border-bottom: 2px solid #333 !important;
+                padding: 10px 0 !important;
+            }
+            .modal-header h3 {
+                color: black !important;
+                font-size: 18pt !important;
+            }
+            .modal-body {
+                max-height: none !important;
+                overflow: visible !important;
+                padding: 10px 0 !important;
+            }
+            .section {
+                background: white !important;
+                border: 1px solid #ccc !important;
+                page-break-inside: avoid;
+                margin-bottom: 10px !important;
+                padding: 10px !important;
+            }
+            .section-title {
+                color: black !important;
+                border-bottom: 1px solid #ccc !important;
+                font-size: 12pt !important;
+            }
+            .section-code {
+                background: #333 !important;
+                color: white !important;
+            }
+            .signature-box {
+                background: #f5f5f5 !important;
+                border: 1px solid #ccc !important;
+            }
+            .signature-box.signed {
+                border-color: green !important;
+            }
+            .badge {
+                border: 1px solid #333 !important;
+                background: white !important;
+            }
+            .badge-success { color: green !important; border-color: green !important; }
+            .badge-warning { color: orange !important; border-color: orange !important; }
+            .badge-danger { color: red !important; border-color: red !important; }
+            .badge-info { color: blue !important; border-color: blue !important; }
+            p, span, div { color: black !important; }
+            .bloqueio-item {
+                background: #f5f5f5 !important;
+                border: 1px solid #ccc !important;
+            }
+            .transfer-status {
+                background: #f5f5f5 !important;
+            }
+        }
+
+        /* QR Code Styles */
+        .qr-container { text-align: center; padding: 20px; }
+        .qr-code-box {
+            display: inline-block;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            margin: 15px 0;
+        }
+        .qr-timer {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: var(--warning);
+            margin: 15px 0;
+        }
+        .qr-timer.expired { color: var(--danger); }
+        .qr-timer.success { color: var(--success); }
+        .qr-instructions { color: var(--text-secondary); font-size: 0.9rem; margin: 10px 0; }
+        .qr-status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+        .qr-status.waiting { background: rgba(255, 170, 0, 0.1); border: 1px solid var(--warning); color: var(--warning); }
+        .qr-status.success { background: rgba(0, 255, 136, 0.1); border: 1px solid var(--success); color: var(--success); }
+        .qr-status.error { background: rgba(255, 51, 102, 0.1); border: 1px solid var(--danger); color: var(--danger); }
+        #qr-reader { width: 100%; max-width: 350px; margin: 0 auto; }
+        #qr-reader video { border-radius: 10px; }
+        .qr-pending-alert {
+            background: linear-gradient(135deg, rgba(255, 170, 0, 0.2), rgba(255, 170, 0, 0.1));
+            border: 2px solid var(--warning);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+        @keyframes glow {
+            from { box-shadow: 0 0 5px rgba(255, 170, 0, 0.3); }
+            to { box-shadow: 0 0 20px rgba(255, 170, 0, 0.6); }
+        }
+        .qr-pending-alert h4 { color: var(--warning); margin-bottom: 5px; }
+        .qr-pending-alert p { color: var(--text-secondary); font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Conectando ao Firebase...</div>
+    </div>
+    
+    <!-- Sync Indicator -->
+    <div class="sync-indicator online" id="syncIndicator">
+        <div class="sync-dot"></div>
+        <span id="syncText">Online</span>
+    </div>
+
+    <!-- Login Page -->
+    <div class="login-container" id="loginPage" style="display: none;">
+        <div class="login-box">
+            <div class="login-logo">
+                <h1>PERMISSÃO DE TRABALHO</h1>
+                <p>UHE VOLTA GRANDE</p>
+            </div>
+            <div class="firebase-status" id="firebaseStatus"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Usuário</label>
+                    <input type="text" id="loginUsername" placeholder="Digite seu usuário" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="loginPassword" placeholder="Digite sua senha" required autocomplete="current-password">
+                        <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">👁</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" id="btnLogin">🔐 Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="app-container" id="appContainer">
+        <!-- Mobile Header -->
+        <header class="mobile-header">
+            <div class="mobile-header-top">
+                <button class="btn-back hidden" id="btnBack" onclick="goBack()">◀</button>
+                <span class="mobile-title" id="mobileTitle">Página Inicial</span>
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+            </div>
+            <div class="mobile-header-bottom">
+                <div class="mobile-user-info">
+                    <div class="mobile-user-avatar" id="mobileUserAvatar">PA</div>
+                    <span class="mobile-user-name" id="mobileUserName">Nome do Usuário</span>
+                </div>
+                <button class="mobile-logout" onclick="logout()">🚪 Sair</button>
+            </div>
+        </header>
+
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+            <div class="sidebar-logo">
+                <h2>PERMISSÃO DE TRABALHO</h2>
+                <p>UHE VOLTA GRANDE</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-section">Principal</li>
+                <li class="nav-item">
+                    <a class="nav-link active" onclick="navigateTo('home')">🏠 Página Inicial</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="navigateTo('notificacoes')">🔔 Notificações <span class="nav-badge" id="navNotifBadge" style="display: none;">0</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="navigateTo('dashboard')">📊 Dashboard</a>
+                </li>
+                <li class="nav-section">Permissões</li>
+                <li class="nav-item" id="navSolicitar">
+                    <a class="nav-link" onclick="navigateTo('solicitar')">📝 Solicitar Permissão</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="navigateTo('solicitadas')">⏳ Solicitadas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="navigateTo('execucao')">▶️ Em Execução</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="navigateTo('vencidas')">⚠️ Vencidas <span class="nav-badge" id="navVencidasBadge" style="display: none;">0</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="navigateTo('encerradas')">✅ Encerradas</a>
+                </li>
+                <li class="nav-section">Configurações</li>
+                <li class="nav-item" id="navUsuarios">
+                    <a class="nav-link" onclick="navigateTo('usuarios')">👥 Usuários</a>
+                </li>
+                <li class="nav-item" id="navSeguranca">
+                    <a class="nav-link" onclick="navigateTo('seguranca')">🛡️ Segurança</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="navigateTo('assinatura')">✍️ Assinatura Digital</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1 id="pageTitle">Página Inicial</h1>
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">PA</div>
+                    <div class="user-details">
+                        <h4 id="userName">Nome do Usuário</h4>
+                        <p id="userRole">Cargo</p>
+                    </div>
+                    <button class="btn-logout" onclick="logout()">🚪 Sair</button>
+                </div>
+            </div>
+
+            <!-- Home Page -->
+            <div class="page active" id="pageHome">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statSolicitadas">0</div>
+                        <div class="stat-label">Solicitadas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statExecucao">0</div>
+                        <div class="stat-label">Em Execução</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statVencidas">0</div>
+                        <div class="stat-label">Vencidas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statEncerradas">0</div>
+                        <div class="stat-label">Encerradas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTotal">0</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                </div>
+                <div class="home-grid">
+                    <div class="home-card" onclick="navigateTo('notificacoes')" id="cardNotificacoes">
+                        <div class="home-card-icon">🔔</div>
+                        <h3>Notificações</h3>
+                        <p>Transferências pendentes</p>
+                        <span class="notif-count" id="homeNotifBadge" style="display: none;">0</span>
+                    </div>
+                    <div class="home-card" onclick="navigateTo('solicitar')" id="cardSolicitar">
+                        <div class="home-card-icon">📝</div>
+                        <h3>Nova Permissão</h3>
+                        <p>Criar nova solicitação</p>
+                    </div>
+                    <div class="home-card" onclick="navigateTo('solicitadas')">
+                        <div class="home-card-icon">⏳</div>
+                        <h3>Solicitadas</h3>
+                        <p>Aguardando aprovação</p>
+                    </div>
+                    <div class="home-card" onclick="navigateTo('execucao')">
+                        <div class="home-card-icon">▶️</div>
+                        <h3>Em Execução</h3>
+                        <p>Permissões ativas</p>
+                    </div>
+                    <div class="home-card" onclick="navigateTo('vencidas')" id="cardVencidas">
+                        <div class="home-card-icon">⚠️</div>
+                        <h3>Vencidas</h3>
+                        <p>Prazo expirado</p>
+                        <span class="notif-count" id="homeVencidasBadge" style="display: none;">0</span>
+                    </div>
+                    <div class="home-card" onclick="navigateTo('encerradas')">
+                        <div class="home-card-icon">✅</div>
+                        <h3>Encerradas</h3>
+                        <p>Histórico</p>
+                    </div>
+                    <div class="home-card" onclick="navigateTo('dashboard')">
+                        <div class="home-card-icon">📊</div>
+                        <h3>Dashboard</h3>
+                        <p>Estatísticas</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notificações Page -->
+            <div class="page" id="pageNotificacoes">
+                <div class="card">
+                    <div class="card-title">🔔 Notificações de Transferência</div>
+                    <div id="notificacoesList">
+                        <p style="color: var(--text-secondary); text-align: center; padding: 30px;">Nenhuma notificação pendente</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Usuários Page -->
+            <div class="page" id="pageUsuarios">
+                <div class="card">
+                    <div class="card-title" style="justify-content: space-between;">
+                        <span>👥 Usuários</span>
+                        <button class="btn btn-primary btn-sm" onclick="openModal('modalNovoUsuario')">+ Novo</button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr><th>Nome</th><th>Usuário</th><th>Cargo</th><th>Tipos</th><th>Ações</th></tr>
+                            </thead>
+                            <tbody id="usuariosTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assinatura Digital Page -->
+            <div class="page" id="pageAssinatura">
+                <div class="card" style="max-width: 500px; margin: 0 auto;">
+                    <div class="card-title">✍️ Assinatura Digital</div>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">
+                        Sua assinatura digital é utilizada para autorizar processos. Mínimo 6 dígitos numéricos.
+                    </p>
+                    <div id="assinaturaExistente" style="display: none;">
+                        <div class="signature-display">
+                            <span class="signature-dots" id="signatureDisplay">••••••</span>
+                        </div>
+                        <div style="text-align: center; margin-bottom: 15px;">
+                            <button class="btn btn-secondary btn-sm" onclick="toggleSignatureVisibility()">
+                                <span id="toggleText">👁 Mostrar</span>
+                            </button>
+                        </div>
+                        <button class="btn btn-warning" onclick="showResetSignature()" style="width: 100%;">
+                            🔄 Alterar Assinatura
+                        </button>
+                    </div>
+                    <div id="assinaturaForm">
+                        <div class="form-group">
+                            <label>Nova Assinatura</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="novaAssinatura" placeholder="Mínimo 6 dígitos" maxlength="10" inputmode="numeric">
+                                <button type="button" class="password-toggle" onclick="togglePassword('novaAssinatura')">👁</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirmar</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="confirmarAssinatura" placeholder="Confirme" maxlength="10" inputmode="numeric">
+                                <button type="button" class="password-toggle" onclick="togglePassword('confirmarAssinatura')">👁</button>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="salvarAssinatura()" style="width: 100%;">💾 Salvar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Segurança do Trabalho Page -->
+            <div class="page" id="pageSeguranca">
+                <div class="safety-grid">
+                    <div class="safety-card" onclick="openSafetyModal('riscos')">
+                        <div style="font-size: 1.8rem;">⚠️</div>
+                        <h4>Riscos</h4>
+                    </div>
+                    <div class="safety-card" onclick="openSafetyModal('epi')">
+                        <div style="font-size: 1.8rem;">🦺</div>
+                        <h4>EPIs</h4>
+                    </div>
+                    <div class="safety-card" onclick="openSafetyModal('medidas')">
+                        <div style="font-size: 1.8rem;">📋</div>
+                        <h4>Medidas</h4>
+                    </div>
+                    <div class="safety-card" onclick="openSafetyModal('equipamentos')">
+                        <div style="font-size: 1.8rem;">🔧</div>
+                        <h4>Equipamentos</h4>
+                    </div>
+                </div>
+                <div class="card"><div class="card-title">⚠️ Riscos</div><div class="item-list" id="listaRiscos"></div></div>
+                <div class="card"><div class="card-title">🦺 EPIs</div><div class="item-list" id="listaEpi"></div></div>
+                <div class="card"><div class="card-title">📋 Medidas</div><div class="item-list" id="listaMedidas"></div></div>
+                <div class="card"><div class="card-title">🔧 Equipamentos</div><div class="item-list" id="listaEquipamentos"></div></div>
+            </div>
+
+            <!-- Solicitar Permissão Page -->
+            <div class="page" id="pageSolicitar">
+                <form id="formPermissao">
+                    <div class="section">
+                        <div class="section-title"><span class="section-code">A1</span> Responsabilidades</div>
+                        <div class="form-grid">
+                            <div class="form-group"><label>Autorizador</label><select id="permAutorizador" required><option value="">Selecione</option></select></div>
+                            <div class="form-group"><label>Supervisor</label><select id="permSupervisor" required><option value="">Selecione</option></select></div>
+                            <div class="form-group"><label>Executor</label><select id="permExecutor" required><option value="">Selecione</option></select></div>
+                        </div>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><span class="section-code">A2</span> Descrição do Trabalho</div>
+                        <div class="form-grid">
+                            <div class="form-group"><label>Local</label><input type="text" id="permLocal" required></div>
+                            <div class="form-group"><label>Equipamento</label><input type="text" id="permEquipamento" required></div>
+                            <div class="form-group full-width"><label>Descrição da Atividade</label><textarea id="permDescricao" rows="3" required></textarea></div>
+                            <div class="form-group"><label>Condição Requerida</label><input type="text" id="permCondicao"></div>
+                            <div class="form-group"><label>Ordem de Trabalho</label><input type="text" id="permOrdem"></div>
+                            <div class="form-group full-width">
+                                <label>Tipo de Trabalho</label>
+                                <div class="checkbox-group" id="tipoTrabalhoGroup">
+                                    <div class="checkbox-item" data-value="Altura"><input type="checkbox" id="cbAltura"><span>Altura</span></div>
+                                    <div class="checkbox-item" data-value="Elétrico"><input type="checkbox" id="cbEletrico"><span>Elétrico</span></div>
+                                    <div class="checkbox-item" data-value="Quente"><input type="checkbox" id="cbQuente"><span>Quente</span></div>
+                                    <div class="checkbox-item" data-value="Confinado"><input type="checkbox" id="cbConfinado"><span>Confinado</span></div>
+                                    <div class="checkbox-item" data-value="Perigosos"><input type="checkbox" id="cbPerigosos"><span>Perigosos</span></div>
+                                    <div class="checkbox-item" data-value="Içamento"><input type="checkbox" id="cbIcamento"><span>Içamento</span></div>
+                                    <div class="checkbox-item" data-value="Mergulho"><input type="checkbox" id="cbMergulho"><span>Mergulho</span></div>
+                                    <div class="checkbox-item" data-value="Outros"><input type="checkbox" id="cbOutros"><span>Outros</span></div>
+                                </div>
+                                <input type="text" id="permOutrosTipo" placeholder="Especifique..." style="margin-top: 10px; display: none;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><span class="section-code">A3</span> Programação</div>
+                        <div class="form-grid">
+                            <div class="form-group"><label>Data Início</label><input type="date" id="permDataInicio" required></div>
+                            <div class="form-group"><label>Hora Início</label><input type="time" id="permHoraInicio" required></div>
+                            <div class="form-group"><label>Data Término</label><input type="date" id="permDataTermino" required></div>
+                            <div class="form-group"><label>Hora Término</label><input type="time" id="permHoraTermino" required></div>
+                            <div class="form-group"><label>Tempo Retorno (h)</label><input type="number" id="permTempoRetorno" min="0" inputmode="numeric"></div>
+                        </div>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><span class="section-code">A4</span> Empresa e Executores</div>
+                        <div class="form-grid">
+                            <div class="form-group"><label>Empresa</label><input type="text" id="permEmpresa" required></div>
+                            <div class="form-group">
+                                <label>Executores</label>
+                                <button type="button" class="btn btn-secondary btn-xs" onclick="openModal('modalAddExecutor')">+ Adicionar</button>
+                                <div class="item-list" id="listaExecutores"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><span class="section-code">B1</span> Equipamentos</div>
+                        <button type="button" class="btn btn-secondary btn-xs" onclick="openSelectModal('equipamentos')">+ Adicionar</button>
+                        <div class="item-list" id="permEquipamentosList"></div>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><span class="section-code">B2</span> Riscos</div>
+                        <button type="button" class="btn btn-secondary btn-xs" onclick="openSelectModal('riscos')">+ Adicionar</button>
+                        <div class="item-list" id="permRiscosList"></div>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><span class="section-code">B3</span> EPIs</div>
+                        <button type="button" class="btn btn-secondary btn-xs" onclick="openSelectModal('epi')">+ Adicionar</button>
+                        <div class="item-list" id="permEpiList"></div>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><span class="section-code">B4</span> Medidas Adicionais</div>
+                        <button type="button" class="btn btn-secondary btn-xs" onclick="openSelectModal('medidas')">+ Adicionar</button>
+                        <div class="item-list" id="permMedidasList"></div>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><span class="section-code">C1</span> Bloqueios</div>
+                        <div class="radio-group" id="bloqueioGroup">
+                            <div class="radio-item checked" data-value="nao"><input type="radio" name="bloqueio" value="nao" checked><span>Não</span></div>
+                            <div class="radio-item" data-value="sim"><input type="radio" name="bloqueio" value="sim"><span>Sim</span></div>
+                        </div>
+                        <div id="bloqueiosContainer" style="display: none; margin-top: 15px;">
+                            <button type="button" class="btn btn-secondary btn-xs" onclick="openModal('modalAddBloqueio')">+ Adicionar</button>
+                            <div class="item-list" id="permBloqueiosList"></div>
+                        </div>
+                    </div>
+                    <div class="section">
+                        <div class="section-title"><span class="section-code">C2</span> Anotações</div>
+                        <textarea id="permAnotacoes" rows="3" placeholder="Anotações..."></textarea>
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="limparFormPermissao()">Limpar</button>
+                        <button type="submit" class="btn btn-success btn-sm">💾 Salvar</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Permissões Solicitadas -->
+            <div class="page" id="pageSolicitadas">
+                <div class="card">
+                    <div class="card-title">⏳ Permissões Solicitadas</div>
+                    <div class="permission-list" id="listSolicitadas"></div>
+                </div>
+            </div>
+
+            <!-- Permissões Em Execução -->
+            <div class="page" id="pageExecucao">
+                <div class="card">
+                    <div class="card-title">▶️ Permissões Em Execução</div>
+                    <div class="permission-list" id="listExecucao"></div>
+                </div>
+            </div>
+
+            <!-- Permissões Vencidas -->
+            <div class="page" id="pageVencidas">
+                <div class="card">
+                    <div class="card-title">⚠️ Permissões Vencidas</div>
+                    <p style="color: var(--danger); font-size: 0.85rem; margin-bottom: 15px;">
+                        ⚠️ Estas permissões ultrapassaram a data/hora de término programada e precisam ser encerradas ou renovadas.
+                    </p>
+                    <div class="permission-list" id="listVencidas"></div>
+                </div>
+            </div>
+
+            <!-- Permissões Encerradas -->
+            <div class="page" id="pageEncerradas">
+                <div class="card">
+                    <div class="card-title">✅ Permissões Encerradas</div>
+                    <div class="permission-list" id="listEncerradas"></div>
+                </div>
+            </div>
+
+            <!-- Dashboard -->
+            <div class="page" id="pageDashboard">
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-value" id="dashSolicitadas">0</div><div class="stat-label">Solicitadas</div></div>
+                    <div class="stat-card"><div class="stat-value" id="dashExecucao">0</div><div class="stat-label">Em Execução</div></div>
+                    <div class="stat-card"><div class="stat-value" id="dashVencidas">0</div><div class="stat-label">Vencidas</div></div>
+                    <div class="stat-card"><div class="stat-value" id="dashEncerradas">0</div><div class="stat-label">Encerradas</div></div>
+                    <div class="stat-card"><div class="stat-value" id="dashTotal">0</div><div class="stat-label">Total</div></div>
+                </div>
+                <div class="chart-grid">
+                    <div class="card"><div class="card-title">Status</div><div class="chart-container"><canvas id="chartStatus"></canvas></div></div>
+                    <div class="card"><div class="card-title">Tipos de Trabalho</div><div class="chart-container"><canvas id="chartTipos"></canvas></div></div>
+                    <div class="card"><div class="card-title">Mensal</div><div class="chart-container"><canvas id="chartMensal"></canvas></div></div>
+                    <div class="card"><div class="card-title">Top Executores</div><div class="chart-container"><canvas id="chartExecutores"></canvas></div></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="modalNovoUsuario">
+        <div class="modal">
+            <div class="modal-header"><h3>Novo Usuário</h3><button class="modal-close" onclick="closeModal('modalNovoUsuario')">✕</button></div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group full-width"><label>Nome</label><input type="text" id="novoNome"></div>
+                    <div class="form-group"><label>Usuário</label><input type="text" id="novoUsuario" autocomplete="off"></div>
+                    <div class="form-group"><label>Senha</label><input type="password" id="novoSenha" autocomplete="new-password"></div>
+                    <div class="form-group"><label>Setor</label><input type="text" id="novoSetor"></div>
+                    <div class="form-group"><label>Cargo</label><input type="text" id="novoCargo"></div>
+                    <div class="form-group full-width"><label>Empresa</label><input type="text" id="novoEmpresa"></div>
+                    <div class="form-group full-width">
+                        <label>Tipo de Usuário</label>
+                        <div class="checkbox-group" id="tipoUsuarioGroup">
+                            <div class="checkbox-item" data-value="administrador"><input type="checkbox" id="tipoAdmin"><span>Admin</span></div>
+                            <div class="checkbox-item" data-value="supervisor"><input type="checkbox" id="tipoSupervisor"><span>Supervisor</span></div>
+                            <div class="checkbox-item" data-value="autorizador"><input type="checkbox" id="tipoAutorizador"><span>Autorizador</span></div>
+                            <div class="checkbox-item" data-value="executor"><input type="checkbox" id="tipoExecutor"><span>Executor</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-sm" onclick="closeModal('modalNovoUsuario')">Cancelar</button>
+                <button class="btn btn-success btn-sm" onclick="salvarUsuario()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalSafety">
+        <div class="modal">
+            <div class="modal-header"><h3 id="safetyModalTitle">Cadastro</h3><button class="modal-close" onclick="closeModal('modalSafety')">✕</button></div>
+            <div class="modal-body">
+                <div class="form-group"><label id="safetyInputLabel">Nome</label><input type="text" id="safetyInput"></div>
+                <div class="form-group" id="safetyDescGroup" style="display: none;"><label>Descrição</label><textarea id="safetyDesc" rows="2"></textarea></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-sm" onclick="closeModal('modalSafety')">Cancelar</button>
+                <button class="btn btn-success btn-sm" onclick="salvarSafetyItem()">Adicionar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalAddExecutor">
+        <div class="modal">
+            <div class="modal-header"><h3>Adicionar Executor</h3><button class="modal-close" onclick="closeModal('modalAddExecutor')">✕</button></div>
+            <div class="modal-body">
+                <div class="form-group"><label>Nome</label><input type="text" id="executorNome"></div>
+                <div class="form-group"><label>Cargo</label><input type="text" id="executorCargo"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-sm" onclick="closeModal('modalAddExecutor')">Cancelar</button>
+                <button class="btn btn-success btn-sm" onclick="addExecutorToList()">Adicionar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalAddBloqueio">
+        <div class="modal">
+            <div class="modal-header"><h3>Adicionar Bloqueio</h3><button class="modal-close" onclick="closeModal('modalAddBloqueio')">✕</button></div>
+            <div class="modal-body">
+                <div class="form-group"><label>Local</label><input type="text" id="bloqueioLocal"></div>
+                <div class="form-group"><label>Descrição</label><input type="text" id="bloqueioDescricao"></div>
+                <div class="form-group"><label>Nº Cadeado</label><input type="text" id="bloqueioCadeado"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-sm" onclick="closeModal('modalAddBloqueio')">Cancelar</button>
+                <button class="btn btn-success btn-sm" onclick="addBloqueioToList()">Adicionar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalSelectItems">
+        <div class="modal">
+            <div class="modal-header"><h3 id="selectModalTitle">Selecionar</h3><button class="modal-close" onclick="closeModal('modalSelectItems')">✕</button></div>
+            <div class="modal-body"><div class="selectable-list" id="selectableItemsList"></div></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-sm" onclick="closeModal('modalSelectItems')">Cancelar</button>
+                <button class="btn btn-success btn-sm" onclick="confirmSelectItems()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalViewPermissao">
+        <div class="modal modal-xl">
+            <div class="modal-header"><h3>Permissão de Trabalho <span id="viewPermissaoNum"></span></h3><button class="modal-close" onclick="closeModal('modalViewPermissao')">✕</button></div>
+            <div class="modal-body" id="viewPermissaoContent"></div>
+            <div class="modal-footer no-print">
+                <button class="btn btn-secondary btn-sm" onclick="printPermissao()">🖨️ Imprimir</button>
+                <button class="btn btn-secondary btn-sm" onclick="closeModal('modalViewPermissao')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalAssinatura">
+        <div class="modal">
+            <div class="modal-header"><h3>Assinatura Digital</h3><button class="modal-close" onclick="closeModal('modalAssinatura')">✕</button></div>
+            <div class="modal-body">
+                <p id="assinaturaMessage" style="margin-bottom: 15px; color: var(--text-secondary); font-size: 0.9rem;"></p>
+                <div class="form-group">
+                    <label>Digite sua Assinatura</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="inputAssinatura" maxlength="10" inputmode="numeric">
+                        <button type="button" class="password-toggle" onclick="togglePassword('inputAssinatura')">👁</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-sm" onclick="closeModal('modalAssinatura')">Cancelar</button>
+                <button class="btn btn-success btn-sm" onclick="confirmarAssinatura()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalTransfer">
+        <div class="modal">
+            <div class="modal-header"><h3 id="transferTitle">Transferência</h3><button class="modal-close" onclick="closeModal('modalTransfer')">✕</button></div>
+            <div class="modal-body">
+                <p style="margin-bottom: 12px; font-size: 0.9rem;">Responsável atual: <strong id="transferCurrent" style="color: var(--primary);"></strong></p>
+                <div class="form-group"><label>Novo responsável</label><select id="transferSelect"></select></div>
+                <div class="form-group">
+                    <label>Sua Assinatura Digital</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="transferAssinatura" maxlength="10" inputmode="numeric">
+                        <button type="button" class="password-toggle" onclick="togglePassword('transferAssinatura')">👁</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-sm" onclick="closeModal('modalTransfer')">Cancelar</button>
+                <button class="btn btn-warning btn-sm" onclick="solicitarTransferencia()">Solicitar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalAceitarTransfer">
+        <div class="modal">
+            <div class="modal-header"><h3>Aceitar Transferência</h3><button class="modal-close" onclick="closeModal('modalAceitarTransfer')">✕</button></div>
+            <div class="modal-body">
+                <div id="aceitarTransferInfo"></div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Sua Assinatura Digital</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="aceitarTransferAssinatura" maxlength="10" inputmode="numeric">
+                        <button type="button" class="password-toggle" onclick="togglePassword('aceitarTransferAssinatura')">👁</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger btn-sm" onclick="recusarTransferencia()">Recusar</button>
+                <button class="btn btn-success btn-sm" onclick="aceitarTransferencia()">Aceitar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal QR Code - Executor -->
+    <div class="modal-overlay" id="modalQRCode">
+        <div class="modal">
+            <div class="modal-header"><h3>📱 Validação Presencial</h3><button class="modal-close" onclick="cancelarQRCode()">✕</button></div>
+            <div class="modal-body">
+                <div class="qr-container">
+                    <p class="qr-instructions">Peça ao <strong style="color: var(--primary);">Supervisor</strong> para escanear este QR Code</p>
+                    <div class="qr-code-box" id="qrCodeContainer"></div>
+                    <div class="qr-timer" id="qrTimer">30</div>
+                    <p class="qr-instructions">segundos restantes</p>
+                    <div class="qr-status waiting" id="qrStatus">⏳ Aguardando validação...</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger btn-sm" onclick="cancelarQRCode()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Scanner - Supervisor -->
+    <div class="modal-overlay" id="modalScanner">
+        <div class="modal modal-large">
+            <div class="modal-header"><h3>📷 Escanear QR Code</h3><button class="modal-close" onclick="fecharScanner()">✕</button></div>
+            <div class="modal-body">
+                <p style="color: var(--text-secondary); margin-bottom: 15px; text-align: center;">Aponte a câmera para o QR Code do Executor</p>
+                <div id="qr-reader"></div>
+                <div id="scannerResult" style="margin-top: 15px; text-align: center;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-sm" onclick="fecharScanner()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        // CONFIGURAÇÃO DO FIREBASE
+        // ================================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMCFLSKH-Ug61qb-x-b4IUMOP7E6_7r1M",
+            authDomain: "permissao-trabalho-uhevg-95a56.firebaseapp.com",
+            projectId: "permissao-trabalho-uhevg-95a56",
+            storageBucket: "permissao-trabalho-uhevg-95a56.firebasestorage.app",
+            messagingSenderId: "4949368740",
+            appId: "1:4949368740:web:0090e62d1fe1961e1c6b31"
+        };
+        // ================================================================
+
+        let db = null;
+        let firebaseInitialized = false;
+        let unsubscribers = [];
+
+        let currentUser = null;
+        let editingPermissaoId = null;
+        let currentSafetyType = null;
+        let currentSelectType = null;
+        let selectedItems = [];
+        let signatureCallback = null;
+        let transferType = null;
+        let transferPermissaoId = null;
+        let currentNotification = null;
+        let navigationHistory = ['home'];
+        let tempExecutores = [];
+        let tempEquipamentos = [];
+        let tempRiscos = [];
+        let tempEpi = [];
+        let tempMedidas = [];
+        let tempBloqueios = [];
+
+        // ==================== QR CODE SYSTEM ====================
+        let qrCodeInstance = null;
+        let qrTimerInterval = null;
+        let qrValidationListener = null;
+        let currentQRToken = null;
+        let html5QrCode = null;
+        let pendingQRListener = null;
+
+        // Verificar QRs pendentes para o supervisor
+        function setupQRListener() {
+            if (pendingQRListener) pendingQRListener();
+            if (!currentUser || !currentUser.tipos.includes('supervisor')) return;
+            
+            pendingQRListener = db.collection('qr_validations')
+                .where('supervisorId', '==', currentUser.id)
+                .where('validated', '==', false)
+                .onSnapshot(snapshot => {
+                    const pendingQRs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    updateQRBadge(pendingQRs.length);
+                    // Se estiver na página de notificações, atualizar
+                    if (document.getElementById('pageNotificacoes').classList.contains('active')) {
+                        renderQRNotifications(pendingQRs);
+                    }
+                });
+        }
+
+        function updateQRBadge(count) {
+            // Atualiza o badge de notificações se houver QRs pendentes
+            const navBadge = document.getElementById('navNotifBadge');
+            const homeBadge = document.getElementById('homeNotifBadge');
+            const currentCount = cachedNotificacoes.filter(n => n.paraId === currentUser.id && n.status === 'pendente').length;
+            const total = currentCount + count;
+            if (total > 0) {
+                navBadge.textContent = total;
+                navBadge.style.display = 'inline';
+                homeBadge.textContent = total;
+                homeBadge.style.display = 'inline';
+            } else {
+                navBadge.style.display = 'none';
+                homeBadge.style.display = 'none';
+            }
+        }
+
+        function renderQRNotifications(pendingQRs) {
+            const container = document.getElementById('notificacoesList');
+            let html = '';
+            
+            // Renderizar QRs pendentes primeiro
+            pendingQRs.forEach(qr => {
+                const expiresAt = new Date(qr.expiresAt);
+                const now = new Date();
+                if (now < expiresAt) {
+                    html += '<div class="qr-pending-alert" onclick="abrirScanner(\'' + qr.id + '\')">' +
+                        '<h4>📱 VALIDAR QR CODE</h4>' +
+                        '<p><strong>PT #' + String(qr.permissaoNumero).padStart(4, '0') + '</strong> - ' + qr.executorNome + ' aguarda validação</p>' +
+                        '<p style="color: var(--warning); font-size: 0.8rem; margin-top: 5px;">⏰ Clique para abrir a câmera</p>' +
+                    '</div>';
+                }
+            });
+            
+            // Depois as notificações normais de transferência
+            const notifs = cachedNotificacoes.filter(n => n.paraId === currentUser.id && n.status === 'pendente');
+            notifs.forEach(n => {
+                const tipoLabel = { supervisor: 'Supervisor', autorizador: 'Autorizador', executor: 'Executor' };
+                html += '<div class="notification-card pending" onclick="abrirNotificacao(\'' + n.id + '\')">' +
+                    '<div class="notification-icon">🔄</div>' +
+                    '<div class="notification-content">' +
+                        '<h4>Transferência de ' + (tipoLabel[n.tipo] || n.tipo) + '</h4>' +
+                        '<p>PT #' + String(n.permissaoNumero).padStart(4, '0') + ' - ' + n.de + ' → você</p>' +
+                    '</div>' +
+                    '<div class="notification-time">' + formatDate(n.data) + '</div>' +
+                '</div>';
+            });
+            
+            if (html === '') {
+                html = '<p style="color: var(--text-secondary); text-align: center; padding: 30px;">Nenhuma notificação pendente</p>';
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // Executor: Gerar QR Code
+        async function gerarQRCode() {
+            const p = cachedPermissoes.find(perm => perm.id === editingPermissaoId);
+            if (!p) return;
+            
+            // Criar token único
+            currentQRToken = 'QR_' + p.numero + '_' + Date.now();
+            const expiresAt = new Date(Date.now() + 30000); // 30 segundos
+            
+            // Salvar no Firebase
+            await db.collection('qr_validations').doc(currentQRToken).set({
+                permissaoId: editingPermissaoId,
+                permissaoNumero: p.numero,
+                executorId: currentUser.id,
+                executorNome: currentUser.nome,
+                supervisorId: p.supervisorId,
+                supervisorNome: p.supervisor,
+                createdAt: new Date().toISOString(),
+                expiresAt: expiresAt.toISOString(),
+                validated: false
+            });
+            
+            // Limpar container
+            document.getElementById('qrCodeContainer').innerHTML = '';
+            
+            // Gerar QR Code visual
+            qrCodeInstance = new QRCode(document.getElementById('qrCodeContainer'), {
+                text: currentQRToken,
+                width: 200,
+                height: 200,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            
+            // Reset status
+            document.getElementById('qrStatus').className = 'qr-status waiting';
+            document.getElementById('qrStatus').textContent = '⏳ Aguardando ' + p.supervisor + ' validar...';
+            document.getElementById('qrTimer').className = 'qr-timer';
+            
+            // Timer
+            let timeLeft = 30;
+            document.getElementById('qrTimer').textContent = timeLeft;
+            
+            qrTimerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('qrTimer').textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(qrTimerInterval);
+                    document.getElementById('qrTimer').className = 'qr-timer expired';
+                    document.getElementById('qrStatus').className = 'qr-status error';
+                    document.getElementById('qrStatus').textContent = '❌ Tempo expirado!';
+                    db.collection('qr_validations').doc(currentQRToken).delete();
+                    if (qrValidationListener) qrValidationListener();
+                }
+            }, 1000);
+            
+            // Escutar validação
+            qrValidationListener = db.collection('qr_validations').doc(currentQRToken).onSnapshot(async (doc) => {
+                if (doc.exists && doc.data().validated) {
+                    clearInterval(qrTimerInterval);
+                    if (qrValidationListener) qrValidationListener();
+                    
+                    document.getElementById('qrTimer').textContent = '✓';
+                    document.getElementById('qrTimer').className = 'qr-timer success';
+                    document.getElementById('qrStatus').className = 'qr-status success';
+                    document.getElementById('qrStatus').textContent = '✅ Validado por ' + doc.data().validatedBy + '!';
+                    
+                    // Registrar assinatura
+                    await updateDoc('permissoes', editingPermissaoId, {
+                        assinaturaInicioExecutor: new Date().toISOString(),
+                        validacaoPresencial: {
+                            supervisorNome: doc.data().validatedBy,
+                            validadoEm: doc.data().validatedAt
+                        },
+                        status: 'Em Execução'
+                    });
+                    
+                    showToast('Trabalho iniciado com validação presencial!', 'success');
+                    
+                    setTimeout(() => {
+                        closeModal('modalQRCode');
+                        viewPermissao(editingPermissaoId);
+                    }, 1500);
+                }
+            });
+            
+            openModal('modalQRCode');
+        }
+
+        function cancelarQRCode() {
+            clearInterval(qrTimerInterval);
+            if (qrValidationListener) qrValidationListener();
+            if (currentQRToken) {
+                db.collection('qr_validations').doc(currentQRToken).delete().catch(() => {});
+            }
+            closeModal('modalQRCode');
+        }
+
+        // Supervisor: Abrir scanner
+        function abrirScanner(qrId) {
+            document.getElementById('scannerResult').innerHTML = '<p style="color: var(--warning);">📷 Iniciando câmera...</p>';
+            openModal('modalScanner');
+            
+            setTimeout(() => {
+                html5QrCode = new Html5Qrcode("qr-reader");
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    { fps: 10, qrbox: { width: 250, height: 250 } },
+                    async (decodedText) => {
+                        await validarQRCode(decodedText);
+                    },
+                    () => {}
+                ).then(() => {
+                    document.getElementById('scannerResult').innerHTML = '<p style="color: var(--success);">📷 Câmera ativa - Aponte para o QR Code</p>';
+                }).catch((err) => {
+                    document.getElementById('scannerResult').innerHTML = '<p style="color: var(--danger);">❌ Erro na câmera: ' + err + '</p>';
+                });
+            }, 300);
+        }
+
+        function fecharScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().catch(() => {});
+            }
+            closeModal('modalScanner');
+        }
+
+        async function validarQRCode(token) {
+            if (html5QrCode) html5QrCode.stop().catch(() => {});
+            
+            const resultEl = document.getElementById('scannerResult');
+            resultEl.innerHTML = '<p style="color: var(--warning);">⏳ Validando...</p>';
+            
+            try {
+                const doc = await db.collection('qr_validations').doc(token).get();
+                
+                if (!doc.exists) {
+                    resultEl.innerHTML = '<div class="qr-status error">❌ QR Code inválido!</div>';
+                    return;
+                }
+                
+                const data = doc.data();
+                
+                if (new Date() > new Date(data.expiresAt)) {
+                    resultEl.innerHTML = '<div class="qr-status error">❌ QR Code expirado!</div>';
+                    return;
+                }
+                
+                if (data.validated) {
+                    resultEl.innerHTML = '<div class="qr-status warning">⚠️ Já foi validado!</div>';
+                    return;
+                }
+                
+                if (currentUser.id !== data.supervisorId) {
+                    resultEl.innerHTML = '<div class="qr-status error">❌ Você não é o supervisor desta PT!</div>';
+                    return;
+                }
+                
+                // Pedir assinatura
+                const assinatura = prompt('Digite sua assinatura digital para confirmar:');
+                if (!assinatura || assinatura !== currentUser.assinatura) {
+                    resultEl.innerHTML = '<div class="qr-status error">❌ Assinatura inválida!</div>';
+                    return;
+                }
+                
+                // Validar!
+                await db.collection('qr_validations').doc(token).update({
+                    validated: true,
+                    validatedBy: currentUser.nome,
+                    validatedAt: new Date().toISOString()
+                });
+                
+                resultEl.innerHTML = '<div class="qr-status success">✅ Validado com sucesso!<br><br>' +
+                    '<strong>PT #' + String(data.permissaoNumero).padStart(4, '0') + '</strong><br>' +
+                    'Executor: ' + data.executorNome + '</div>';
+                
+                showToast('Presença validada!', 'success');
+                
+                setTimeout(() => fecharScanner(), 2000);
+                
+            } catch (error) {
+                resultEl.innerHTML = '<div class="qr-status error">❌ Erro: ' + error.message + '</div>';
+            }
+        }
+
+        // Modificar assinatura do executor para usar QR
+        function signInicioExecutorComQR() {
+            if (!currentUser.assinatura) {
+                showToast('Configure sua assinatura primeiro!', 'error');
+                closeModal('modalViewPermissao');
+                navigateTo('assinatura');
+                return;
+            }
+            
+            document.getElementById('assinaturaMessage').textContent = 'Digite sua assinatura para gerar o QR Code de validação presencial';
+            signatureCallback = async () => {
+                closeModal('modalAssinatura');
+                await gerarQRCode();
+            };
+            openModal('modalAssinatura');
+        }
+
+        let cachedUsuarios = [];
+        let cachedPermissoes = [];
+        let cachedNotificacoes = [];
+        let cachedRiscos = [];
+        let cachedEpi = [];
+        let cachedMedidas = [];
+        let cachedEquipamentos = [];
+
+        async function initFirebase() {
+            try {
+                if (firebaseConfig.apiKey === "SUA_API_KEY") {
+                    throw new Error("Configure as credenciais do Firebase no código");
+                }
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                try {
+                    await db.enablePersistence({ synchronizeTabs: true });
+                } catch (err) {
+                    console.log("Persistência offline não disponível:", err);
+                }
+                firebaseInitialized = true;
+                updateSyncStatus('online');
+                db.collection('_health').doc('check').onSnapshot(() => {
+                    updateSyncStatus('online');
+                }, () => {
+                    updateSyncStatus('offline');
+                });
+                await initializeDefaultData();
+                setupRealtimeListeners();
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                document.getElementById('loginPage').style.display = 'flex';
+                const statusEl = document.getElementById('firebaseStatus');
+                statusEl.textContent = '✅ Firebase conectado';
+                statusEl.className = 'firebase-status connected';
+            } catch (error) {
+                console.error("Erro ao inicializar Firebase:", error);
+                document.getElementById('loadingOverlay').querySelector('.loading-text').textContent = 'Erro: ' + error.message;
+                document.getElementById('loadingOverlay').querySelector('.loading-text').style.color = 'var(--danger)';
+                const statusEl = document.getElementById('firebaseStatus');
+                statusEl.textContent = '❌ ' + error.message;
+                statusEl.className = 'firebase-status error';
+                setTimeout(() => {
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                    document.getElementById('loginPage').style.display = 'flex';
+                }, 2000);
+            }
+        }
+
+        function updateSyncStatus(status) {
+            const indicator = document.getElementById('syncIndicator');
+            const text = document.getElementById('syncText');
+            indicator.className = 'sync-indicator ' + status;
+            const statusTexts = { online: 'Online', offline: 'Offline', syncing: 'Sincronizando...' };
+            text.textContent = statusTexts[status] || status;
+        }
+
+        async function initializeDefaultData() {
+            const usersRef = db.collection('usuarios');
+            const usersSnapshot = await usersRef.get();
+            if (usersSnapshot.empty) {
+                await usersRef.add({
+                    nome: 'Paulo Henrique Ávila', usuario: 'pauloavila', senha: 'paulo@2025',
+                    setor: 'Operação', cargo: 'Mantenedor', empresa: 'Enel',
+                    tipos: ['administrador', 'supervisor', 'autorizador', 'executor'], assinatura: null,
+                    criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                showToast('Usuário admin criado: pauloavila / paulo@2025', 'warning');
+            }
+            const counterRef = db.collection('config').doc('counters');
+            const counterDoc = await counterRef.get();
+            if (!counterDoc.exists) {
+                await counterRef.set({ permissaoNumero: 0 });
+            }
+        }
+
+        function setupRealtimeListeners() {
+            unsubscribers.forEach(unsub => unsub());
+            unsubscribers = [];
+            unsubscribers.push(
+                db.collection('usuarios').onSnapshot(snapshot => {
+                    cachedUsuarios = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    if (currentUser) {
+                        const updatedUser = cachedUsuarios.find(u => u.id === currentUser.id);
+                        if (updatedUser) {
+                            currentUser = updatedUser;
+                            sessionStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
+                        }
+                        loadSelects();
+                        if (document.getElementById('pageUsuarios').classList.contains('active')) loadUsuarios();
+                    }
+                })
+            );
+            unsubscribers.push(
+                db.collection('permissoes').orderBy('criadoEm', 'desc').onSnapshot(snapshot => {
+                    cachedPermissoes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    checkVencidas();
+                    updateStats();
+                    if (document.getElementById('pageSolicitadas').classList.contains('active')) loadPermissoesSolicitadas();
+                    if (document.getElementById('pageExecucao').classList.contains('active')) loadPermissoesExecucao();
+                    if (document.getElementById('pageVencidas').classList.contains('active')) loadPermissoesVencidas();
+                    if (document.getElementById('pageEncerradas').classList.contains('active')) loadPermissoesEncerradas();
+                    if (document.getElementById('pageDashboard').classList.contains('active')) loadDashboard();
+                })
+            );
+            unsubscribers.push(
+                db.collection('notificacoes').onSnapshot(snapshot => {
+                    cachedNotificacoes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    if (currentUser) {
+                        updateNotificationBadges(); setupQRListener();
+                        if (document.getElementById('pageNotificacoes').classList.contains('active')) loadNotificacoes();
+                    }
+                })
+            );
+            ['riscos', 'epi', 'medidas', 'equipamentos'].forEach(collection => {
+                unsubscribers.push(
+                    db.collection(collection).onSnapshot(snapshot => {
+                        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        switch(collection) {
+                            case 'riscos': cachedRiscos = data; break;
+                            case 'epi': cachedEpi = data; break;
+                            case 'medidas': cachedMedidas = data; break;
+                            case 'equipamentos': cachedEquipamentos = data; break;
+                        }
+                        if (document.getElementById('pageSeguranca').classList.contains('active')) loadSafetyLists();
+                    })
+                );
+            });
+        }
+
+        // Verificar permissões vencidas
+        function checkVencidas() {
+            const now = new Date();
+            cachedPermissoes.forEach(p => {
+                if (p.status === 'Em Execução') {
+                    const termino = new Date(p.dataTermino + 'T' + (p.horaTermino || '23:59'));
+                    if (now > termino) {
+                        // Marcar como vencida no cache local
+                        p.vencida = true;
+                    }
+                }
+            });
+            updateVencidasBadges();
+        }
+
+        function updateVencidasBadges() {
+            const vencidas = cachedPermissoes.filter(p => p.status === 'Em Execução' && p.vencida);
+            const count = vencidas.length;
+            const navBadge = document.getElementById('navVencidasBadge');
+            const homeBadge = document.getElementById('homeVencidasBadge');
+            if (count > 0) {
+                navBadge.textContent = count;
+                navBadge.style.display = 'inline';
+                homeBadge.textContent = count;
+                homeBadge.style.display = 'inline';
+            } else {
+                navBadge.style.display = 'none';
+                homeBadge.style.display = 'none';
+            }
+        }
+
+        function getData(collection) {
+            switch(collection) {
+                case 'usuarios': return cachedUsuarios;
+                case 'permissoes': return cachedPermissoes;
+                case 'notificacoes': return cachedNotificacoes;
+                case 'riscos': return cachedRiscos;
+                case 'epi': return cachedEpi;
+                case 'medidas': return cachedMedidas;
+                case 'equipamentos': return cachedEquipamentos;
+                default: return [];
+            }
+        }
+
+        async function addDoc(collection, data) {
+            updateSyncStatus('syncing');
+            try {
+                const docRef = await db.collection(collection).add({
+                    ...data,
+                    criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                updateSyncStatus('online');
+                return docRef.id;
+            } catch (error) {
+                updateSyncStatus('offline');
+                throw error;
+            }
+        }
+
+        async function updateDoc(collection, id, data) {
+            updateSyncStatus('syncing');
+            try {
+                await db.collection(collection).doc(id).update({
+                    ...data,
+                    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                updateSyncStatus('online');
+            } catch (error) {
+                updateSyncStatus('offline');
+                throw error;
+            }
+        }
+
+        async function deleteDoc(collection, id) {
+            updateSyncStatus('syncing');
+            try {
+                await db.collection(collection).doc(id).delete();
+                updateSyncStatus('online');
+            } catch (error) {
+                updateSyncStatus('offline');
+                throw error;
+            }
+        }
+
+        async function getNextPermissaoNumber() {
+            const counterRef = db.collection('config').doc('counters');
+            const result = await db.runTransaction(async (transaction) => {
+                const counterDoc = await transaction.get(counterRef);
+                const newNumber = (counterDoc.data()?.permissaoNumero || 0) + 1;
+                transaction.update(counterRef, { permissaoNumero: newNumber });
+                return newNumber;
+            });
+            return result;
+        }
+        
+        function showToast(msg, type = 'success') {
+            const c = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = 'toast toast-' + type;
+            const icons = { success: '✅', error: '❌', warning: '⚠️' };
+            t.innerHTML = (icons[type] || '✅') + ' ' + msg;
+            c.appendChild(t);
+            setTimeout(() => t.remove(), 4000);
+        }
+
+        function formatDate(d) { 
+            if (!d) return '-';
+            if (d.toDate) d = d.toDate();
+            return new Date(d).toLocaleDateString('pt-BR'); 
+        }
+        function formatDateTime(d) { 
+            if (!d) return '-';
+            if (d.toDate) d = d.toDate();
+            return new Date(d).toLocaleString('pt-BR'); 
+        }
+        function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
+        function togglePassword(id) { const i = document.getElementById(id); i.type = i.type === 'password' ? 'text' : 'password'; }
+        function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow = 'hidden'; }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); document.body.style.overflow = ''; }
+
+        // Impressão corrigida
+        function printPermissao() {
+            window.print();
+        }
+
+        // CHECKBOX E RADIO HANDLERS
+        function initCheckboxHandlers() {
+            document.querySelectorAll('.checkbox-item').forEach(function(item) {
+                item.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'INPUT') return;
+                    const checkbox = this.querySelector('input[type="checkbox"]');
+                    if (checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        updateCheckboxVisual(this, checkbox.checked);
+                        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                if (checkbox) {
+                    checkbox.addEventListener('change', function() {
+                        updateCheckboxVisual(item, this.checked);
+                    });
+                }
+            });
+            document.querySelectorAll('.radio-item').forEach(function(item) {
+                item.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'INPUT') return;
+                    const radio = this.querySelector('input[type="radio"]');
+                    if (radio && !radio.checked) {
+                        radio.checked = true;
+                        const group = this.parentElement;
+                        group.querySelectorAll('.radio-item').forEach(function(r) { r.classList.remove('checked'); });
+                        this.classList.add('checked');
+                        radio.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+                const radio = item.querySelector('input[type="radio"]');
+                if (radio) {
+                    radio.addEventListener('change', function() {
+                        const group = item.parentElement;
+                        group.querySelectorAll('.radio-item').forEach(function(r) { r.classList.remove('checked'); });
+                        if (this.checked) item.classList.add('checked');
+                    });
+                }
+            });
+        }
+        
+        function updateCheckboxVisual(item, isChecked) {
+            if (isChecked) item.classList.add('checked');
+            else item.classList.remove('checked');
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        function goBack() {
+            if (navigationHistory.length > 1) {
+                navigationHistory.pop();
+                const prevPage = navigationHistory[navigationHistory.length - 1];
+                navigateTo(prevPage, false);
+            }
+        }
+
+        function updateBackButton() {
+            const btn = document.getElementById('btnBack');
+            if (navigationHistory.length > 1) btn.classList.remove('hidden');
+            else btn.classList.add('hidden');
+        }
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnLogin');
+            btn.disabled = true;
+            btn.textContent = 'Entrando...';
+            try {
+                const u = document.getElementById('loginUsername').value.trim();
+                const p = document.getElementById('loginPassword').value;
+                const user = cachedUsuarios.find(x => x.usuario === u && x.senha === p);
+                if (user) {
+                    currentUser = user;
+                    sessionStorage.setItem('ptd_currentUser', JSON.stringify(user));
+                    document.getElementById('loginPage').style.display = 'none';
+                    document.getElementById('appContainer').style.display = 'block';
+                    updateUserInterface();
+                    updateStats();
+                    updateNotificationBadges(); setupQRListener();
+                    navigationHistory = ['home'];
+                    navigateTo('home', false);
+                    showToast('Login realizado!'); setupQRListener();
+                } else {
+                    showToast('Usuário ou senha inválidos!', 'error');
+                }
+            } catch (error) {
+                showToast('Erro ao fazer login: ' + error.message, 'error');
+            }
+            btn.disabled = false;
+            btn.innerHTML = '🔐 Entrar';
+        });
+
+        function logout() {
+            currentUser = null;
+            sessionStorage.removeItem('ptd_currentUser');
+            document.getElementById('appContainer').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            navigationHistory = ['home'];
+        }
+
+        function updateUserInterface() {
+            if (!currentUser) return;
+            const initials = currentUser.nome.split(' ').map(n => n[0]).join('').substr(0, 2);
+            document.getElementById('userName').textContent = currentUser.nome;
+            document.getElementById('userRole').textContent = currentUser.tipos.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(', ');
+            document.getElementById('userAvatar').textContent = initials;
+            document.getElementById('mobileUserName').textContent = currentUser.nome;
+            document.getElementById('mobileUserAvatar').textContent = initials;
+            const isAdmin = currentUser.tipos.includes('administrador');
+            const canSolicitar = isAdmin || currentUser.tipos.includes('supervisor') || currentUser.tipos.includes('autorizador');
+            document.getElementById('navUsuarios').style.display = isAdmin ? 'block' : 'none';
+            document.getElementById('navSeguranca').style.display = isAdmin ? 'block' : 'none';
+            document.getElementById('navSolicitar').style.display = canSolicitar ? 'block' : 'none';
+            document.getElementById('cardSolicitar').style.display = canSolicitar ? 'block' : 'none';
+            loadSelects();
+            checkAssinatura();
+        }
+
+        function checkAssinatura() {
+            const has = currentUser.assinatura !== null;
+            document.getElementById('assinaturaExistente').style.display = has ? 'block' : 'none';
+            document.getElementById('assinaturaForm').style.display = has ? 'none' : 'block';
+        }
+
+        function updateNotificationBadges() {
+            const notifs = cachedNotificacoes.filter(n => n.paraId === currentUser.id && n.status === 'pendente');
+            const count = notifs.length;
+            const navBadge = document.getElementById('navNotifBadge');
+            const homeBadge = document.getElementById('homeNotifBadge');
+            if (count > 0) {
+                navBadge.textContent = count; navBadge.style.display = 'inline';
+                homeBadge.textContent = count; homeBadge.style.display = 'inline';
+            } else {
+                navBadge.style.display = 'none';
+                homeBadge.style.display = 'none';
+            }
+        }
+
+        function loadNotificacoes() {
+            // Se for supervisor, buscar QRs pendentes e renderizar junto
+            if (currentUser.tipos.includes('supervisor')) {
+                db.collection('qr_validations')
+                    .where('supervisorId', '==', currentUser.id)
+                    .where('validated', '==', false)
+                    .get()
+                    .then(snapshot => {
+                        const pendingQRs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+                            .filter(qr => new Date() < new Date(qr.expiresAt));
+                        renderQRNotifications(pendingQRs);
+                    });
+            } else {
+                // Renderizar só notificações normais
+                renderQRNotifications([]);
+            }
+        }
+
+        function abrirNotificacao(notifId) {
+            const notif = cachedNotificacoes.find(n => n.id === notifId);
+            if (!notif) return;
+            currentNotification = notif;
+            const tipoLabel = { supervisor: 'Supervisor', autorizador: 'Autorizador', executor: 'Executor' };
+            document.getElementById('aceitarTransferInfo').innerHTML = 
+                '<div class="section" style="margin-bottom: 0;">' +
+                    '<p><strong>Permissão:</strong> #' + String(notif.permissaoNumero).padStart(4, '0') + '</p>' +
+                    '<p><strong>Tipo:</strong> ' + tipoLabel[notif.tipo] + '</p>' +
+                    '<p><strong>De:</strong> ' + notif.de + '</p>' +
+                    '<p><strong>Para:</strong> ' + notif.para + ' (você)</p>' +
+                '</div>' +
+                '<p style="margin-top: 12px; color: var(--warning); font-size: 0.85rem;">⚠️ Ao aceitar, você assume a responsabilidade.</p>';
+            openModal('modalAceitarTransfer');
+        }
+
+        async function aceitarTransferencia() {
+            const assinatura = document.getElementById('aceitarTransferAssinatura').value;
+            if (!currentUser.assinatura) { showToast('Configure sua assinatura primeiro!', 'error'); closeModal('modalAceitarTransfer'); navigateTo('assinatura'); return; }
+            if (assinatura !== currentUser.assinatura) { showToast('Assinatura inválida!', 'error'); return; }
+            try {
+                const permissao = cachedPermissoes.find(p => p.id === currentNotification.permissaoId);
+                if (permissao) {
+                    const transferencias = permissao.transferencias || [];
+                    transferencias.push({
+                        tipo: currentNotification.tipo, de: currentNotification.de, deId: currentNotification.deId,
+                        para: currentNotification.para, paraId: currentNotification.paraId,
+                        dataSolicitacao: currentNotification.data, dataAceite: new Date().toISOString(), status: 'aceita'
+                    });
+                    const updateData = { transferencias };
+                    updateData[currentNotification.tipo + 'Id'] = currentNotification.paraId;
+                    updateData[currentNotification.tipo] = currentNotification.para;
+                    await updateDoc('permissoes', permissao.id, updateData);
+                }
+                await updateDoc('notificacoes', currentNotification.id, { status: 'aceita', dataAceite: new Date().toISOString() });
+                closeModal('modalAceitarTransfer');
+                document.getElementById('aceitarTransferAssinatura').value = '';
+                showToast('Transferência aceita!');
+            } catch (error) { showToast('Erro ao aceitar: ' + error.message, 'error'); }
+        }
+
+        async function recusarTransferencia() {
+            if (!confirm('Recusar transferência?')) return;
+            try {
+                await updateDoc('notificacoes', currentNotification.id, { status: 'recusada' });
+                closeModal('modalAceitarTransfer');
+                showToast('Transferência recusada.');
+            } catch (error) { showToast('Erro ao recusar: ' + error.message, 'error'); }
+        }
+
+        function navigateTo(page, addToHistory = true) {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1)).classList.add('active');
+            const titles = {
+                home: 'Página Inicial', usuarios: 'Usuários', assinatura: 'Assinatura Digital',
+                seguranca: 'Segurança', solicitar: 'Nova Permissão', solicitadas: 'Solicitadas',
+                execucao: 'Em Execução', vencidas: 'Vencidas', encerradas: 'Encerradas',
+                dashboard: 'Dashboard', notificacoes: 'Notificações'
+            };
+            const title = titles[page] || page;
+            document.getElementById('pageTitle').textContent = title;
+            document.getElementById('mobileTitle').textContent = title;
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('onclick')?.includes("'" + page + "'")) link.classList.add('active');
+            });
+            if (addToHistory && navigationHistory[navigationHistory.length - 1] !== page) navigationHistory.push(page);
+            updateBackButton();
+            if (page === 'usuarios') loadUsuarios();
+            if (page === 'seguranca') loadSafetyLists();
+            if (page === 'solicitadas') loadPermissoesSolicitadas();
+            if (page === 'execucao') loadPermissoesExecucao();
+            if (page === 'vencidas') loadPermissoesVencidas();
+            if (page === 'encerradas') loadPermissoesEncerradas();
+            if (page === 'dashboard') loadDashboard();
+            if (page === 'assinatura') checkAssinatura();
+            if (page === 'home') { updateStats(); updateNotificationBadges(); }
+            if (page === 'notificacoes') loadNotificacoes();
+            window.scrollTo(0, 0);
+        }
+
+        function loadUsuarios() {
+            document.getElementById('usuariosTableBody').innerHTML = cachedUsuarios.map(u => 
+                '<tr onclick="event.stopPropagation()"><td>' + u.nome + '</td><td>' + u.usuario + '</td><td>' + u.cargo + '</td><td>' + 
+                u.tipos.map(t => '<span class="badge badge-info">' + t.substr(0,3) + '</span>').join(' ') + '</td><td>' +
+                '<button class="btn btn-danger btn-xs" onclick="deleteUsuario(\'' + u.id + '\')">🗑️</button></td></tr>'
+            ).join('');
+        }
+
+        async function salvarUsuario() {
+            const tipos = [];
+            if (document.getElementById('tipoAdmin').checked) tipos.push('administrador');
+            if (document.getElementById('tipoSupervisor').checked) tipos.push('supervisor');
+            if (document.getElementById('tipoAutorizador').checked) tipos.push('autorizador');
+            if (document.getElementById('tipoExecutor').checked) tipos.push('executor');
+            if (tipos.length === 0) { showToast('Selecione um tipo!', 'error'); return; }
+            try {
+                await addDoc('usuarios', {
+                    nome: document.getElementById('novoNome').value, usuario: document.getElementById('novoUsuario').value,
+                    senha: document.getElementById('novoSenha').value, setor: document.getElementById('novoSetor').value,
+                    cargo: document.getElementById('novoCargo').value, empresa: document.getElementById('novoEmpresa').value,
+                    tipos: tipos, assinatura: null
+                });
+                closeModal('modalNovoUsuario');
+                ['novoNome','novoUsuario','novoSenha','novoSetor','novoCargo','novoEmpresa'].forEach(id => document.getElementById(id).value = '');
+                ['tipoAdmin','tipoSupervisor','tipoAutorizador','tipoExecutor'].forEach(id => {
+                    document.getElementById(id).checked = false;
+                    document.getElementById(id).parentElement.classList.remove('checked');
+                });
+                showToast('Usuário cadastrado!');
+            } catch (error) { showToast('Erro ao salvar: ' + error.message, 'error'); }
+        }
+
+        async function deleteUsuario(id) {
+            if (!confirm('Excluir usuário?')) return;
+            try { await deleteDoc('usuarios', id); showToast('Usuário excluído!'); }
+            catch (error) { showToast('Erro ao excluir: ' + error.message, 'error'); }
+        }
+
+        async function salvarAssinatura() {
+            const nova = document.getElementById('novaAssinatura').value;
+            const confirmar = document.getElementById('confirmarAssinatura').value;
+            if (!/^\d{6,}$/.test(nova)) { showToast('Mínimo 6 dígitos numéricos!', 'error'); return; }
+            if (nova !== confirmar) { showToast('Assinaturas não coincidem!', 'error'); return; }
+            try {
+                await updateDoc('usuarios', currentUser.id, { assinatura: nova });
+                currentUser.assinatura = nova;
+                sessionStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
+                document.getElementById('novaAssinatura').value = '';
+                document.getElementById('confirmarAssinatura').value = '';
+                checkAssinatura();
+                showToast('Assinatura salva!');
+            } catch (error) { showToast('Erro ao salvar: ' + error.message, 'error'); }
+        }
+
+        function toggleSignatureVisibility() {
+            const d = document.getElementById('signatureDisplay');
+            const t = document.getElementById('toggleText');
+            if (d.textContent.includes('•')) { d.textContent = currentUser.assinatura; t.textContent = '🙈 Ocultar'; }
+            else { d.textContent = '••••••'; t.textContent = '👁 Mostrar'; }
+        }
+
+        function showResetSignature() {
+            document.getElementById('assinaturaExistente').style.display = 'none';
+            document.getElementById('assinaturaForm').style.display = 'block';
+        }
+
+        function openSafetyModal(type) {
+            currentSafetyType = type;
+            const titles = { riscos: 'Cadastrar Risco', epi: 'Cadastrar EPI', medidas: 'Cadastrar Medida', equipamentos: 'Cadastrar Equipamento' };
+            document.getElementById('safetyModalTitle').textContent = titles[type];
+            document.getElementById('safetyInput').value = '';
+            document.getElementById('safetyDesc').value = '';
+            document.getElementById('safetyDescGroup').style.display = type === 'riscos' ? 'block' : 'none';
+            openModal('modalSafety');
+        }
+
+        async function salvarSafetyItem() {
+            const nome = document.getElementById('safetyInput').value.trim();
+            if (!nome) { showToast('Digite um nome!', 'error'); return; }
+            try {
+                await addDoc(currentSafetyType, { nome: nome, descricao: document.getElementById('safetyDesc').value.trim() });
+                closeModal('modalSafety');
+                showToast('Item cadastrado!');
+            } catch (error) { showToast('Erro ao salvar: ' + error.message, 'error'); }
+        }
+
+        function loadSafetyLists() {
+            const collections = {
+                riscos: { data: cachedRiscos, listId: 'listaRiscos' },
+                epi: { data: cachedEpi, listId: 'listaEpi' },
+                medidas: { data: cachedMedidas, listId: 'listaMedidas' },
+                equipamentos: { data: cachedEquipamentos, listId: 'listaEquipamentos' }
+            };
+            Object.keys(collections).forEach(type => {
+                const { data, listId } = collections[type];
+                const list = document.getElementById(listId);
+                if (list) {
+                    list.innerHTML = data.length === 0 ? '<div class="item-list-item" style="color: var(--text-secondary);">Nenhum item</div>' :
+                        data.map(item => '<div class="item-list-item"><span>' + item.nome + '</span>' +
+                            '<button class="btn-remove" onclick="deleteSafetyItem(\'' + type + '\',\'' + item.id + '\')">✕</button></div>').join('');
+                }
+            });
+        }
+
+        async function deleteSafetyItem(type, id) {
+            try { await deleteDoc(type, id); showToast('Removido!'); }
+            catch (error) { showToast('Erro ao remover: ' + error.message, 'error'); }
+        }
+
+        function loadSelects() {
+            ['autorizador', 'supervisor', 'executor'].forEach(tipo => {
+                const users = cachedUsuarios.filter(u => u.tipos.includes(tipo));
+                const sel = document.getElementById('perm' + tipo.charAt(0).toUpperCase() + tipo.slice(1));
+                if (sel) sel.innerHTML = '<option value="">Selecione</option>' + users.map(u => '<option value="' + u.id + '">' + u.nome + '</option>').join('');
+            });
+        }
+
+        function toggleBloqueios() {
+            const sim = document.querySelector('input[name="bloqueio"][value="sim"]');
+            document.getElementById('bloqueiosContainer').style.display = sim && sim.checked ? 'block' : 'none';
+        }
+
+        function addExecutorToList() {
+            const nome = document.getElementById('executorNome').value.trim();
+            const cargo = document.getElementById('executorCargo').value.trim();
+            if (!nome || !cargo) { showToast('Preencha todos!', 'error'); return; }
+            tempExecutores.push({ nome, cargo });
+            renderTempList('listaExecutores', tempExecutores, 'executores');
+            closeModal('modalAddExecutor');
+            document.getElementById('executorNome').value = '';
+            document.getElementById('executorCargo').value = '';
+        }
+
+        function addBloqueioToList() {
+            const local = document.getElementById('bloqueioLocal').value.trim();
+            const descricao = document.getElementById('bloqueioDescricao').value.trim();
+            const cadeado = document.getElementById('bloqueioCadeado').value.trim();
+            if (!local || !descricao || !cadeado) { showToast('Preencha todos!', 'error'); return; }
+            tempBloqueios.push({ local, descricao, cadeado });
+            renderTempList('permBloqueiosList', tempBloqueios, 'bloqueios');
+            closeModal('modalAddBloqueio');
+            document.getElementById('bloqueioLocal').value = '';
+            document.getElementById('bloqueioDescricao').value = '';
+            document.getElementById('bloqueioCadeado').value = '';
+        }
+
+        function openSelectModal(type) {
+            currentSelectType = type;
+            selectedItems = [];
+            const titles = { equipamentos: 'Equipamentos', riscos: 'Riscos', epi: 'EPIs', medidas: 'Medidas' };
+            document.getElementById('selectModalTitle').textContent = titles[type];
+            const data = getData(type);
+            document.getElementById('selectableItemsList').innerHTML = data.length === 0 ?
+                '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">Nenhum item cadastrado</div>' :
+                data.map(item => '<label class="selectable-item"><input type="checkbox" value="' + item.id + '" onchange="toggleSelectItem(\'' + item.id + '\',\'' + item.nome.replace(/'/g, "\\'") + '\')">' + item.nome + '</label>').join('');
+            openModal('modalSelectItems');
+        }
+
+        function toggleSelectItem(id, nome) {
+            const idx = selectedItems.findIndex(i => i.id === id);
+            if (idx === -1) selectedItems.push({ id, nome });
+            else selectedItems.splice(idx, 1);
+        }
+
+        function confirmSelectItems() {
+            const lists = {
+                equipamentos: { temp: tempEquipamentos, listId: 'permEquipamentosList' },
+                riscos: { temp: tempRiscos, listId: 'permRiscosList' },
+                epi: { temp: tempEpi, listId: 'permEpiList' },
+                medidas: { temp: tempMedidas, listId: 'permMedidasList' }
+            };
+            const list = lists[currentSelectType];
+            selectedItems.forEach(item => { if (!list.temp.find(i => i.id === item.id)) list.temp.push(item); });
+            renderTempList(list.listId, list.temp, currentSelectType);
+            closeModal('modalSelectItems');
+        }
+
+        function renderTempList(listId, items, type) {
+            const list = document.getElementById(listId);
+            if (items.length === 0) { list.innerHTML = ''; return; }
+            list.innerHTML = items.map((item, idx) => {
+                let text = type === 'executores' ? item.nome + ' - ' + item.cargo :
+                           type === 'bloqueios' ? item.local + ' (' + item.cadeado + ')' : item.nome;
+                return '<div class="item-list-item"><span>' + text + '</span><button class="btn-remove" onclick="removeFromTempList(\'' + type + '\',' + idx + ')">✕</button></div>';
+            }).join('');
+        }
+
+        function removeFromTempList(type, idx) {
+            const lists = {
+                executores: { temp: tempExecutores, listId: 'listaExecutores' },
+                equipamentos: { temp: tempEquipamentos, listId: 'permEquipamentosList' },
+                riscos: { temp: tempRiscos, listId: 'permRiscosList' },
+                epi: { temp: tempEpi, listId: 'permEpiList' },
+                medidas: { temp: tempMedidas, listId: 'permMedidasList' },
+                bloqueios: { temp: tempBloqueios, listId: 'permBloqueiosList' }
+            };
+            lists[type].temp.splice(idx, 1);
+            renderTempList(lists[type].listId, lists[type].temp, type);
+        }
+
+        function limparFormPermissao() {
+            document.getElementById('formPermissao').reset();
+            tempExecutores = []; tempEquipamentos = []; tempRiscos = []; tempEpi = []; tempMedidas = []; tempBloqueios = [];
+            ['listaExecutores', 'permEquipamentosList', 'permRiscosList', 'permEpiList', 'permMedidasList', 'permBloqueiosList'].forEach(id => document.getElementById(id).innerHTML = '');
+            document.getElementById('bloqueiosContainer').style.display = 'none';
+            document.getElementById('permOutrosTipo').style.display = 'none';
+            document.querySelectorAll('#tipoTrabalhoGroup .checkbox-item').forEach(item => item.classList.remove('checked'));
+            document.querySelectorAll('#bloqueioGroup .radio-item').forEach(item => {
+                item.classList.remove('checked');
+                if (item.dataset.value === 'nao') item.classList.add('checked');
+            });
+        }
+
+        function getSelectedTiposTrabalho() {
+            const tipos = [];
+            document.querySelectorAll('#tipoTrabalhoGroup .checkbox-item').forEach(item => {
+                const cb = item.querySelector('input[type="checkbox"]');
+                if (cb && cb.checked) tipos.push(item.dataset.value);
+            });
+            const outrosIdx = tipos.indexOf('Outros');
+            if (outrosIdx !== -1) {
+                const outrosText = document.getElementById('permOutrosTipo').value.trim();
+                if (outrosText) tipos[outrosIdx] = 'Outros: ' + outrosText;
+            }
+            return tipos;
+        }
+
+        document.getElementById('formPermissao').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            try {
+                const autorizadorId = document.getElementById('permAutorizador').value;
+                const supervisorId = document.getElementById('permSupervisor').value;
+                const executorId = document.getElementById('permExecutor').value;
+                const tiposTrabalho = getSelectedTiposTrabalho();
+                const numero = await getNextPermissaoNumber();
+                await addDoc('permissoes', {
+                    numero: numero, status: 'Solicitada', criadoPor: currentUser.id,
+                    autorizadorId, autorizador: cachedUsuarios.find(u => u.id === autorizadorId)?.nome || '',
+                    supervisorId, supervisor: cachedUsuarios.find(u => u.id === supervisorId)?.nome || '',
+                    executorId, executor: cachedUsuarios.find(u => u.id === executorId)?.nome || '',
+                    local: document.getElementById('permLocal').value,
+                    equipamento: document.getElementById('permEquipamento').value,
+                    descricao: document.getElementById('permDescricao').value,
+                    condicao: document.getElementById('permCondicao').value,
+                    ordemTrabalho: document.getElementById('permOrdem').value,
+                    tiposTrabalho,
+                    dataInicio: document.getElementById('permDataInicio').value,
+                    horaInicio: document.getElementById('permHoraInicio').value,
+                    dataTermino: document.getElementById('permDataTermino').value,
+                    horaTermino: document.getElementById('permHoraTermino').value,
+                    tempoRetorno: document.getElementById('permTempoRetorno').value,
+                    empresa: document.getElementById('permEmpresa').value,
+                    executores: [...tempExecutores],
+                    equipamentosList: [...tempEquipamentos],
+                    riscosList: [...tempRiscos],
+                    epiList: [...tempEpi],
+                    medidasList: [...tempMedidas],
+                    temBloqueio: document.querySelector('input[name="bloqueio"][value="sim"]')?.checked || false,
+                    bloqueios: [...tempBloqueios],
+                    anotacoes: document.getElementById('permAnotacoes').value,
+                    transferencias: [],
+                    assinaturaInicioAutorizador: null, assinaturaInicioSupervisor: null, assinaturaInicioExecutor: null,
+                    assinaturaTerminoExecutor: null, assinaturaTerminoSupervisor: null, assinaturaTerminoAutorizador: null,
+                    equipamentoRetornou: true, justificativaNaoRetorno: ''
+                });
+                limparFormPermissao();
+                showToast('Permissão criada!');
+                navigateTo('solicitadas');
+            } catch (error) { showToast('Erro ao criar permissão: ' + error.message, 'error'); }
+        });
+
+        // Renderizar card de permissão
+        function renderPermissionCard(p, showExpired = false) {
+            const now = new Date();
+            const termino = new Date(p.dataTermino + 'T' + (p.horaTermino || '23:59'));
+            const isExpired = p.status === 'Em Execução' && now > termino;
+            const cardClass = isExpired ? 'expired' : '';
+            
+            const badgeMap = {
+                'Solicitada': '<span class="badge badge-warning">Solicitada</span>',
+                'Em Execução': isExpired ? '<span class="badge badge-danger">Vencida</span>' : '<span class="badge badge-info">Em Execução</span>',
+                'Encerrada': '<span class="badge badge-success">Encerrada</span>'
+            };
+            
+            return '<div class="permission-card ' + cardClass + '" onclick="viewPermissao(\'' + p.id + '\')">' +
+                '<div class="permission-card-header">' +
+                    '<span class="permission-card-num">PT #' + String(p.numero).padStart(4, '0') + '</span>' +
+                    '<span class="permission-card-date">' + formatDate(p.dataInicio) + ' - ' + formatDate(p.dataTermino) + '</span>' +
+                '</div>' +
+                '<div class="permission-card-desc">' + (p.descricao || 'Sem descrição') + '</div>' +
+                '<div class="permission-card-footer">' +
+                    '<div class="permission-card-info"><strong>Local:</strong> ' + (p.local || '-') + ' | <strong>Executor:</strong> ' + (p.executor || '-').split(' ')[0] + '</div>' +
+                    badgeMap[p.status] +
+                '</div>' +
+            '</div>';
+        }
+
+        function loadPermissoesSolicitadas() {
+            const permissoes = cachedPermissoes.filter(p => p.status === 'Solicitada');
+            const container = document.getElementById('listSolicitadas');
+            container.innerHTML = permissoes.length === 0 ?
+                '<p style="color: var(--text-secondary); text-align: center; padding: 30px;">Nenhuma permissão solicitada</p>' :
+                permissoes.map(p => renderPermissionCard(p)).join('');
+        }
+
+        function loadPermissoesExecucao() {
+            const permissoes = cachedPermissoes.filter(p => p.status === 'Em Execução' && !p.vencida);
+            const container = document.getElementById('listExecucao');
+            container.innerHTML = permissoes.length === 0 ?
+                '<p style="color: var(--text-secondary); text-align: center; padding: 30px;">Nenhuma permissão em execução</p>' :
+                permissoes.map(p => renderPermissionCard(p)).join('');
+        }
+
+        function loadPermissoesVencidas() {
+            const permissoes = cachedPermissoes.filter(p => p.status === 'Em Execução' && p.vencida);
+            const container = document.getElementById('listVencidas');
+            container.innerHTML = permissoes.length === 0 ?
+                '<p style="color: var(--text-secondary); text-align: center; padding: 30px;">Nenhuma permissão vencida</p>' :
+                permissoes.map(p => renderPermissionCard(p, true)).join('');
+        }
+
+        function loadPermissoesEncerradas() {
+            const permissoes = cachedPermissoes.filter(p => p.status === 'Encerrada');
+            const container = document.getElementById('listEncerradas');
+            container.innerHTML = permissoes.length === 0 ?
+                '<p style="color: var(--text-secondary); text-align: center; padding: 30px;">Nenhuma permissão encerrada</p>' :
+                permissoes.map(p => renderPermissionCard(p)).join('');
+        }
+
+        // View Permission - Com descrição completa de bloqueios
+        function viewPermissao(id) {
+            const p = cachedPermissoes.find(perm => perm.id === id);
+            if (!p) return;
+            editingPermissaoId = id;
+            document.getElementById('viewPermissaoNum').textContent = '#' + String(p.numero).padStart(4, '0');
+            
+            const now = new Date();
+            const termino = new Date(p.dataTermino + 'T' + (p.horaTermino || '23:59'));
+            const isExpired = p.status === 'Em Execução' && now > termino;
+            
+            const statusBadge = { 
+                'Solicitada': '<span class="badge badge-warning">Solicitada</span>', 
+                'Em Execução': isExpired ? '<span class="badge badge-danger">VENCIDA</span>' : '<span class="badge badge-info">Em Execução</span>', 
+                'Encerrada': '<span class="badge badge-success">Encerrada</span>' 
+            };
+            
+            let content = '<div style="margin-bottom: 12px;">' + statusBadge[p.status];
+            if (isExpired) {
+                content += '<p style="color: var(--danger); font-size: 0.85rem; margin-top: 8px;">⚠️ Esta permissão ultrapassou a data/hora de término programada!</p>';
+            }
+            content += '</div>';
+            
+            // A1 - Responsabilidades
+            content += '<div class="section"><div class="section-title"><span class="section-code">A1</span> Responsabilidades</div>';
+            content += '<p><strong>Autorizador:</strong> ' + p.autorizador + '</p>';
+            content += '<p><strong>Supervisor:</strong> ' + p.supervisor + '</p>';
+            content += '<p><strong>Executor:</strong> ' + p.executor + '</p></div>';
+            
+            // A2 - Trabalho
+            content += '<div class="section"><div class="section-title"><span class="section-code">A2</span> Descrição do Trabalho</div>';
+            content += '<p><strong>Local:</strong> ' + (p.local || '-') + '</p>';
+            content += '<p><strong>Equipamento:</strong> ' + (p.equipamento || '-') + '</p>';
+            content += '<p><strong>Descrição:</strong> ' + (p.descricao || '-') + '</p>';
+            if (p.condicao) content += '<p><strong>Condição Requerida:</strong> ' + p.condicao + '</p>';
+            if (p.ordemTrabalho) content += '<p><strong>Ordem de Trabalho:</strong> ' + p.ordemTrabalho + '</p>';
+            if (p.tiposTrabalho && p.tiposTrabalho.length > 0) content += '<p><strong>Tipos de Trabalho:</strong> ' + p.tiposTrabalho.join(', ') + '</p>';
+            content += '</div>';
+            
+            // A3 - Programação
+            content += '<div class="section"><div class="section-title"><span class="section-code">A3</span> Programação</div>';
+            content += '<p><strong>Data/Hora Início:</strong> ' + formatDate(p.dataInicio) + ' às ' + (p.horaInicio || '-') + '</p>';
+            content += '<p><strong>Data/Hora Término:</strong> ' + formatDate(p.dataTermino) + ' às ' + (p.horaTermino || '-') + '</p>';
+            if (p.tempoRetorno) content += '<p><strong>Tempo de Retorno:</strong> ' + p.tempoRetorno + ' hora(s)</p>';
+            content += '</div>';
+            
+            // A4 - Empresa
+            content += '<div class="section"><div class="section-title"><span class="section-code">A4</span> Empresa e Executores</div>';
+            content += '<p><strong>Empresa:</strong> ' + (p.empresa || '-') + '</p>';
+            if (p.executores && p.executores.length > 0) {
+                content += '<p><strong>Executores:</strong></p><ul style="margin-left: 20px;">';
+                p.executores.forEach(e => { content += '<li>' + e.nome + ' - ' + e.cargo + '</li>'; });
+                content += '</ul>';
+            }
+            content += '</div>';
+            
+            // B1 - Equipamentos
+            if (p.equipamentosList && p.equipamentosList.length > 0) {
+                content += '<div class="section"><div class="section-title"><span class="section-code">B1</span> Equipamentos</div>';
+                content += '<p>' + p.equipamentosList.map(e => e.nome).join(', ') + '</p></div>';
+            }
+            
+            // B2 - Riscos
+            if (p.riscosList && p.riscosList.length > 0) {
+                content += '<div class="section"><div class="section-title"><span class="section-code">B2</span> Riscos Identificados</div>';
+                content += '<p>' + p.riscosList.map(r => r.nome).join(', ') + '</p></div>';
+            }
+            
+            // B3 - EPIs
+            if (p.epiList && p.epiList.length > 0) {
+                content += '<div class="section"><div class="section-title"><span class="section-code">B3</span> EPIs Requeridos</div>';
+                content += '<p>' + p.epiList.map(e => e.nome).join(', ') + '</p></div>';
+            }
+            
+            // B4 - Medidas
+            if (p.medidasList && p.medidasList.length > 0) {
+                content += '<div class="section"><div class="section-title"><span class="section-code">B4</span> Medidas de Segurança</div>';
+                content += '<p>' + p.medidasList.map(m => m.nome).join(', ') + '</p></div>';
+            }
+            
+            // C1 - Bloqueios - DESCRIÇÃO COMPLETA
+            content += '<div class="section"><div class="section-title"><span class="section-code">C1</span> Bloqueios</div>';
+            if (p.temBloqueio && p.bloqueios && p.bloqueios.length > 0) {
+                content += '<p style="color: var(--warning); margin-bottom: 12px;"><strong>⚠️ Requer Bloqueio</strong></p>';
+                p.bloqueios.forEach(b => {
+                    content += '<div class="bloqueio-item">';
+                    content += '<p><strong>Local:</strong> ' + b.local + '</p>';
+                    content += '<p><strong>Descrição:</strong> ' + b.descricao + '</p>';
+                    content += '<p><strong>Nº Cadeado:</strong> ' + b.cadeado + '</p>';
+                    content += '</div>';
+                });
+            } else {
+                content += '<p style="color: var(--success);">✓ Não requer bloqueio</p>';
+            }
+            content += '</div>';
+            
+            // C2 - Anotações
+            if (p.anotacoes) {
+                content += '<div class="section"><div class="section-title"><span class="section-code">C2</span> Anotações</div>';
+                content += '<p>' + p.anotacoes + '</p></div>';
+            }
+            
+            // D1 - Transferências
+            content += '<div class="section"><div class="section-title"><span class="section-code">D1</span> Transferências de Responsabilidade</div>';
+            ['supervisor', 'autorizador', 'executor'].forEach(tipo => {
+                const transfers = (p.transferencias || []).filter(t => t.tipo === tipo);
+                const pendingNotif = cachedNotificacoes.find(n => n.permissaoId === p.id && n.tipo === tipo && n.status === 'pendente');
+                const tipoLabel = tipo.charAt(0).toUpperCase() + tipo.slice(1);
+                content += '<div class="transfer-status ' + (transfers.length > 0 ? 'completed' : pendingNotif ? 'pending' : '') + '" style="font-size: 0.9rem;">';
+                content += '<strong>' + tipoLabel + ':</strong> ' + p[tipo];
+                if (pendingNotif) {
+                    content += '<div style="margin-top: 8px; color: var(--warning);">⏳ Transferência pendente para ' + pendingNotif.para + '</div>';
+                } else if (transfers.length > 0) {
+                    const last = transfers[transfers.length - 1];
+                    content += '<div style="margin-top: 8px; color: var(--success);">✓ Transferido de ' + last.de + ' em ' + formatDateTime(last.dataAceite) + '</div>';
+                }
+                if (p.status === 'Em Execução' && currentUser.id === p[tipo + 'Id'] && !pendingNotif) {
+                    content += '<button class="btn btn-warning btn-xs" style="margin-top: 8px;" onclick="openTransferModal(\'' + tipo + '\', \'' + p.id + '\')">🔄 Transferir</button>';
+                }
+                content += '</div>';
+            });
+            content += '</div>';
+            
+            // E1 - Assinaturas de Início
+            if (p.status === 'Solicitada' || p.status === 'Em Execução' || p.status === 'Encerrada') {
+                content += '<div class="section"><div class="section-title"><span class="section-code">E1</span> Assinaturas de Início</div>';
+                // Autorizador
+                content += '<div class="signature-box ' + (p.assinaturaInicioAutorizador ? 'signed' : '') + '"><div class="signature-info"><span class="signature-name">' + p.autorizador + '</span><span class="signature-role">Autorizador - Confirma condições e bloqueios</span>';
+                if (p.assinaturaInicioAutorizador) content += '<span class="signature-timestamp">✓ Assinado em ' + formatDateTime(p.assinaturaInicioAutorizador) + '</span>';
+                content += '</div>';
+                if (!p.assinaturaInicioAutorizador && p.status === 'Solicitada' && currentUser.id === p.autorizadorId) {
+                    content += '<button class="btn btn-success btn-xs" onclick="signInicio(\'autorizador\')">Assinar</button>';
+                }
+                content += '</div>';
+                // Supervisor
+                content += '<div class="signature-box ' + (p.assinaturaInicioSupervisor ? 'signed' : '') + '"><div class="signature-info"><span class="signature-name">' + p.supervisor + '</span><span class="signature-role">Supervisor - Confere bloqueios e condições</span>';
+                if (p.assinaturaInicioSupervisor) content += '<span class="signature-timestamp">✓ Assinado em ' + formatDateTime(p.assinaturaInicioSupervisor) + '</span>';
+                content += '</div>';
+                if (!p.assinaturaInicioSupervisor && p.assinaturaInicioAutorizador && p.status === 'Solicitada' && currentUser.id === p.supervisorId) {
+                    content += '<button class="btn btn-success btn-xs" onclick="signInicio(\'supervisor\')">Assinar</button>';
+                }
+                content += '</div>';
+                // Executor
+                content += '<div class="signature-box ' + (p.assinaturaInicioExecutor ? 'signed' : '') + '"><div class="signature-info"><span class="signature-name">' + p.executor + '</span><span class="signature-role">Executor - Inicia o trabalho</span>';
+                if (p.assinaturaInicioExecutor) content += '<span class="signature-timestamp">✓ Assinado em ' + formatDateTime(p.assinaturaInicioExecutor) + '</span>';
+                content += '</div>';
+                if (!p.assinaturaInicioExecutor && p.assinaturaInicioSupervisor && p.status === 'Solicitada' && currentUser.id === p.executorId) {
+                    content += '<button class="btn btn-success btn-xs" onclick="signInicioExecutorComQR()">📱 Assinar com QR</button>';
+                }
+                content += '</div>';
+                content += '</div>';
+            }
+            
+            // E2 - Assinaturas de Término
+            if (p.status === 'Em Execução' || p.status === 'Encerrada') {
+                content += '<div class="section"><div class="section-title"><span class="section-code">E2</span> Assinaturas de Término</div>';
+                // Executor
+                content += '<div class="signature-box ' + (p.assinaturaTerminoExecutor ? 'signed' : '') + '"><div class="signature-info"><span class="signature-name">' + p.executor + '</span><span class="signature-role">Executor - Trabalho concluído</span>';
+                if (p.assinaturaTerminoExecutor) content += '<span class="signature-timestamp">✓ Assinado em ' + formatDateTime(p.assinaturaTerminoExecutor) + '</span>';
+                content += '</div>';
+                if (!p.assinaturaTerminoExecutor && p.status === 'Em Execução' && currentUser.id === p.executorId) {
+                    content += '<button class="btn btn-success btn-xs" onclick="signTermino(\'executor\')">Assinar</button>';
+                }
+                content += '</div>';
+                // Supervisor
+                content += '<div class="signature-box ' + (p.assinaturaTerminoSupervisor ? 'signed' : '') + '"><div class="signature-info"><span class="signature-name">' + p.supervisor + '</span><span class="signature-role">Supervisor - Confere término</span>';
+                if (p.assinaturaTerminoSupervisor) content += '<span class="signature-timestamp">✓ Assinado em ' + formatDateTime(p.assinaturaTerminoSupervisor) + '</span>';
+                content += '</div>';
+                if (!p.assinaturaTerminoSupervisor && p.assinaturaTerminoExecutor && p.status === 'Em Execução' && currentUser.id === p.supervisorId) {
+                    content += '<button class="btn btn-success btn-xs" onclick="signTermino(\'supervisor\')">Assinar</button>';
+                }
+                content += '</div>';
+                // Autorizador
+                content += '<div class="signature-box ' + (p.assinaturaTerminoAutorizador ? 'signed' : '') + '"><div class="signature-info"><span class="signature-name">' + p.autorizador + '</span><span class="signature-role">Autorizador - Encerra permissão</span>';
+                if (p.assinaturaTerminoAutorizador) content += '<span class="signature-timestamp">✓ Assinado em ' + formatDateTime(p.assinaturaTerminoAutorizador) + '</span>';
+                content += '</div>';
+                if (!p.assinaturaTerminoAutorizador && p.assinaturaTerminoSupervisor && p.status === 'Em Execução' && currentUser.id === p.autorizadorId) {
+                    content += '<button class="btn btn-success btn-xs" onclick="signTermino(\'autorizador\')">Assinar</button>';
+                }
+                content += '</div>';
+                // Equipamento não retornou
+                if (!p.equipamentoRetornou && p.status === 'Encerrada') {
+                    content += '<div style="margin-top: 10px; padding: 12px; background: rgba(255,51,102,0.1); border: 1px solid var(--danger); border-radius: 8px;">';
+                    content += '<p style="color: var(--danger); font-weight: 600;">⚠️ Equipamento não retornou</p>';
+                    content += '<p style="margin-top: 5px;">' + (p.justificativaNaoRetorno || 'Sem justificativa') + '</p>';
+                    content += '</div>';
+                }
+                content += '</div>';
+            }
+            
+            document.getElementById('viewPermissaoContent').innerHTML = content;
+            openModal('modalViewPermissao');
+        }
+
+        function openTransferModal(type, permissaoId) {
+            transferType = type;
+            transferPermissaoId = permissaoId;
+            const p = cachedPermissoes.find(perm => perm.id === permissaoId);
+            const tipoLabel = type.charAt(0).toUpperCase() + type.slice(1);
+            document.getElementById('transferTitle').textContent = 'Transferir ' + tipoLabel;
+            document.getElementById('transferCurrent').textContent = p[type];
+            const typeUsers = cachedUsuarios.filter(u => u.tipos.includes(type) && u.id !== p[type + 'Id']);
+            document.getElementById('transferSelect').innerHTML = '<option value="">Selecione...</option>' + typeUsers.map(u => '<option value="' + u.id + '">' + u.nome + '</option>').join('');
+            document.getElementById('transferAssinatura').value = '';
+            openModal('modalTransfer');
+        }
+
+        async function solicitarTransferencia() {
+            const novoId = document.getElementById('transferSelect').value;
+            const assinatura = document.getElementById('transferAssinatura').value;
+            if (!novoId) { showToast('Selecione!', 'error'); return; }
+            if (!currentUser.assinatura) { showToast('Configure assinatura!', 'error'); closeModal('modalTransfer'); navigateTo('assinatura'); return; }
+            if (assinatura !== currentUser.assinatura) { showToast('Assinatura inválida!', 'error'); return; }
+            try {
+                const p = cachedPermissoes.find(perm => perm.id === transferPermissaoId);
+                const novoUsuario = cachedUsuarios.find(u => u.id === novoId);
+                await addDoc('notificacoes', {
+                    permissaoId: transferPermissaoId, permissaoNumero: p.numero, tipo: transferType,
+                    deId: currentUser.id, de: currentUser.nome, paraId: novoId, para: novoUsuario.nome,
+                    data: new Date().toISOString(), status: 'pendente'
+                });
+                closeModal('modalTransfer');
+                closeModal('modalViewPermissao');
+                document.getElementById('transferAssinatura').value = '';
+                showToast('Solicitação enviada!');
+            } catch (error) { showToast('Erro: ' + error.message, 'error'); }
+        }
+
+        function signInicio(role) {
+            const msgs = { autorizador: 'Confirmar bloqueios e condições de segurança?', supervisor: 'Conferir bloqueios e autorizar início?', executor: 'Iniciar o trabalho?' };
+            document.getElementById('assinaturaMessage').textContent = msgs[role];
+            signatureCallback = async () => {
+                try {
+                    const updateData = {};
+                    updateData['assinaturaInicio' + role.charAt(0).toUpperCase() + role.slice(1)] = new Date().toISOString();
+                    if (role === 'executor') updateData.status = 'Em Execução';
+                    await updateDoc('permissoes', editingPermissaoId, updateData);
+                    viewPermissao(editingPermissaoId);
+                    showToast('Assinado!');
+                } catch (error) { showToast('Erro: ' + error.message, 'error'); }
+            };
+            openModal('modalAssinatura');
+        }
+
+        function signTermino(role) {
+            if (role === 'autorizador') {
+                document.getElementById('assinaturaMessage').innerHTML = 'Equipamento/ferramenta retornou ao local de origem?<div style="margin-top: 12px;"><label class="radio-item checked" style="display: inline-flex; margin-right: 10px;"><input type="radio" name="equipRetornou" value="sim" checked><span>Sim</span></label><label class="radio-item" style="display: inline-flex;"><input type="radio" name="equipRetornou" value="nao"><span>Não</span></label><div id="justificativaContainer" style="display: none; margin-top: 10px;"><textarea id="justificativaNaoRetorno" rows="2" placeholder="Justifique o motivo..." style="width: 100%; padding: 10px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 0.9rem;"></textarea></div></div>';
+                setTimeout(() => {
+                    document.querySelectorAll('input[name="equipRetornou"]').forEach(radio => {
+                        radio.addEventListener('change', function() { 
+                            document.getElementById('justificativaContainer').style.display = this.value === 'nao' ? 'block' : 'none'; 
+                            document.querySelectorAll('input[name="equipRetornou"]').forEach(r => {
+                                r.parentElement.classList.toggle('checked', r.checked);
+                            });
+                        });
+                    });
+                }, 100);
+                signatureCallback = async () => {
+                    try {
+                        const equipRetornou = document.querySelector('input[name="equipRetornou"]:checked').value === 'sim';
+                        const updateData = {
+                            assinaturaTerminoAutorizador: new Date().toISOString(),
+                            status: 'Encerrada',
+                            equipamentoRetornou: equipRetornou
+                        };
+                        if (!equipRetornou) updateData.justificativaNaoRetorno = document.getElementById('justificativaNaoRetorno')?.value || '';
+                        await updateDoc('permissoes', editingPermissaoId, updateData);
+                        viewPermissao(editingPermissaoId);
+                        showToast('Permissão encerrada!');
+                    } catch (error) { showToast('Erro: ' + error.message, 'error'); }
+                };
+            } else {
+                const msgs = { executor: 'Trabalho concluído. Confirmar término?', supervisor: 'Conferir conclusão do trabalho?' };
+                document.getElementById('assinaturaMessage').textContent = msgs[role];
+                signatureCallback = async () => {
+                    try {
+                        const updateData = {};
+                        updateData['assinaturaTermino' + role.charAt(0).toUpperCase() + role.slice(1)] = new Date().toISOString();
+                        await updateDoc('permissoes', editingPermissaoId, updateData);
+                        viewPermissao(editingPermissaoId);
+                        showToast('Assinado!');
+                    } catch (error) { showToast('Erro: ' + error.message, 'error'); }
+                };
+            }
+            openModal('modalAssinatura');
+        }
+
+        function confirmarAssinatura() {
+            const assinatura = document.getElementById('inputAssinatura').value;
+            if (!currentUser.assinatura) { showToast('Configure assinatura!', 'error'); closeModal('modalAssinatura'); navigateTo('assinatura'); return; }
+            if (assinatura !== currentUser.assinatura) { showToast('Assinatura inválida!', 'error'); return; }
+            closeModal('modalAssinatura');
+            document.getElementById('inputAssinatura').value = '';
+            if (signatureCallback) { signatureCallback(); signatureCallback = null; }
+        }
+
+        function updateStats() {
+            const vencidas = cachedPermissoes.filter(p => p.status === 'Em Execução' && p.vencida).length;
+            const execucao = cachedPermissoes.filter(p => p.status === 'Em Execução' && !p.vencida).length;
+            document.getElementById('statSolicitadas').textContent = cachedPermissoes.filter(p => p.status === 'Solicitada').length;
+            document.getElementById('statExecucao').textContent = execucao;
+            document.getElementById('statVencidas').textContent = vencidas;
+            document.getElementById('statEncerradas').textContent = cachedPermissoes.filter(p => p.status === 'Encerrada').length;
+            document.getElementById('statTotal').textContent = cachedPermissoes.length;
+        }
+
+        let chartStatus, chartTipos, chartMensal, chartExecutores;
+        function loadDashboard() {
+            const permissoes = cachedPermissoes;
+            const sol = permissoes.filter(p => p.status === 'Solicitada').length;
+            const venc = permissoes.filter(p => p.status === 'Em Execução' && p.vencida).length;
+            const exe = permissoes.filter(p => p.status === 'Em Execução' && !p.vencida).length;
+            const enc = permissoes.filter(p => p.status === 'Encerrada').length;
+            document.getElementById('dashSolicitadas').textContent = sol;
+            document.getElementById('dashExecucao').textContent = exe;
+            document.getElementById('dashVencidas').textContent = venc;
+            document.getElementById('dashEncerradas').textContent = enc;
+            document.getElementById('dashTotal').textContent = permissoes.length;
+            if (chartStatus) chartStatus.destroy();
+            if (chartTipos) chartTipos.destroy();
+            if (chartMensal) chartMensal.destroy();
+            if (chartExecutores) chartExecutores.destroy();
+            const chartOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#a0a0c0', boxWidth: 12, font: { size: 11 } } } } };
+            chartStatus = new Chart(document.getElementById('chartStatus').getContext('2d'), {
+                type: 'doughnut', data: { labels: ['Solic.', 'Exec.', 'Venc.', 'Enc.'], datasets: [{ data: [sol, exe, venc, enc], backgroundColor: ['#ffaa00', '#00f0ff', '#ff3366', '#00ff88'], borderWidth: 0 }] },
+                options: { ...chartOpts, plugins: { legend: { position: 'bottom', labels: chartOpts.plugins.legend.labels } } }
+            });
+            const tiposCount = {};
+            permissoes.forEach(p => { (p.tiposTrabalho || []).forEach(t => { tiposCount[t] = (tiposCount[t] || 0) + 1; }); });
+            chartTipos = new Chart(document.getElementById('chartTipos').getContext('2d'), {
+                type: 'bar', data: { labels: Object.keys(tiposCount).map(l => l.substr(0,8)), datasets: [{ data: Object.values(tiposCount), backgroundColor: '#7b2dff', borderRadius: 4 }] },
+                options: { ...chartOpts, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#a0a0c0', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#a0a0c0' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+            });
+            const monthlyCount = {};
+            permissoes.forEach(p => { 
+                let d = p.criadoEm;
+                if (d && d.toDate) d = d.toDate();
+                if (d) { d = new Date(d); const k = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); monthlyCount[k] = (monthlyCount[k] || 0) + 1; }
+            });
+            const months = Object.keys(monthlyCount).sort();
+            chartMensal = new Chart(document.getElementById('chartMensal').getContext('2d'), {
+                type: 'line', data: { labels: months.map(m => m.substr(5)), datasets: [{ data: months.map(m => monthlyCount[m]), borderColor: '#00f0ff', backgroundColor: 'rgba(0, 240, 255, 0.1)', fill: true, tension: 0.4 }] },
+                options: { ...chartOpts, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#a0a0c0' }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#a0a0c0' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+            });
+            const execCount = {};
+            permissoes.forEach(p => { if (p.executor) execCount[p.executor] = (execCount[p.executor] || 0) + 1; });
+            const top = Object.entries(execCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            chartExecutores = new Chart(document.getElementById('chartExecutores').getContext('2d'), {
+                type: 'bar', data: { labels: top.map(e => e[0].split(' ')[0]), datasets: [{ data: top.map(e => e[1]), backgroundColor: '#ff00aa', borderRadius: 4 }] },
+                options: { ...chartOpts, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#a0a0c0' }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#a0a0c0', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+            });
+        }
+
+        // Verificar vencidas periodicamente
+        setInterval(() => {
+            if (currentUser && cachedPermissoes.length > 0) {
+                checkVencidas();
+            }
+        }, 60000); // Verificar a cada minuto
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initCheckboxHandlers();
+            document.getElementById('cbOutros').addEventListener('change', function() {
+                document.getElementById('permOutrosTipo').style.display = this.checked ? 'block' : 'none';
+            });
+            document.querySelectorAll('#bloqueioGroup .radio-item').forEach(item => {
+                item.addEventListener('click', function() { setTimeout(toggleBloqueios, 50); });
+            });
+            document.querySelectorAll('input[name="bloqueio"]').forEach(radio => {
+                radio.addEventListener('change', toggleBloqueios);
+            });
+            const savedUser = sessionStorage.getItem('ptd_currentUser');
+            if (savedUser) currentUser = JSON.parse(savedUser);
+            initFirebase().then(() => {
+                if (currentUser) {
+                    const userExists = cachedUsuarios.find(u => u.id === currentUser.id);
+                    if (userExists) {
+                        currentUser = userExists;
+                        document.getElementById('loginPage').style.display = 'none';
+                        document.getElementById('appContainer').style.display = 'block';
+                        updateUserInterface();
+                        updateStats();
+                        updateNotificationBadges(); setupQRListener();
+                        navigationHistory = ['home'];
+                        updateBackButton();
+                    } else {
+                        sessionStorage.removeItem('ptd_currentUser');
+                        currentUser = null;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
