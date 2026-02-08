@@ -33,7 +33,6 @@
             --glow-secondary: 0 0 20px rgba(255, 0, 170, 0.3);
             --sidebar-width: 280px;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { font-size: 16px; }
         body {
@@ -44,7 +43,6 @@
             overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
         }
-
         body::before {
             content: '';
             position: fixed;
@@ -56,7 +54,6 @@
             pointer-events: none;
             z-index: -1;
         }
-
         .grid-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -67,7 +64,6 @@
             pointer-events: none;
             z-index: -1;
         }
-
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-dark); }
         ::-webkit-scrollbar-thumb { background: var(--primary-dark); border-radius: 3px; }
@@ -85,7 +81,6 @@
             align-items: center;
             z-index: 9999;
         }
-
         .loading-overlay.hidden { display: none; }
         .loading-spinner {
             width: 50px; height: 50px;
@@ -94,7 +89,6 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-
         @keyframes spin { to { transform: rotate(360deg); } }
         .loading-text {
             margin-top: 20px;
@@ -102,7 +96,6 @@
             color: var(--primary);
             font-size: 0.9rem;
         }
-
         .sync-indicator {
             position: fixed;
             bottom: 20px;
@@ -118,7 +111,6 @@
             z-index: 100;
             transition: all 0.3s ease;
         }
-
         .sync-indicator.online { border-color: var(--success); }
         .sync-indicator.offline { border-color: var(--danger); }
         .sync-indicator.syncing { border-color: var(--warning); }
@@ -127,7 +119,6 @@
             border-radius: 50%;
             background: var(--success);
         }
-
         .sync-indicator.offline .sync-dot { background: var(--danger); }
         .sync-indicator.syncing .sync-dot { background: var(--warning); animation: pulse 1s infinite; }
         
@@ -139,7 +130,6 @@
             min-height: 100vh;
             padding: 20px;
         }
-
         .login-box {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -151,7 +141,6 @@
             overflow: hidden;
             animation: fadeInUp 0.6s ease;
         }
-
         .login-box::before {
             content: '';
             position: absolute;
@@ -159,12 +148,10 @@
             height: 3px;
             background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
         }
-
         .login-logo {
             text-align: center;
             margin-bottom: 30px;
         }
-
         .login-logo h1 {
             font-family: 'Orbitron', sans-serif;
             font-size: clamp(1.2rem, 4vw, 1.6rem);
@@ -175,14 +162,12 @@
             background-clip: text;
             margin-bottom: 8px;
         }
-
         .login-logo p {
             font-family: 'Share Tech Mono', monospace;
             color: var(--text-secondary);
             font-size: 0.85rem;
             letter-spacing: 2px;
         }
-
         .firebase-status {
             text-align: center;
             padding: 10px;
@@ -191,26 +176,22 @@
             font-size: 0.8rem;
             display: none;
         }
-
         .firebase-status.connected {
             display: block;
             background: rgba(0, 255, 136, 0.1);
             border: 1px solid var(--success);
             color: var(--success);
         }
-
         .firebase-status.error {
             display: block;
             background: rgba(255, 51, 102, 0.1);
             border: 1px solid var(--danger);
             color: var(--danger);
         }
-
         .form-group {
             margin-bottom: 20px;
             position: relative;
         }
-
         .form-group label {
             display: block;
             font-size: 0.8rem;
@@ -220,7 +201,6 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-
         .form-group input, .form-group select, .form-group textarea {
             width: 100%;
             padding: 14px 16px;
@@ -233,13 +213,11 @@
             transition: all 0.3s ease;
             -webkit-appearance: none;
         }
-
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: var(--glow-primary);
         }
-
         .form-group input::placeholder { color: var(--text-secondary); }
         .form-group select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2300f0ff' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; padding-right: 40px; }
         
@@ -260,39 +238,33 @@
             gap: 8px;
             touch-action: manipulation;
         }
-
         .btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: var(--bg-dark);
             width: 100%;
         }
-
         .btn-primary:hover:not(:disabled), .btn-primary:active:not(:disabled) { box-shadow: var(--glow-primary); transform: translateY(-2px); }
         .btn-secondary {
             background: transparent;
             border: 1px solid var(--primary);
             color: var(--primary);
         }
-
         .btn-secondary:hover, .btn-secondary:active { background: rgba(0, 240, 255, 0.1); }
         .btn-success {
             background: linear-gradient(135deg, var(--success), #00cc6a);
             color: var(--bg-dark);
         }
-
         .btn-success:hover, .btn-success:active { box-shadow: 0 0 20px rgba(0, 255, 136, 0.3); }
         .btn-danger {
             background: linear-gradient(135deg, var(--danger), #cc2952);
             color: var(--text-primary);
         }
-
         .btn-danger:hover, .btn-danger:active { box-shadow: 0 0 20px rgba(255, 51, 102, 0.3); }
         .btn-warning {
             background: linear-gradient(135deg, var(--warning), #cc8800);
             color: var(--bg-dark);
         }
-
         .btn-sm { padding: 10px 16px; font-size: 0.75rem; }
         .btn-xs { padding: 8px 12px; font-size: 0.7rem; }
         
@@ -310,7 +282,6 @@
             z-index: 200;
             flex-direction: column;
         }
-
         .mobile-header-top {
             display: flex;
             align-items: center;
@@ -318,7 +289,6 @@
             padding: 10px 12px;
             min-height: 56px;
         }
-
         .mobile-header-bottom {
             display: flex;
             align-items: center;
@@ -327,7 +297,6 @@
             background: rgba(0, 240, 255, 0.03);
             border-top: 1px solid var(--border-color);
         }
-
         .mobile-user-info {
             display: flex;
             align-items: center;
@@ -335,7 +304,6 @@
             flex: 1;
             min-width: 0;
         }
-
         .mobile-user-avatar {
             width: 32px; height: 32px;
             background: linear-gradient(135deg, var(--primary), var(--accent));
@@ -348,7 +316,6 @@
             font-size: 0.75rem;
             flex-shrink: 0;
         }
-
         .mobile-user-name {
             font-size: 0.85rem;
             font-weight: 600;
@@ -356,7 +323,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
         .mobile-logout {
             padding: 8px 14px;
             background: rgba(255, 51, 102, 0.15);
@@ -370,7 +336,6 @@
             transition: all 0.3s ease;
             white-space: nowrap;
         }
-
         .mobile-logout:hover, .mobile-logout:active { background: var(--danger); color: white; }
         .menu-toggle {
             width: 48px; height: 48px;
@@ -386,7 +351,6 @@
             transition: background 0.3s ease;
             flex-shrink: 0;
         }
-
         .menu-toggle:hover, .menu-toggle:active { background: rgba(0, 240, 255, 0.2); }
         .mobile-title {
             font-family: 'Orbitron', sans-serif;
@@ -399,7 +363,6 @@
             text-overflow: ellipsis;
             padding: 0 10px;
         }
-
         .btn-back {
             width: 48px; height: 48px;
             background: rgba(0, 240, 255, 0.1);
@@ -415,7 +378,6 @@
             transition: all 0.3s ease;
             flex-shrink: 0;
         }
-
         .btn-back:hover, .btn-back:active { background: rgba(0, 240, 255, 0.2); border-color: var(--primary); }
         .btn-back.hidden { visibility: hidden; }
         
@@ -432,7 +394,6 @@
             z-index: 300;
             transition: transform 0.3s ease;
         }
-
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -441,7 +402,6 @@
             background: rgba(0, 0, 0, 0.7);
             z-index: 250;
         }
-
         .sidebar-overlay.active { display: block; }
         .sidebar-logo {
             text-align: center;
@@ -449,7 +409,6 @@
             border-bottom: 1px solid var(--border-color);
             margin-bottom: 20px;
         }
-
         .sidebar-logo h2 {
             font-family: 'Orbitron', sans-serif;
             font-size: 1rem;
@@ -458,14 +417,12 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
         .sidebar-logo p {
             font-family: 'Share Tech Mono', monospace;
             font-size: 0.65rem;
             color: var(--text-secondary);
             margin-top: 5px;
         }
-
         .sidebar-close {
             display: none;
             position: absolute;
@@ -480,7 +437,6 @@
             align-items: center;
             justify-content: center;
         }
-
         .sidebar-close:hover { background: var(--danger); color: white; }
         .nav-menu { list-style: none; }
         .nav-item { margin-bottom: 4px; position: relative; }
@@ -497,14 +453,12 @@
             cursor: pointer;
             font-size: 0.95rem;
         }
-
         .nav-link:hover, .nav-link:active { background: rgba(0, 240, 255, 0.1); color: var(--primary); }
         .nav-link.active {
             background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(123, 45, 255, 0.1));
             color: var(--primary);
             border-left: 3px solid var(--primary);
         }
-
         .nav-section {
             font-size: 0.65rem;
             color: var(--text-secondary);
@@ -513,7 +467,6 @@
             padding: 18px 14px 8px;
             font-weight: 600;
         }
-
         .nav-badge {
             position: absolute;
             right: 12px;
@@ -529,7 +482,6 @@
             text-align: center;
             animation: pulse 2s infinite;
         }
-
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
         
         /* Main Content */
@@ -538,7 +490,6 @@
             min-height: 100vh;
             padding: 25px;
         }
-
         .header {
             display: flex;
             justify-content: space-between;
@@ -549,13 +500,11 @@
             flex-wrap: wrap;
             gap: 15px;
         }
-
         .header h1 {
             font-family: 'Orbitron', sans-serif;
             font-size: clamp(1.2rem, 3vw, 1.6rem);
             font-weight: 600;
         }
-
         .user-info { display: flex; align-items: center; gap: 12px; }
         .user-avatar {
             width: 42px; height: 42px;
@@ -569,7 +518,6 @@
             font-size: 1rem;
             flex-shrink: 0;
         }
-
         .user-details h4 { font-size: 0.9rem; font-weight: 600; }
         .user-details p { font-size: 0.75rem; color: var(--text-secondary); }
         .btn-logout {
@@ -584,7 +532,6 @@
             font-size: 0.85rem;
             transition: all 0.3s ease;
         }
-
         .btn-logout:hover, .btn-logout:active { background: var(--danger); color: white; }
         
         /* Pages */
@@ -603,7 +550,6 @@
             position: relative;
             overflow: hidden;
         }
-
         .card::before {
             content: '';
             position: absolute;
@@ -611,7 +557,6 @@
             height: 2px;
             background: linear-gradient(90deg, var(--primary), transparent);
         }
-
         .card-title {
             font-family: 'Orbitron', sans-serif;
             font-size: 1rem;
@@ -622,7 +567,6 @@
             gap: 10px;
             flex-wrap: wrap;
         }
-
         
         /* Home Grid */
         .home-grid {
@@ -631,7 +575,6 @@
             gap: 15px;
             margin-top: 20px;
         }
-
         .home-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -642,7 +585,6 @@
             position: relative;
             overflow: hidden;
         }
-
         .home-card::before {
             content: '';
             position: absolute;
@@ -652,13 +594,11 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         }
-
         .home-card:hover, .home-card:active {
             transform: translateY(-3px);
             border-color: var(--primary);
             box-shadow: var(--glow-primary);
         }
-
         .home-card:hover::before, .home-card:active::before { opacity: 1; }
         .home-card-icon {
             width: 50px; height: 50px;
@@ -670,14 +610,12 @@
             margin-bottom: 15px;
             font-size: 1.5rem;
         }
-
         .home-card h3 {
             font-family: 'Orbitron', sans-serif;
             font-size: 0.85rem;
             font-weight: 600;
             margin-bottom: 8px;
         }
-
         .home-card p { color: var(--text-secondary); font-size: 0.8rem; line-height: 1.4; display: none; }
         .home-card .notif-count {
             position: absolute;
@@ -690,7 +628,6 @@
             padding: 4px 10px;
             border-radius: 12px;
         }
-
         
         /* Stats Grid */
         .stats-grid {
@@ -699,7 +636,6 @@
             gap: 12px;
             margin-bottom: 25px;
         }
-
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -707,7 +643,6 @@
             padding: 18px 15px;
             text-align: center;
         }
-
         .stat-value {
             font-family: 'Orbitron', sans-serif;
             font-size: clamp(1.5rem, 5vw, 2.2rem);
@@ -717,7 +652,6 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
         .stat-label { color: var(--text-secondary); font-size: 0.8rem; margin-top: 3px; }
         
         /* Permission List Cards */
@@ -730,12 +664,10 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
         .permission-card:hover {
             border-color: var(--primary);
             transform: translateX(5px);
         }
-
         .permission-card-header {
             display: flex;
             justify-content: space-between;
@@ -744,26 +676,22 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-
         .permission-card-num {
             font-family: 'Orbitron', sans-serif;
             font-size: 1rem;
             color: var(--primary);
         }
-
         .permission-card-date {
             font-family: 'Share Tech Mono', monospace;
             font-size: 0.8rem;
             color: var(--text-secondary);
         }
-
         .permission-card-desc {
             font-size: 0.9rem;
             color: var(--text-primary);
             margin-bottom: 10px;
             line-height: 1.4;
         }
-
         .permission-card-footer {
             display: flex;
             justify-content: space-between;
@@ -771,12 +699,10 @@
             flex-wrap: wrap;
             gap: 8px;
         }
-
         .permission-card-info {
             font-size: 0.8rem;
             color: var(--text-secondary);
         }
-
         .permission-card-info strong { color: var(--text-primary); }
         .permission-card.expired { border-left: 4px solid var(--danger); }
         .permission-card.warning { border-left: 4px solid var(--warning); }
@@ -795,7 +721,6 @@
             background: rgba(0, 240, 255, 0.05);
             white-space: nowrap;
         }
-
         tr:hover, tr:active { background: rgba(0, 240, 255, 0.03); }
         tr { cursor: pointer; transition: background 0.3s ease; }
         
@@ -813,7 +738,6 @@
             padding: 20px;
             overflow-y: auto;
         }
-
         .modal-overlay.active { display: flex; }
         .modal {
             background: var(--bg-card);
@@ -825,7 +749,6 @@
             animation: modalIn 0.3s ease;
             margin: auto;
         }
-
         .modal-large { max-width: 700px; }
         .modal-xl { max-width: 900px; }
         @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
@@ -838,7 +761,6 @@
             background: linear-gradient(135deg, rgba(0, 240, 255, 0.05), rgba(123, 45, 255, 0.03));
             border-radius: 15px 15px 0 0;
         }
-
         .modal-header h3 { font-family: 'Orbitron', sans-serif; font-size: 1rem; }
         .modal-close {
             width: 38px; height: 38px;
@@ -854,7 +776,6 @@
             font-size: 1.1rem;
             flex-shrink: 0;
         }
-
         .modal-close:hover, .modal-close:active { background: var(--danger); color: white; }
         .modal-body { padding: 20px; max-height: 60vh; overflow-y: auto; }
         .modal-footer {
@@ -865,7 +786,6 @@
             gap: 10px;
             flex-wrap: wrap;
         }
-
         
         /* Sections */
         .section {
@@ -875,7 +795,6 @@
             padding: 18px;
             margin-bottom: 18px;
         }
-
         .section-title {
             font-family: 'Orbitron', sans-serif;
             font-size: 0.9rem;
@@ -888,7 +807,6 @@
             gap: 10px;
             flex-wrap: wrap;
         }
-
         .section-code {
             background: var(--primary);
             color: var(--bg-dark);
@@ -897,13 +815,11 @@
             font-size: 0.7rem;
             font-weight: 700;
         }
-
         .form-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 15px;
         }
-
         .form-group.full-width { grid-column: 1 / -1; }
         
         /* CHECKBOX GROUP */
@@ -912,7 +828,6 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-
         .checkbox-item {
             display: flex;
             align-items: center;
@@ -928,13 +843,11 @@
             transition: all 0.2s ease;
             min-height: 48px;
         }
-
         .checkbox-item:active,
         .checkbox-item.checked {
             background: rgba(0, 240, 255, 0.15);
             border-color: var(--primary);
         }
-
         .checkbox-item input[type="checkbox"] {
             width: 24px;
             height: 24px;
@@ -944,7 +857,6 @@
             cursor: pointer;
             margin: 0;
         }
-
         
         /* RADIO GROUP */
         .radio-group {
@@ -952,7 +864,6 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-
         .radio-item {
             display: flex;
             align-items: center;
@@ -968,13 +879,11 @@
             transition: all 0.2s ease;
             min-height: 48px;
         }
-
         .radio-item:active,
         .radio-item.checked {
             background: rgba(0, 240, 255, 0.15);
             border-color: var(--primary);
         }
-
         .radio-item input[type="radio"] {
             width: 24px;
             height: 24px;
@@ -984,7 +893,6 @@
             cursor: pointer;
             margin: 0;
         }
-
         
         /* Badges */
         .badge {
@@ -997,7 +905,6 @@
             letter-spacing: 0.5px;
             white-space: nowrap;
         }
-
         .badge-success { background: rgba(0, 255, 136, 0.15); color: var(--success); border: 1px solid var(--success); }
         .badge-warning { background: rgba(255, 170, 0, 0.15); color: var(--warning); border: 1px solid var(--warning); }
         .badge-danger { background: rgba(255, 51, 102, 0.15); color: var(--danger); border: 1px solid var(--danger); }
@@ -1011,7 +918,6 @@
             overflow-y: auto;
             margin-top: 10px;
         }
-
         .item-list-item {
             padding: 10px 12px;
             display: flex;
@@ -1021,7 +927,6 @@
             font-size: 0.9rem;
             gap: 10px;
         }
-
         .item-list-item:last-child { border-bottom: none; }
         .item-list-item:hover, .item-list-item:active { background: rgba(0, 240, 255, 0.05); }
         .item-list-item span { flex: 1; word-break: break-word; }
@@ -1034,7 +939,6 @@
             font-size: 1rem;
             flex-shrink: 0;
         }
-
         
         /* Password */
         .password-wrapper { position: relative; }
@@ -1051,7 +955,6 @@
             padding: 5px;
             font-size: 1.1rem;
         }
-
         .password-toggle:hover, .password-toggle:active { color: var(--primary); }
         
         /* Signature */
@@ -1065,7 +968,6 @@
             border-radius: 10px;
             margin: 15px 0;
         }
-
         .signature-dots { color: var(--primary); }
         
         /* Safety Grid */
@@ -1075,7 +977,6 @@
             gap: 12px;
             margin-bottom: 25px;
         }
-
         .safety-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -1085,13 +986,11 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
         .safety-card:hover, .safety-card:active {
             border-color: var(--primary);
             transform: translateY(-2px);
             box-shadow: var(--glow-primary);
         }
-
         .safety-card h4 { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; margin-top: 8px; }
         
         /* Charts */
@@ -1101,7 +1000,6 @@
             grid-template-columns: 1fr;
             gap: 15px;
         }
-
         
         /* Signature Box */
         .signature-box {
@@ -1116,7 +1014,6 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-
         .signature-box.signed { border-color: var(--success); background: rgba(0, 255, 136, 0.05); }
         .signature-info { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 150px; }
         .signature-name { font-weight: 600; font-size: 0.9rem; }
@@ -1130,7 +1027,6 @@
             border-radius: 10px;
             margin-bottom: 12px;
         }
-
         .transfer-status.pending { border-left: 3px solid var(--warning); }
         .transfer-status.completed { border-left: 3px solid var(--success); }
         
@@ -1145,7 +1041,6 @@
             gap: 10px;
             max-width: calc(100% - 30px);
         }
-
         .toast {
             padding: 12px 18px;
             border-radius: 10px;
@@ -1157,7 +1052,6 @@
             gap: 10px;
             font-size: 0.9rem;
         }
-
         .toast-success { border-color: var(--success); }
         .toast-error { border-color: var(--danger); }
         .toast-warning { border-color: var(--warning); }
@@ -1170,7 +1064,6 @@
             border: 1px solid var(--border-color);
             border-radius: 10px;
         }
-
         .selectable-item {
             padding: 14px 16px;
             cursor: pointer;
@@ -1182,7 +1075,6 @@
             font-size: 0.95rem;
             min-height: 50px;
         }
-
         .selectable-item:last-child { border-bottom: none; }
         .selectable-item:hover, .selectable-item:active { background: rgba(0, 240, 255, 0.1); }
         .selectable-item input[type="checkbox"] { 
@@ -1192,7 +1084,6 @@
             min-width: 22px;
             min-height: 22px;
         }
-
         
         /* Notification Card */
         .notification-card {
@@ -1207,12 +1098,10 @@
             align-items: flex-start;
             gap: 12px;
         }
-
         .notification-card:hover, .notification-card:active {
             border-color: var(--primary);
             transform: translateX(3px);
         }
-
         .notification-card.pending { border-left: 4px solid var(--warning); }
         .notification-icon {
             width: 44px; height: 44px;
@@ -1224,27 +1113,23 @@
             font-size: 1.3rem;
             flex-shrink: 0;
         }
-
         .notification-content { flex: 1; min-width: 0; }
         .notification-content h4 {
             font-family: 'Orbitron', sans-serif;
             font-size: 0.85rem;
             margin-bottom: 4px;
         }
-
         .notification-content p {
             color: var(--text-secondary);
             font-size: 0.8rem;
             word-break: break-word;
         }
-
         .notification-time {
             font-family: 'Share Tech Mono', monospace;
             font-size: 0.7rem;
             color: var(--text-secondary);
             white-space: nowrap;
         }
-
         
         /* Bloqueio Detail */
         .bloqueio-item {
@@ -1254,7 +1139,6 @@
             padding: 12px;
             margin-bottom: 10px;
         }
-
         .bloqueio-item:last-child { margin-bottom: 0; }
         .bloqueio-item p { margin: 5px 0; font-size: 0.9rem; }
         .bloqueio-item strong { color: var(--primary); }
@@ -1268,14 +1152,12 @@
             .chart-grid { grid-template-columns: repeat(2, 1fr); }
             .toast-container { top: 140px; }
         }
-
         
         /* Responsive - Mobile */
         @media (max-width: 1024px) {
             .sidebar {
                 transform: translateX(-100%);
             }
-
             .sidebar.open { transform: translateX(0); }
             .sidebar-close { display: flex; }
             .main-content { margin-left: 0; padding-top: 130px; }
@@ -1283,7 +1165,6 @@
             .header { display: none; }
             .sync-indicator { bottom: 10px; left: 10px; font-size: 0.7rem; padding: 6px 12px; }
         }
-
         
         @media (max-width: 480px) {
             .login-box { padding: 30px 20px; }
@@ -1311,7 +1192,6 @@
             .checkbox-item { padding: 10px 12px; font-size: 0.9rem; }
             .radio-item { padding: 10px 12px; font-size: 0.9rem; }
         }
-
         
         /* Print Styles */
         @media print {
@@ -1319,18 +1199,15 @@
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
-
             body {
                 background: white !important;
                 color: black !important;
                 font-size: 12pt;
             }
-
             .grid-bg, .sidebar, .mobile-header, .header, .modal-close, .modal-footer, 
             .sync-indicator, .toast-container, .btn, .no-print { 
                 display: none !important; 
             }
-
             .modal-overlay {
                 position: static !important;
                 background: white !important;
@@ -1338,7 +1215,6 @@
                 padding: 0 !important;
                 overflow: visible !important;
             }
-
             .modal {
                 position: static !important;
                 max-width: 100% !important;
@@ -1347,24 +1223,20 @@
                 margin: 0 !important;
                 background: white !important;
             }
-
             .modal-header {
                 background: white !important;
                 border-bottom: 2px solid #333 !important;
                 padding: 10px 0 !important;
             }
-
             .modal-header h3 {
                 color: black !important;
                 font-size: 18pt !important;
             }
-
             .modal-body {
                 max-height: none !important;
                 overflow: visible !important;
                 padding: 10px 0 !important;
             }
-
             .section {
                 background: white !important;
                 border: 1px solid #ccc !important;
@@ -1372,32 +1244,26 @@
                 margin-bottom: 10px !important;
                 padding: 10px !important;
             }
-
             .section-title {
                 color: black !important;
                 border-bottom: 1px solid #ccc !important;
                 font-size: 12pt !important;
             }
-
             .section-code {
                 background: #333 !important;
                 color: white !important;
             }
-
             .signature-box {
                 background: #f5f5f5 !important;
                 border: 1px solid #ccc !important;
             }
-
             .signature-box.signed {
                 border-color: green !important;
             }
-
             .badge {
                 border: 1px solid #333 !important;
                 background: white !important;
             }
-
             .badge-success { color: green !important; border-color: green !important; }
             .badge-warning { color: orange !important; border-color: orange !important; }
             .badge-danger { color: red !important; border-color: red !important; }
@@ -1407,60 +1273,25 @@
                 background: #f5f5f5 !important;
                 border: 1px solid #ccc !important;
             }
-
             .transfer-status {
                 background: #f5f5f5 !important;
             }
-
         }
 
         /* QR Code Styles */
         .qr-container { text-align: center; padding: 20px; }
-        .qr-code-box {
-            display: inline-block;
-            padding: 20px;
-            background: white;
-            border-radius: 15px;
-            margin: 15px 0;
-        }
-
-        .qr-timer {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
-            color: var(--warning);
-            margin: 15px 0;
-        }
-
+        .qr-code-box { display: inline-block; padding: 20px; background: white; border-radius: 15px; margin: 15px 0; }
+        .qr-timer { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; color: var(--warning); margin: 15px 0; }
         .qr-timer.expired { color: var(--danger); }
         .qr-timer.success { color: var(--success); }
-        .qr-instructions { color: var(--text-secondary); font-size: 0.9rem; margin: 10px 0; }
-        .qr-status {
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-            font-weight: 600;
-        }
-
+        .qr-status { padding: 15px; border-radius: 10px; margin: 15px 0; font-weight: 600; }
         .qr-status.waiting { background: rgba(255, 170, 0, 0.1); border: 1px solid var(--warning); color: var(--warning); }
         .qr-status.success { background: rgba(0, 255, 136, 0.1); border: 1px solid var(--success); color: var(--success); }
         .qr-status.error { background: rgba(255, 51, 102, 0.1); border: 1px solid var(--danger); color: var(--danger); }
         #qr-reader { width: 100%; max-width: 350px; margin: 0 auto; }
         #qr-reader video { border-radius: 10px; }
-        .qr-pending-alert {
-            background: linear-gradient(135deg, rgba(255, 170, 0, 0.2), rgba(255, 170, 0, 0.1));
-            border: 2px solid var(--warning);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            animation: glow 1.5s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            from { box-shadow: 0 0 5px rgba(255, 170, 0, 0.3); }
-            to { box-shadow: 0 0 20px rgba(255, 170, 0, 0.6); }
-        }
-
+        .qr-pending-alert { background: linear-gradient(135deg, rgba(255, 170, 0, 0.2), rgba(255, 170, 0, 0.1)); border: 2px solid var(--warning); border-radius: 12px; padding: 15px; margin-bottom: 15px; cursor: pointer; animation: qrglow 1.5s ease-in-out infinite alternate; }
+        @keyframes qrglow { from { box-shadow: 0 0 5px rgba(255, 170, 0, 0.3); } to { box-shadow: 0 0 20px rgba(255, 170, 0, 0.6); } }
         .qr-pending-alert h4 { color: var(--warning); margin-bottom: 5px; }
         .qr-pending-alert p { color: var(--text-secondary); font-size: 0.85rem; }
     </style>
@@ -1482,7 +1313,7 @@
     </div>
 
     <!-- Login Page -->
-    <div class="login-container" id="loginPage" style="display: none;">
+    <div class="login-container" id="loginPage">
         <div class="login-box">
             <div class="login-logo">
                 <h1>PERMISSÃO DE TRABALHO</h1>
@@ -2061,16 +1892,14 @@
             <div class="modal-header"><h3>📱 Validação Presencial</h3><button class="modal-close" onclick="cancelarQRCode()">✕</button></div>
             <div class="modal-body">
                 <div class="qr-container">
-                    <p class="qr-instructions">Peça ao <strong style="color: var(--primary);">Supervisor</strong> para escanear este QR Code</p>
+                    <p style="color: var(--text-secondary);">Peça ao <strong style="color: var(--primary);">Supervisor</strong> escanear</p>
                     <div class="qr-code-box" id="qrCodeContainer"></div>
                     <div class="qr-timer" id="qrTimer">30</div>
-                    <p class="qr-instructions">segundos restantes</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">segundos restantes</p>
                     <div class="qr-status waiting" id="qrStatus">⏳ Aguardando validação...</div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-danger btn-sm" onclick="cancelarQRCode()">Cancelar</button>
-            </div>
+            <div class="modal-footer"><button class="btn btn-danger btn-sm" onclick="cancelarQRCode()">Cancelar</button></div>
         </div>
     </div>
 
@@ -2083,9 +1912,7 @@
                 <div id="qr-reader"></div>
                 <div id="scannerResult" style="margin-top: 15px; text-align: center;"></div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary btn-sm" onclick="fecharScanner()">Fechar</button>
-            </div>
+            <div class="modal-footer"><button class="btn btn-secondary btn-sm" onclick="fecharScanner()">Fechar</button></div>
         </div>
     </div>
 
@@ -2130,100 +1957,18 @@
         let qrValidationListener = null;
         let currentQRToken = null;
         let html5QrCode = null;
-        let pendingQRListener = null;
 
-        // Verificar QRs pendentes para o supervisor
         function setupQRListener() {
-            if (pendingQRListener) pendingQRListener();
             if (!currentUser || !currentUser.tipos.includes('supervisor')) return;
-            
-            pendingQRListener = db.collection('qr_validations')
-                .where('supervisorId', '==', currentUser.id)
-                .where('validated', '==', false)
-                .onSnapshot(snapshot => {
-                    const pendingQRs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    updateQRBadge(pendingQRs.length);
-                    // Se estiver na página de notificações, atualizar
-                    if (document.getElementById('pageNotificacoes').classList.contains('active')) {
-                        renderQRNotifications(pendingQRs);
-                    }).catch(() => {
-                        renderQRNotifications([]);
-                    }
-
-                });
-
         }
 
-        function updateQRBadge(count) {
-            // Atualiza o badge de notificações se houver QRs pendentes
-            const navBadge = document.getElementById('navNotifBadge');
-            const homeBadge = document.getElementById('homeNotifBadge');
-            const currentCount = cachedNotificacoes.filter(n => n.paraId === currentUser.id && n.status === 'pendente').length;
-            const total = currentCount + count;
-            if (total > 0) {
-                navBadge.textContent = total;
-                navBadge.style.display = 'inline';
-                homeBadge.textContent = total;
-                homeBadge.style.display = 'inline';
-            } else {
-                navBadge.style.display = 'none';
-                homeBadge.style.display = 'none';
-            }
-
-        }
-
-        function renderQRNotifications(pendingQRs) {
-            const container = document.getElementById('notificacoesList');
-            let html = '';
-            
-            // Renderizar QRs pendentes primeiro
-            pendingQRs.forEach(qr => {
-                const expiresAt = new Date(qr.expiresAt);
-                const now = new Date();
-                if (now < expiresAt) {
-                    html += '<div class="qr-pending-alert" onclick="abrirScanner(\'' + qr.id + '\')">' +
-                        '<h4>📱 VALIDAR QR CODE</h4>' +
-                        '<p><strong>PT #' + String(qr.permissaoNumero).padStart(4, '0') + '</strong> - ' + qr.executorNome + ' aguarda validação</p>' +
-                        '<p style="color: var(--warning); font-size: 0.8rem; margin-top: 5px;">⏰ Clique para abrir a câmera</p>' +
-                    '</div>';
-                }
-
-            });
-
-            
-            // Depois as notificações normais de transferência
-            const notifs = cachedNotificacoes.filter(n => n.paraId === currentUser.id && n.status === 'pendente');
-            notifs.forEach(n => {
-                const tipoLabel = { supervisor: 'Supervisor', autorizador: 'Autorizador', executor: 'Executor' };
-                html += '<div class="notification-card pending" onclick="abrirNotificacao(\'' + n.id + '\')">' +
-                    '<div class="notification-icon">🔄</div>' +
-                    '<div class="notification-content">' +
-                        '<h4>Transferência de ' + (tipoLabel[n.tipo] || n.tipo) + '</h4>' +
-                        '<p>PT #' + String(n.permissaoNumero).padStart(4, '0') + ' - ' + n.de + ' → você</p>' +
-                    '</div>' +
-                    '<div class="notification-time">' + formatDate(n.data) + '</div>' +
-                '</div>';
-            });
-
-            
-            if (html === '') {
-                html = '<p style="color: var(--text-secondary); text-align: center; padding: 30px;">Nenhuma notificação pendente</p>';
-            }
-
-            
-            container.innerHTML = html;
-        }
-
-        // Executor: Gerar QR Code
         async function gerarQRCode() {
             const p = cachedPermissoes.find(perm => perm.id === editingPermissaoId);
             if (!p) return;
             
-            // Criar token único
             currentQRToken = 'QR_' + p.numero + '_' + Date.now();
-            const expiresAt = new Date(Date.now() + 30000); // 30 segundos
+            const expiresAt = new Date(Date.now() + 30000);
             
-            // Salvar no Firebase
             await db.collection('qr_validations').doc(currentQRToken).set({
                 permissaoId: editingPermissaoId,
                 permissaoNumero: p.numero,
@@ -2235,28 +1980,18 @@
                 expiresAt: expiresAt.toISOString(),
                 validated: false
             });
-
             
-            // Limpar container
             document.getElementById('qrCodeContainer').innerHTML = '';
-            
-            // Gerar QR Code visual
             qrCodeInstance = new QRCode(document.getElementById('qrCodeContainer'), {
-                text: currentQRToken,
-                width: 200,
-                height: 200,
-                colorDark: '#000000',
-                colorLight: '#ffffff',
+                text: currentQRToken, width: 200, height: 200,
+                colorDark: '#000000', colorLight: '#ffffff',
                 correctLevel: QRCode.CorrectLevel.H
             });
-
             
-            // Reset status
             document.getElementById('qrStatus').className = 'qr-status waiting';
             document.getElementById('qrStatus').textContent = '⏳ Aguardando ' + p.supervisor + ' validar...';
             document.getElementById('qrTimer').className = 'qr-timer';
             
-            // Timer
             let timeLeft = 30;
             document.getElementById('qrTimer').textContent = timeLeft;
             
@@ -2268,13 +2003,11 @@
                     document.getElementById('qrTimer').className = 'qr-timer expired';
                     document.getElementById('qrStatus').className = 'qr-status error';
                     document.getElementById('qrStatus').textContent = '❌ Tempo expirado!';
-                    db.collection('qr_validations').doc(currentQRToken).delete();
+                    db.collection('qr_validations').doc(currentQRToken).delete().catch(() => {});
                     if (qrValidationListener) qrValidationListener();
                 }
-
             }, 1000);
             
-            // Escutar validação
             qrValidationListener = db.collection('qr_validations').doc(currentQRToken).onSnapshot(async (doc) => {
                 if (doc.exists && doc.data().validated) {
                     clearInterval(qrTimerInterval);
@@ -2285,48 +2018,28 @@
                     document.getElementById('qrStatus').className = 'qr-status success';
                     document.getElementById('qrStatus').textContent = '✅ Validado por ' + doc.data().validatedBy + '!';
                     
-                    // Registrar assinatura
                     await updateDoc('permissoes', editingPermissaoId, {
                         assinaturaInicioExecutor: new Date().toISOString(),
-                        validacaoPresencial: {
-                            supervisorNome: doc.data().validatedBy,
-                            validadoEm: doc.data().validatedAt
-                        },
+                        validacaoPresencial: { supervisorNome: doc.data().validatedBy, validadoEm: doc.data().validatedAt },
                         status: 'Em Execução'
                     });
-
                     
-                    showToast('Trabalho iniciado com validação presencial!', 'success');
-                    
-                    setTimeout(() => {
-                        closeModal('modalQRCode');
-                        viewPermissao(editingPermissaoId);
-                    }, 1500);
+                    showToast('Trabalho iniciado!', 'success');
+                    setTimeout(() => { cancelarQRCode(); viewPermissao(editingPermissaoId); }, 1500);
                 }
-
             });
-
             
             openModal('modalQRCode');
         }
 
         function cancelarQRCode() {
-            try {
-                clearInterval(qrTimerInterval);
-                if (qrValidationListener) {
-                    qrValidationListener();
-                    qrValidationListener = null;
-                }
-                if (currentQRToken) {
-                    db.collection('qr_validations').doc(currentQRToken).delete().catch(() => {});
-                    currentQRToken = null;
-                }
-            } catch(e) {}
+            clearInterval(qrTimerInterval);
+            if (qrValidationListener) { qrValidationListener(); qrValidationListener = null; }
+            if (currentQRToken) { db.collection('qr_validations').doc(currentQRToken).delete().catch(() => {}); currentQRToken = null; }
             document.getElementById('modalQRCode').classList.remove('active');
             document.body.style.overflow = '';
         }
 
-        // Supervisor: Abrir scanner
         function abrirScanner(qrId) {
             document.getElementById('scannerResult').innerHTML = '<p style="color: var(--warning);">📷 Iniciando câmera...</p>';
             openModal('modalScanner');
@@ -2336,115 +2049,71 @@
                 html5QrCode.start(
                     { facingMode: "environment" },
                     { fps: 10, qrbox: { width: 250, height: 250 } },
-                    async (decodedText) => {
-                        await validarQRCode(decodedText);
-                    },
+                    async (decodedText) => { await validarQRCode(decodedText); },
                     () => {}
                 ).then(() => {
-                    document.getElementById('scannerResult').innerHTML = '<p style="color: var(--success);">📷 Câmera ativa - Aponte para o QR Code</p>';
+                    document.getElementById('scannerResult').innerHTML = '<p style="color: var(--success);">📷 Câmera ativa</p>';
                 }).catch((err) => {
-                    document.getElementById('scannerResult').innerHTML = '<p style="color: var(--danger);">❌ Erro na câmera: ' + err + '</p>';
+                    document.getElementById('scannerResult').innerHTML = '<p style="color: var(--danger);">❌ Erro câmera: ' + err + '</p>';
                 });
-
             }, 300);
         }
 
         function fecharScanner() {
-            try {
-                if (html5QrCode) {
-                    html5QrCode.stop().then(() => {
-                        html5QrCode = null;
-                    }).catch(() => {
-                        html5QrCode = null;
-                    });
-
-                }
-            } catch(e) {}
+            if (html5QrCode) { html5QrCode.stop().catch(() => {}); html5QrCode = null; }
             document.getElementById('modalScanner').classList.remove('active');
             document.body.style.overflow = '';
         }
 
         async function validarQRCode(token) {
-            if (html5QrCode) html5QrCode.stop().catch(() => {});
-            
-            const resultEl = document.getElementById('scannerResult');
-            resultEl.innerHTML = '<p style="color: var(--warning);">⏳ Validando...</p>';
+            if (html5QrCode) { html5QrCode.stop().catch(() => {}); }
+            document.getElementById('scannerResult').innerHTML = '<p style="color: var(--warning);">⏳ Validando...</p>';
             
             try {
                 const doc = await db.collection('qr_validations').doc(token).get();
-                
-                if (!doc.exists) {
-                    resultEl.innerHTML = '<div class="qr-status error">❌ QR Code inválido!</div>';
-                    return;
-                }
-
+                if (!doc.exists) { document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ QR inválido!</div>'; return; }
                 
                 const data = doc.data();
+                if (new Date() > new Date(data.expiresAt)) { document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ QR expirado!</div>'; return; }
+                if (data.validated) { document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ Já validado!</div>'; return; }
+                if (currentUser.id !== data.supervisorId) { document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ Você não é o supervisor!</div>'; return; }
                 
-                if (new Date() > new Date(data.expiresAt)) {
-                    resultEl.innerHTML = '<div class="qr-status error">❌ QR Code expirado!</div>';
-                    return;
-                }
-
+                const assinatura = prompt('Digite sua assinatura digital:');
+                if (!assinatura || assinatura !== currentUser.assinatura) { document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ Assinatura inválida!</div>'; return; }
                 
-                if (data.validated) {
-                    resultEl.innerHTML = '<div class="qr-status warning">⚠️ Já foi validado!</div>';
-                    return;
-                }
-
-                
-                if (currentUser.id !== data.supervisorId) {
-                    resultEl.innerHTML = '<div class="qr-status error">❌ Você não é o supervisor desta PT!</div>';
-                    return;
-                }
-
-                
-                // Pedir assinatura
-                const assinatura = prompt('Digite sua assinatura digital para confirmar:');
-                if (!assinatura || assinatura !== currentUser.assinatura) {
-                    resultEl.innerHTML = '<div class="qr-status error">❌ Assinatura inválida!</div>';
-                    return;
-                }
-
-                
-                // Validar!
                 await db.collection('qr_validations').doc(token).update({
-                    validated: true,
-                    validatedBy: currentUser.nome,
-                    validatedAt: new Date().toISOString()
+                    validated: true, validatedBy: currentUser.nome, validatedAt: new Date().toISOString()
                 });
-
                 
-                resultEl.innerHTML = '<div class="qr-status success">✅ Validado com sucesso!<br><br>' +
-                    '<strong>PT #' + String(data.permissaoNumero).padStart(4, '0') + '</strong><br>' +
-                    'Executor: ' + data.executorNome + '</div>';
-                
+                document.getElementById('scannerResult').innerHTML = '<div class="qr-status success">✅ Validado!<br>PT #' + String(data.permissaoNumero).padStart(4, '0') + '</div>';
                 showToast('Presença validada!', 'success');
-                
                 setTimeout(() => fecharScanner(), 2000);
-                
             } catch (error) {
-                resultEl.innerHTML = '<div class="qr-status error">❌ Sem conexão. Verifique sua internet.</div>';
+                document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ Erro de conexão</div>';
             }
-
         }
 
-        // Modificar assinatura do executor para usar QR
         function signInicioExecutorComQR() {
-            if (!currentUser.assinatura) {
-                showToast('Configure sua assinatura primeiro!', 'error');
-                closeModal('modalViewPermissao');
-                navigateTo('assinatura');
-                return;
-            }
-
-            
-            document.getElementById('assinaturaMessage').textContent = 'Digite sua assinatura para gerar o QR Code de validação presencial';
-            signatureCallback = async () => {
-                closeModal('modalAssinatura');
-                await gerarQRCode();
-            };
+            if (!currentUser.assinatura) { showToast('Configure sua assinatura!', 'error'); return; }
+            document.getElementById('assinaturaMessage').textContent = 'Digite sua assinatura para gerar o QR Code';
+            signatureCallback = async () => { closeModal('modalAssinatura'); await gerarQRCode(); };
             openModal('modalAssinatura');
+        }
+
+        function renderQRNotifications(pendingQRs) {
+            const container = document.getElementById('notificacoesList');
+            let html = '';
+            pendingQRs.forEach(qr => {
+                if (new Date() < new Date(qr.expiresAt)) {
+                    html += '<div class="qr-pending-alert" onclick="abrirScanner(\'' + qr.id + '\')"><h4>📱 VALIDAR QR</h4><p>PT #' + String(qr.permissaoNumero).padStart(4, '0') + ' - ' + qr.executorNome + '</p></div>';
+                }
+            });
+            const notifs = cachedNotificacoes.filter(n => n.paraId === currentUser.id && n.status === 'pendente');
+            notifs.forEach(n => {
+                const tipoLabel = { supervisor: 'Supervisor', autorizador: 'Autorizador', executor: 'Executor' };
+                html += '<div class="notification-card pending" onclick="abrirNotificacao(\'' + n.id + '\')"><div class="notification-icon">🔄</div><div class="notification-content"><h4>Transferência de ' + (tipoLabel[n.tipo] || n.tipo) + '</h4><p>PT #' + String(n.permissaoNumero).padStart(4, '0') + '</p></div></div>';
+            });
+            container.innerHTML = html || '<p style="color: var(--text-secondary); text-align: center; padding: 30px;">Nenhuma notificação</p>';
         }
 
         let cachedUsuarios = [];
@@ -2474,17 +2143,24 @@
                 }, () => {
                     updateSyncStatus('offline');
                 });
-
                 await initializeDefaultData();
                 setupRealtimeListeners();
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                if (!currentUser) document.getElementById('loginPage').style.display = 'flex';
                 const statusEl = document.getElementById('firebaseStatus');
                 statusEl.textContent = '✅ Firebase conectado';
                 statusEl.className = 'firebase-status connected';
             } catch (error) {
-                console.error("Erro Firebase:", error);
+                console.error("Erro ao inicializar Firebase:", error);
+                document.getElementById('loadingOverlay').querySelector('.loading-text').textContent = 'Erro: ' + error.message;
+                document.getElementById('loadingOverlay').querySelector('.loading-text').style.color = 'var(--danger)';
                 const statusEl = document.getElementById('firebaseStatus');
-                statusEl.textContent = '❌ Erro de conexão';
+                statusEl.textContent = '❌ ' + error.message;
                 statusEl.className = 'firebase-status error';
+                setTimeout(() => {
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                    if (!currentUser) document.getElementById('loginPage').style.display = 'flex';
+                }, 2000);
             }
         }
 
@@ -2497,30 +2173,22 @@
         }
 
         async function initializeDefaultData() {
-            try {
-                const usersRef = db.collection('usuarios');
-                const usersSnapshot = await usersRef.get();
-                if (usersSnapshot.empty) {
-                    await usersRef.add({
-                        nome: 'Paulo Henrique Ávila', usuario: 'pauloavila', senha: 'paulo@2025',
-                        setor: 'Operação', cargo: 'Mantenedor', empresa: 'Enel',
-                        tipos: ['administrador', 'supervisor', 'autorizador', 'executor'], assinatura: null,
-                        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-
-                    showToast('Usuário admin criado: pauloavila / paulo@2025', 'warning');
-                }
-
-                const counterRef = db.collection('config').doc('counters');
-                const counterDoc = await counterRef.get();
-                if (!counterDoc.exists) {
-                    await counterRef.set({ permissaoNumero: 0 });
-                }
-
-            } catch (err) {
-                console.log('Modo offline - dados serão sincronizados quando online');
+            const usersRef = db.collection('usuarios');
+            const usersSnapshot = await usersRef.get();
+            if (usersSnapshot.empty) {
+                await usersRef.add({
+                    nome: 'Paulo Henrique Ávila', usuario: 'pauloavila', senha: 'paulo@2025',
+                    setor: 'Operação', cargo: 'Mantenedor', empresa: 'Enel',
+                    tipos: ['administrador', 'supervisor', 'autorizador', 'executor'], assinatura: null,
+                    criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                showToast('Usuário admin criado: pauloavila / paulo@2025', 'warning');
             }
-
+            const counterRef = db.collection('config').doc('counters');
+            const counterDoc = await counterRef.get();
+            if (!counterDoc.exists) {
+                await counterRef.set({ permissaoNumero: 0 });
+            }
         }
 
         function setupRealtimeListeners() {
@@ -2535,11 +2203,9 @@
                             currentUser = updatedUser;
                             localStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
                         }
-
                         loadSelects();
                         if (document.getElementById('pageUsuarios').classList.contains('active')) loadUsuarios();
                     }
-
                 })
             );
             unsubscribers.push(
@@ -2558,10 +2224,9 @@
                 db.collection('notificacoes').onSnapshot(snapshot => {
                     cachedNotificacoes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     if (currentUser) {
-                        updateNotificationBadges(); setupQRListener();
+                        updateNotificationBadges();
                         if (document.getElementById('pageNotificacoes').classList.contains('active')) loadNotificacoes();
                     }
-
                 })
             );
             ['riscos', 'epi', 'medidas', 'equipamentos'].forEach(collection => {
@@ -2574,12 +2239,10 @@
                             case 'medidas': cachedMedidas = data; break;
                             case 'equipamentos': cachedEquipamentos = data; break;
                         }
-
                         if (document.getElementById('pageSeguranca').classList.contains('active')) loadSafetyLists();
                     })
                 );
             });
-
         }
 
         // Verificar permissões vencidas
@@ -2592,11 +2255,8 @@
                         // Marcar como vencida no cache local
                         p.vencida = true;
                     }
-
                 }
-
             });
-
             updateVencidasBadges();
         }
 
@@ -2614,7 +2274,6 @@
                 navBadge.style.display = 'none';
                 homeBadge.style.display = 'none';
             }
-
         }
 
         function getData(collection) {
@@ -2628,7 +2287,6 @@
                 case 'equipamentos': return cachedEquipamentos;
                 default: return [];
             }
-
         }
 
         async function addDoc(collection, data) {
@@ -2638,14 +2296,12 @@
                     ...data,
                     criadoEm: firebase.firestore.FieldValue.serverTimestamp()
                 });
-
                 updateSyncStatus('online');
                 return docRef.id;
             } catch (error) {
                 updateSyncStatus('offline');
                 throw error;
             }
-
         }
 
         async function updateDoc(collection, id, data) {
@@ -2655,13 +2311,11 @@
                     ...data,
                     atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
                 });
-
                 updateSyncStatus('online');
             } catch (error) {
                 updateSyncStatus('offline');
                 throw error;
             }
-
         }
 
         async function deleteDoc(collection, id) {
@@ -2673,7 +2327,6 @@
                 updateSyncStatus('offline');
                 throw error;
             }
-
         }
 
         async function getNextPermissaoNumber() {
@@ -2684,10 +2337,8 @@
                 transaction.update(counterRef, { permissaoNumero: newNumber });
                 return newNumber;
             });
-
             return result;
         }
-
         
         function showToast(msg, type = 'success') {
             const c = document.getElementById('toastContainer');
@@ -2704,13 +2355,11 @@
             if (d.toDate) d = d.toDate();
             return new Date(d).toLocaleDateString('pt-BR'); 
         }
-
         function formatDateTime(d) { 
             if (!d) return '-';
             if (d.toDate) d = d.toDate();
             return new Date(d).toLocaleString('pt-BR'); 
         }
-
         function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
         function togglePassword(id) { const i = document.getElementById(id); i.type = i.type === 'password' ? 'text' : 'password'; }
         function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow = 'hidden'; }
@@ -2732,19 +2381,14 @@
                         updateCheckboxVisual(this, checkbox.checked);
                         checkbox.dispatchEvent(new Event('change', { bubbles: true }));
                     }
-
                 });
-
                 const checkbox = item.querySelector('input[type="checkbox"]');
                 if (checkbox) {
                     checkbox.addEventListener('change', function() {
                         updateCheckboxVisual(item, this.checked);
                     });
-
                 }
-
             });
-
             document.querySelectorAll('.radio-item').forEach(function(item) {
                 item.addEventListener('click', function(e) {
                     if (e.target.tagName === 'INPUT') return;
@@ -2756,9 +2400,7 @@
                         this.classList.add('checked');
                         radio.dispatchEvent(new Event('change', { bubbles: true }));
                     }
-
                 });
-
                 const radio = item.querySelector('input[type="radio"]');
                 if (radio) {
                     radio.addEventListener('change', function() {
@@ -2766,13 +2408,9 @@
                         group.querySelectorAll('.radio-item').forEach(function(r) { r.classList.remove('checked'); });
                         if (this.checked) item.classList.add('checked');
                     });
-
                 }
-
             });
-
         }
-
         
         function updateCheckboxVisual(item, isChecked) {
             if (isChecked) item.classList.add('checked');
@@ -2790,7 +2428,6 @@
                 const prevPage = navigationHistory[navigationHistory.length - 1];
                 navigateTo(prevPage, false);
             }
-
         }
 
         function updateBackButton() {
@@ -2809,10 +2446,10 @@
             const u = document.getElementById('loginUsername').value.trim();
             const p = document.getElementById('loginPassword').value;
             
-            // Se dados ainda não carregaram, esperar um pouco
+            // Esperar dados carregarem (máximo 5 segundos)
             let tentativas = 0;
             while (cachedUsuarios.length === 0 && tentativas < 10) {
-                await new Promise(resolve => setTimeout(resolve, 500));
+                await new Promise(r => setTimeout(r, 500));
                 tentativas++;
                 btn.textContent = 'Aguarde...';
             }
@@ -2826,7 +2463,6 @@
                 updateUserInterface();
                 updateStats();
                 updateNotificationBadges();
-                setupQRListener();
                 navigationHistory = ['home'];
                 navigateTo('home', false);
                 showToast('Login realizado!');
@@ -2846,7 +2482,7 @@
             currentUser = null;
             localStorage.removeItem('ptd_currentUser');
             document.getElementById('appContainer').style.display = 'none';
-            document.getElementById('loginPage').style.display = 'flex';
+            if (!currentUser) document.getElementById('loginPage').style.display = 'flex';
             document.getElementById('loginUsername').value = '';
             document.getElementById('loginPassword').value = '';
             navigationHistory = ['home'];
@@ -2888,12 +2524,10 @@
                 navBadge.style.display = 'none';
                 homeBadge.style.display = 'none';
             }
-
         }
 
         function loadNotificacoes() {
-            // Se for supervisor, buscar QRs pendentes e renderizar junto
-            if (currentUser.tipos.includes('supervisor')) {
+            if (currentUser && currentUser.tipos.includes('supervisor')) {
                 db.collection('qr_validations')
                     .where('supervisorId', '==', currentUser.id)
                     .where('validated', '==', false)
@@ -2902,15 +2536,10 @@
                         const pendingQRs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
                             .filter(qr => new Date() < new Date(qr.expiresAt));
                         renderQRNotifications(pendingQRs);
-                    }).catch(() => {
-                        renderQRNotifications([]);
-                    });
-
+                    }).catch(() => { renderQRNotifications([]); });
             } else {
-                // Renderizar só notificações normais
                 renderQRNotifications([]);
             }
-
         }
 
         function abrirNotificacao(notifId) {
@@ -2942,13 +2571,11 @@
                         para: currentNotification.para, paraId: currentNotification.paraId,
                         dataSolicitacao: currentNotification.data, dataAceite: new Date().toISOString(), status: 'aceita'
                     });
-
                     const updateData = { transferencias };
                     updateData[currentNotification.tipo + 'Id'] = currentNotification.paraId;
                     updateData[currentNotification.tipo] = currentNotification.para;
                     await updateDoc('permissoes', permissao.id, updateData);
                 }
-
                 await updateDoc('notificacoes', currentNotification.id, { status: 'aceita', dataAceite: new Date().toISOString() });
                 closeModal('modalAceitarTransfer');
                 document.getElementById('aceitarTransferAssinatura').value = '';
@@ -2983,7 +2610,6 @@
             document.querySelectorAll('.nav-link').forEach(link => {
                 if (link.getAttribute('onclick')?.includes("'" + page + "'")) link.classList.add('active');
             });
-
             if (addToHistory && navigationHistory[navigationHistory.length - 1] !== page) navigationHistory.push(page);
             updateBackButton();
             if (page === 'usuarios') loadUsuarios();
@@ -3021,14 +2647,12 @@
                     cargo: document.getElementById('novoCargo').value, empresa: document.getElementById('novoEmpresa').value,
                     tipos: tipos, assinatura: null
                 });
-
                 closeModal('modalNovoUsuario');
                 ['novoNome','novoUsuario','novoSenha','novoSetor','novoCargo','novoEmpresa'].forEach(id => document.getElementById(id).value = '');
                 ['tipoAdmin','tipoSupervisor','tipoAutorizador','tipoExecutor'].forEach(id => {
                     document.getElementById(id).checked = false;
                     document.getElementById(id).parentElement.classList.remove('checked');
                 });
-
                 showToast('Usuário cadastrado!');
             } catch (error) { showToast('Erro ao salvar: ' + error.message, 'error'); }
         }
@@ -3102,9 +2726,7 @@
                         data.map(item => '<div class="item-list-item"><span>' + item.nome + '</span>' +
                             '<button class="btn-remove" onclick="deleteSafetyItem(\'' + type + '\',\'' + item.id + '\')">✕</button></div>').join('');
                 }
-
             });
-
         }
 
         async function deleteSafetyItem(type, id) {
@@ -3118,7 +2740,6 @@
                 const sel = document.getElementById('perm' + tipo.charAt(0).toUpperCase() + tipo.slice(1));
                 if (sel) sel.innerHTML = '<option value="">Selecione</option>' + users.map(u => '<option value="' + u.id + '">' + u.nome + '</option>').join('');
             });
-
         }
 
         function toggleBloqueios() {
@@ -3215,7 +2836,6 @@
                 item.classList.remove('checked');
                 if (item.dataset.value === 'nao') item.classList.add('checked');
             });
-
         }
 
         function getSelectedTiposTrabalho() {
@@ -3224,13 +2844,11 @@
                 const cb = item.querySelector('input[type="checkbox"]');
                 if (cb && cb.checked) tipos.push(item.dataset.value);
             });
-
             const outrosIdx = tipos.indexOf('Outros');
             if (outrosIdx !== -1) {
                 const outrosText = document.getElementById('permOutrosTipo').value.trim();
                 if (outrosText) tipos[outrosIdx] = 'Outros: ' + outrosText;
             }
-
             return tipos;
         }
 
@@ -3272,7 +2890,6 @@
                     assinaturaTerminoExecutor: null, assinaturaTerminoSupervisor: null, assinaturaTerminoAutorizador: null,
                     equipamentoRetornou: true, justificativaNaoRetorno: ''
                 });
-
                 limparFormPermissao();
                 showToast('Permissão criada!');
                 navigateTo('solicitadas');
@@ -3358,7 +2975,6 @@
             if (isExpired) {
                 content += '<p style="color: var(--danger); font-size: 0.85rem; margin-top: 8px;">⚠️ Esta permissão ultrapassou a data/hora de término programada!</p>';
             }
-
             content += '</div>';
             
             // A1 - Responsabilidades
@@ -3392,7 +3008,6 @@
                 p.executores.forEach(e => { content += '<li>' + e.nome + ' - ' + e.cargo + '</li>'; });
                 content += '</ul>';
             }
-
             content += '</div>';
             
             // B1 - Equipamentos
@@ -3400,28 +3015,24 @@
                 content += '<div class="section"><div class="section-title"><span class="section-code">B1</span> Equipamentos</div>';
                 content += '<p>' + p.equipamentosList.map(e => e.nome).join(', ') + '</p></div>';
             }
-
             
             // B2 - Riscos
             if (p.riscosList && p.riscosList.length > 0) {
                 content += '<div class="section"><div class="section-title"><span class="section-code">B2</span> Riscos Identificados</div>';
                 content += '<p>' + p.riscosList.map(r => r.nome).join(', ') + '</p></div>';
             }
-
             
             // B3 - EPIs
             if (p.epiList && p.epiList.length > 0) {
                 content += '<div class="section"><div class="section-title"><span class="section-code">B3</span> EPIs Requeridos</div>';
                 content += '<p>' + p.epiList.map(e => e.nome).join(', ') + '</p></div>';
             }
-
             
             // B4 - Medidas
             if (p.medidasList && p.medidasList.length > 0) {
                 content += '<div class="section"><div class="section-title"><span class="section-code">B4</span> Medidas de Segurança</div>';
                 content += '<p>' + p.medidasList.map(m => m.nome).join(', ') + '</p></div>';
             }
-
             
             // C1 - Bloqueios - DESCRIÇÃO COMPLETA
             content += '<div class="section"><div class="section-title"><span class="section-code">C1</span> Bloqueios</div>';
@@ -3434,11 +3045,9 @@
                     content += '<p><strong>Nº Cadeado:</strong> ' + b.cadeado + '</p>';
                     content += '</div>';
                 });
-
             } else {
                 content += '<p style="color: var(--success);">✓ Não requer bloqueio</p>';
             }
-
             content += '</div>';
             
             // C2 - Anotações
@@ -3446,7 +3055,6 @@
                 content += '<div class="section"><div class="section-title"><span class="section-code">C2</span> Anotações</div>';
                 content += '<p>' + p.anotacoes + '</p></div>';
             }
-
             
             // D1 - Transferências
             content += '<div class="section"><div class="section-title"><span class="section-code">D1</span> Transferências de Responsabilidade</div>';
@@ -3462,14 +3070,11 @@
                     const last = transfers[transfers.length - 1];
                     content += '<div style="margin-top: 8px; color: var(--success);">✓ Transferido de ' + last.de + ' em ' + formatDateTime(last.dataAceite) + '</div>';
                 }
-
                 if (p.status === 'Em Execução' && currentUser.id === p[tipo + 'Id'] && !pendingNotif) {
                     content += '<button class="btn btn-warning btn-xs" style="margin-top: 8px;" onclick="openTransferModal(\'' + tipo + '\', \'' + p.id + '\')">🔄 Transferir</button>';
                 }
-
                 content += '</div>';
             });
-
             content += '</div>';
             
             // E1 - Assinaturas de Início
@@ -3482,7 +3087,6 @@
                 if (!p.assinaturaInicioAutorizador && p.status === 'Solicitada' && currentUser.id === p.autorizadorId) {
                     content += '<button class="btn btn-success btn-xs" onclick="signInicio(\'autorizador\')">Assinar</button>';
                 }
-
                 content += '</div>';
                 // Supervisor
                 content += '<div class="signature-box ' + (p.assinaturaInicioSupervisor ? 'signed' : '') + '"><div class="signature-info"><span class="signature-name">' + p.supervisor + '</span><span class="signature-role">Supervisor - Confere bloqueios e condições</span>';
@@ -3491,7 +3095,6 @@
                 if (!p.assinaturaInicioSupervisor && p.assinaturaInicioAutorizador && p.status === 'Solicitada' && currentUser.id === p.supervisorId) {
                     content += '<button class="btn btn-success btn-xs" onclick="signInicio(\'supervisor\')">Assinar</button>';
                 }
-
                 content += '</div>';
                 // Executor
                 content += '<div class="signature-box ' + (p.assinaturaInicioExecutor ? 'signed' : '') + '"><div class="signature-info"><span class="signature-name">' + p.executor + '</span><span class="signature-role">Executor - Inicia o trabalho</span>';
@@ -3500,11 +3103,9 @@
                 if (!p.assinaturaInicioExecutor && p.assinaturaInicioSupervisor && p.status === 'Solicitada' && currentUser.id === p.executorId) {
                     content += '<button class="btn btn-success btn-xs" onclick="signInicioExecutorComQR()">📱 Assinar com QR</button>';
                 }
-
                 content += '</div>';
                 content += '</div>';
             }
-
             
             // E2 - Assinaturas de Término
             if (p.status === 'Em Execução' || p.status === 'Encerrada') {
@@ -3516,7 +3117,6 @@
                 if (!p.assinaturaTerminoExecutor && p.status === 'Em Execução' && currentUser.id === p.executorId) {
                     content += '<button class="btn btn-success btn-xs" onclick="signTermino(\'executor\')">Assinar</button>';
                 }
-
                 content += '</div>';
                 // Supervisor
                 content += '<div class="signature-box ' + (p.assinaturaTerminoSupervisor ? 'signed' : '') + '"><div class="signature-info"><span class="signature-name">' + p.supervisor + '</span><span class="signature-role">Supervisor - Confere término</span>';
@@ -3525,7 +3125,6 @@
                 if (!p.assinaturaTerminoSupervisor && p.assinaturaTerminoExecutor && p.status === 'Em Execução' && currentUser.id === p.supervisorId) {
                     content += '<button class="btn btn-success btn-xs" onclick="signTermino(\'supervisor\')">Assinar</button>';
                 }
-
                 content += '</div>';
                 // Autorizador
                 content += '<div class="signature-box ' + (p.assinaturaTerminoAutorizador ? 'signed' : '') + '"><div class="signature-info"><span class="signature-name">' + p.autorizador + '</span><span class="signature-role">Autorizador - Encerra permissão</span>';
@@ -3534,7 +3133,6 @@
                 if (!p.assinaturaTerminoAutorizador && p.assinaturaTerminoSupervisor && p.status === 'Em Execução' && currentUser.id === p.autorizadorId) {
                     content += '<button class="btn btn-success btn-xs" onclick="signTermino(\'autorizador\')">Assinar</button>';
                 }
-
                 content += '</div>';
                 // Equipamento não retornou
                 if (!p.equipamentoRetornou && p.status === 'Encerrada') {
@@ -3543,10 +3141,8 @@
                     content += '<p style="margin-top: 5px;">' + (p.justificativaNaoRetorno || 'Sem justificativa') + '</p>';
                     content += '</div>';
                 }
-
                 content += '</div>';
             }
-
             
             document.getElementById('viewPermissaoContent').innerHTML = content;
             openModal('modalViewPermissao');
@@ -3579,7 +3175,6 @@
                     deId: currentUser.id, de: currentUser.nome, paraId: novoId, para: novoUsuario.nome,
                     data: new Date().toISOString(), status: 'pendente'
                 });
-
                 closeModal('modalTransfer');
                 closeModal('modalViewPermissao');
                 document.getElementById('transferAssinatura').value = '';
@@ -3613,11 +3208,8 @@
                             document.querySelectorAll('input[name="equipRetornou"]').forEach(r => {
                                 r.parentElement.classList.toggle('checked', r.checked);
                             });
-
                         });
-
                     });
-
                 }, 100);
                 signatureCallback = async () => {
                     try {
@@ -3646,7 +3238,6 @@
                     } catch (error) { showToast('Erro: ' + error.message, 'error'); }
                 };
             }
-
             openModal('modalAssinatura');
         }
 
@@ -3690,27 +3281,23 @@
                 type: 'doughnut', data: { labels: ['Solic.', 'Exec.', 'Venc.', 'Enc.'], datasets: [{ data: [sol, exe, venc, enc], backgroundColor: ['#ffaa00', '#00f0ff', '#ff3366', '#00ff88'], borderWidth: 0 }] },
                 options: { ...chartOpts, plugins: { legend: { position: 'bottom', labels: chartOpts.plugins.legend.labels } } }
             });
-
             const tiposCount = {};
             permissoes.forEach(p => { (p.tiposTrabalho || []).forEach(t => { tiposCount[t] = (tiposCount[t] || 0) + 1; }); });
             chartTipos = new Chart(document.getElementById('chartTipos').getContext('2d'), {
                 type: 'bar', data: { labels: Object.keys(tiposCount).map(l => l.substr(0,8)), datasets: [{ data: Object.values(tiposCount), backgroundColor: '#7b2dff', borderRadius: 4 }] },
                 options: { ...chartOpts, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#a0a0c0', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#a0a0c0' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
             });
-
             const monthlyCount = {};
             permissoes.forEach(p => { 
                 let d = p.criadoEm;
                 if (d && d.toDate) d = d.toDate();
                 if (d) { d = new Date(d); const k = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); monthlyCount[k] = (monthlyCount[k] || 0) + 1; }
             });
-
             const months = Object.keys(monthlyCount).sort();
             chartMensal = new Chart(document.getElementById('chartMensal').getContext('2d'), {
                 type: 'line', data: { labels: months.map(m => m.substr(5)), datasets: [{ data: months.map(m => monthlyCount[m]), borderColor: '#00f0ff', backgroundColor: 'rgba(0, 240, 255, 0.1)', fill: true, tension: 0.4 }] },
                 options: { ...chartOpts, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#a0a0c0' }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#a0a0c0' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
             });
-
             const execCount = {};
             permissoes.forEach(p => { if (p.executor) execCount[p.executor] = (execCount[p.executor] || 0) + 1; });
             const top = Object.entries(execCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
@@ -3718,7 +3305,6 @@
                 type: 'bar', data: { labels: top.map(e => e[0].split(' ')[0]), datasets: [{ data: top.map(e => e[1]), backgroundColor: '#ff00aa', borderRadius: 4 }] },
                 options: { ...chartOpts, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#a0a0c0' }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#a0a0c0', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
             });
-
         }
 
         // Verificar vencidas periodicamente
@@ -3726,7 +3312,6 @@
             if (currentUser && cachedPermissoes.length > 0) {
                 checkVencidas();
             }
-
         }, 60000); // Verificar a cada minuto
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -3734,41 +3319,34 @@
             document.getElementById('cbOutros').addEventListener('change', function() {
                 document.getElementById('permOutrosTipo').style.display = this.checked ? 'block' : 'none';
             });
-
             document.querySelectorAll('#bloqueioGroup .radio-item').forEach(item => {
                 item.addEventListener('click', function() { setTimeout(toggleBloqueios, 50); });
             });
-
             document.querySelectorAll('input[name="bloqueio"]').forEach(radio => {
                 radio.addEventListener('change', toggleBloqueios);
             });
-
             
-            // Verificar sessão salva PRIMEIRO
+            // Verificar sessão salva
             const savedUser = localStorage.getItem('ptd_currentUser');
             if (savedUser) {
                 try {
                     currentUser = JSON.parse(savedUser);
+                    // Mostrar app imediatamente
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                    document.getElementById('loginPage').style.display = 'none';
+                    document.getElementById('appContainer').style.display = 'block';
+                    updateUserInterface();
+                    navigationHistory = ['home'];
+                    updateBackButton();
                 } catch(e) {
                     localStorage.removeItem('ptd_currentUser');
                     currentUser = null;
                 }
             }
             
-            // Esconder loading e mostrar tela correta IMEDIATAMENTE
-            document.getElementById('loadingOverlay').classList.add('hidden');
-            if (currentUser) {
-                document.getElementById('loginPage').style.display = 'none';
-                document.getElementById('appContainer').style.display = 'block';
-                updateUserInterface();
-                navigationHistory = ['home'];
-                updateBackButton();
-            } else {
-                document.getElementById('loginPage').style.display = 'flex';
-            }
-            
-            // Iniciar Firebase em background
+            // Iniciar Firebase
             initFirebase().then(() => {
+                // Atualizar dados do usuário se logado
                 if (currentUser && cachedUsuarios.length > 0) {
                     const userExists = cachedUsuarios.find(u => u.id === currentUser.id);
                     if (userExists) {
@@ -3777,15 +3355,10 @@
                         updateUserInterface();
                         updateStats();
                         updateNotificationBadges();
-                        setupQRListener();
                     }
                 }
-            }).catch(err => {
-                console.log('Firebase erro:', err);
             });
-
         });
-
     </script>
 </body>
 </html>
