@@ -1414,7 +1414,6 @@
 
         }
 
-
         /* QR Code Styles */
         .qr-container { text-align: center; padding: 20px; }
         .qr-code-box {
@@ -2152,8 +2151,8 @@
                     }
 
                 });
-        }
 
+        }
 
         function updateQRBadge(count) {
             // Atualiza o badge de notificações se houver QRs pendentes
@@ -2173,7 +2172,6 @@
 
         }
 
-
         function renderQRNotifications(pendingQRs) {
             const container = document.getElementById('notificacoesList');
             let html = '';
@@ -2191,6 +2189,7 @@
                 }
 
             });
+
             
             // Depois as notificações normais de transferência
             const notifs = cachedNotificacoes.filter(n => n.paraId === currentUser.id && n.status === 'pendente');
@@ -2205,6 +2204,7 @@
                     '<div class="notification-time">' + formatDate(n.data) + '</div>' +
                 '</div>';
             });
+
             
             if (html === '') {
                 html = '<p style="color: var(--text-secondary); text-align: center; padding: 30px;">Nenhuma notificação pendente</p>';
@@ -2213,7 +2213,6 @@
             
             container.innerHTML = html;
         }
-
 
         // Executor: Gerar QR Code
         async function gerarQRCode() {
@@ -2236,6 +2235,7 @@
                 expiresAt: expiresAt.toISOString(),
                 validated: false
             });
+
             
             // Limpar container
             document.getElementById('qrCodeContainer').innerHTML = '';
@@ -2249,6 +2249,7 @@
                 colorLight: '#ffffff',
                 correctLevel: QRCode.CorrectLevel.H
             });
+
             
             // Reset status
             document.getElementById('qrStatus').className = 'qr-status waiting';
@@ -2293,6 +2294,7 @@
                         },
                         status: 'Em Execução'
                     });
+
                     
                     showToast('Trabalho iniciado com validação presencial!', 'success');
                     
@@ -2303,10 +2305,10 @@
                 }
 
             });
+
             
             openModal('modalQRCode');
         }
-
 
         function cancelarQRCode() {
             try {
@@ -2323,7 +2325,6 @@
             document.getElementById('modalQRCode').classList.remove('active');
             document.body.style.overflow = '';
         }
-
 
         // Supervisor: Abrir scanner
         function abrirScanner(qrId) {
@@ -2344,9 +2345,9 @@
                 }).catch((err) => {
                     document.getElementById('scannerResult').innerHTML = '<p style="color: var(--danger);">❌ Erro na câmera: ' + err + '</p>';
                 });
+
             }, 300);
         }
-
 
         function fecharScanner() {
             try {
@@ -2356,12 +2357,12 @@
                     }).catch(() => {
                         html5QrCode = null;
                     });
+
                 }
             } catch(e) {}
             document.getElementById('modalScanner').classList.remove('active');
             document.body.style.overflow = '';
         }
-
 
         async function validarQRCode(token) {
             if (html5QrCode) html5QrCode.stop().catch(() => {});
@@ -2412,6 +2413,7 @@
                     validatedBy: currentUser.nome,
                     validatedAt: new Date().toISOString()
                 });
+
                 
                 resultEl.innerHTML = '<div class="qr-status success">✅ Validado com sucesso!<br><br>' +
                     '<strong>PT #' + String(data.permissaoNumero).padStart(4, '0') + '</strong><br>' +
@@ -2426,7 +2428,6 @@
             }
 
         }
-
 
         // Modificar assinatura do executor para usar QR
         function signInicioExecutorComQR() {
@@ -2446,7 +2447,6 @@
             openModal('modalAssinatura');
         }
 
-
         let cachedUsuarios = [];
         let cachedPermissoes = [];
         let cachedNotificacoes = [];
@@ -2460,7 +2460,6 @@
                 if (firebaseConfig.apiKey === "SUA_API_KEY") {
                     throw new Error("Configure as credenciais do Firebase no código");
                 }
-
                 firebase.initializeApp(firebaseConfig);
                 db = firebase.firestore();
                 try {
@@ -2468,7 +2467,6 @@
                 } catch (err) {
                     console.log("Persistência offline não disponível:", err);
                 }
-
                 firebaseInitialized = true;
                 updateSyncStatus('online');
                 db.collection('_health').doc('check').onSnapshot(() => {
@@ -2476,28 +2474,19 @@
                 }, () => {
                     updateSyncStatus('offline');
                 });
+
                 await initializeDefaultData();
                 setupRealtimeListeners();
-                document.getElementById('loadingOverlay').classList.add('hidden');
-                if (!currentUser) document.getElementById('loginPage').style.display = 'flex';
                 const statusEl = document.getElementById('firebaseStatus');
                 statusEl.textContent = '✅ Firebase conectado';
                 statusEl.className = 'firebase-status connected';
             } catch (error) {
-                console.error("Erro ao inicializar Firebase:", error);
-                document.getElementById('loadingOverlay').querySelector('.loading-text').textContent = 'Erro: ' + error.message;
-                document.getElementById('loadingOverlay').querySelector('.loading-text').style.color = 'var(--danger)';
+                console.error("Erro Firebase:", error);
                 const statusEl = document.getElementById('firebaseStatus');
-                statusEl.textContent = '❌ ' + error.message;
+                statusEl.textContent = '❌ Erro de conexão';
                 statusEl.className = 'firebase-status error';
-                setTimeout(() => {
-                    document.getElementById('loadingOverlay').classList.add('hidden');
-                    if (!currentUser) document.getElementById('loginPage').style.display = 'flex';
-                }, 2000);
             }
-
         }
-
 
         function updateSyncStatus(status) {
             const indicator = document.getElementById('syncIndicator');
@@ -2506,7 +2495,6 @@
             const statusTexts = { online: 'Online', offline: 'Offline', syncing: 'Sincronizando...' };
             text.textContent = statusTexts[status] || status;
         }
-
 
         async function initializeDefaultData() {
             try {
@@ -2519,6 +2507,7 @@
                         tipos: ['administrador', 'supervisor', 'autorizador', 'executor'], assinatura: null,
                         criadoEm: firebase.firestore.FieldValue.serverTimestamp()
                     });
+
                     showToast('Usuário admin criado: pauloavila / paulo@2025', 'warning');
                 }
 
@@ -2533,7 +2522,6 @@
             }
 
         }
-
 
         function setupRealtimeListeners() {
             unsubscribers.forEach(unsub => unsub());
@@ -2591,8 +2579,8 @@
                     })
                 );
             });
-        }
 
+        }
 
         // Verificar permissões vencidas
         function checkVencidas() {
@@ -2608,9 +2596,9 @@
                 }
 
             });
+
             updateVencidasBadges();
         }
-
 
         function updateVencidasBadges() {
             const vencidas = cachedPermissoes.filter(p => p.status === 'Em Execução' && p.vencida);
@@ -2629,7 +2617,6 @@
 
         }
 
-
         function getData(collection) {
             switch(collection) {
                 case 'usuarios': return cachedUsuarios;
@@ -2644,7 +2631,6 @@
 
         }
 
-
         async function addDoc(collection, data) {
             updateSyncStatus('syncing');
             try {
@@ -2652,6 +2638,7 @@
                     ...data,
                     criadoEm: firebase.firestore.FieldValue.serverTimestamp()
                 });
+
                 updateSyncStatus('online');
                 return docRef.id;
             } catch (error) {
@@ -2661,7 +2648,6 @@
 
         }
 
-
         async function updateDoc(collection, id, data) {
             updateSyncStatus('syncing');
             try {
@@ -2669,6 +2655,7 @@
                     ...data,
                     atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
                 });
+
                 updateSyncStatus('online');
             } catch (error) {
                 updateSyncStatus('offline');
@@ -2676,7 +2663,6 @@
             }
 
         }
-
 
         async function deleteDoc(collection, id) {
             updateSyncStatus('syncing');
@@ -2690,7 +2676,6 @@
 
         }
 
-
         async function getNextPermissaoNumber() {
             const counterRef = db.collection('config').doc('counters');
             const result = await db.runTransaction(async (transaction) => {
@@ -2699,6 +2684,7 @@
                 transaction.update(counterRef, { permissaoNumero: newNumber });
                 return newNumber;
             });
+
             return result;
         }
 
@@ -2712,7 +2698,6 @@
             c.appendChild(t);
             setTimeout(() => t.remove(), 4000);
         }
-
 
         function formatDate(d) { 
             if (!d) return '-';
@@ -2736,7 +2721,6 @@
             window.print();
         }
 
-
         // CHECKBOX E RADIO HANDLERS
         function initCheckboxHandlers() {
             document.querySelectorAll('.checkbox-item').forEach(function(item) {
@@ -2750,14 +2734,17 @@
                     }
 
                 });
+
                 const checkbox = item.querySelector('input[type="checkbox"]');
                 if (checkbox) {
                     checkbox.addEventListener('change', function() {
                         updateCheckboxVisual(item, this.checked);
                     });
+
                 }
 
             });
+
             document.querySelectorAll('.radio-item').forEach(function(item) {
                 item.addEventListener('click', function(e) {
                     if (e.target.tagName === 'INPUT') return;
@@ -2771,6 +2758,7 @@
                     }
 
                 });
+
                 const radio = item.querySelector('input[type="radio"]');
                 if (radio) {
                     radio.addEventListener('change', function() {
@@ -2778,9 +2766,11 @@
                         group.querySelectorAll('.radio-item').forEach(function(r) { r.classList.remove('checked'); });
                         if (this.checked) item.classList.add('checked');
                     });
+
                 }
 
             });
+
         }
 
         
@@ -2789,12 +2779,10 @@
             else item.classList.remove('checked');
         }
 
-
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('sidebarOverlay').classList.toggle('active');
         }
-
 
         function goBack() {
             if (navigationHistory.length > 1) {
@@ -2805,13 +2793,11 @@
 
         }
 
-
         function updateBackButton() {
             const btn = document.getElementById('btnBack');
             if (navigationHistory.length > 1) btn.classList.remove('hidden');
             else btn.classList.add('hidden');
         }
-
 
         // Login
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
@@ -2819,29 +2805,39 @@
             const btn = document.getElementById('btnLogin');
             btn.disabled = true;
             btn.textContent = 'Entrando...';
-            try {
-                const u = document.getElementById('loginUsername').value.trim();
-                const p = document.getElementById('loginPassword').value;
-                const user = cachedUsuarios.find(x => x.usuario === u && x.senha === p);
-                if (user) {
-                    currentUser = user;
-                    localStorage.setItem('ptd_currentUser', JSON.stringify(user));
-                    document.getElementById('loginPage').style.display = 'none';
-                    document.getElementById('loadingOverlay').classList.add('hidden'); document.getElementById('appContainer').style.display = 'block';
-                    updateUserInterface();
-                    updateStats();
-                    updateNotificationBadges(); setupQRListener();
-                    navigationHistory = ['home'];
-                    navigateTo('home', false);
-                    showToast('Login realizado!'); setupQRListener();
+            
+            const u = document.getElementById('loginUsername').value.trim();
+            const p = document.getElementById('loginPassword').value;
+            
+            // Se dados ainda não carregaram, esperar um pouco
+            let tentativas = 0;
+            while (cachedUsuarios.length === 0 && tentativas < 10) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                tentativas++;
+                btn.textContent = 'Aguarde...';
+            }
+            
+            const user = cachedUsuarios.find(x => x.usuario === u && x.senha === p);
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('ptd_currentUser', JSON.stringify(user));
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('appContainer').style.display = 'block';
+                updateUserInterface();
+                updateStats();
+                updateNotificationBadges();
+                setupQRListener();
+                navigationHistory = ['home'];
+                navigateTo('home', false);
+                showToast('Login realizado!');
+            } else {
+                if (cachedUsuarios.length === 0) {
+                    showToast('Sem conexão. Tente novamente.', 'error');
                 } else {
                     showToast('Usuário ou senha inválidos!', 'error');
                 }
-
-            } catch (error) {
-                showToast('Erro ao fazer login: ' + error.message, 'error');
             }
-
+            
             btn.disabled = false;
             btn.innerHTML = '🔐 Entrar';
         });
@@ -2855,7 +2851,6 @@
             document.getElementById('loginPassword').value = '';
             navigationHistory = ['home'];
         }
-
 
         function updateUserInterface() {
             if (!currentUser) return;
@@ -2875,13 +2870,11 @@
             checkAssinatura();
         }
 
-
         function checkAssinatura() {
             const has = currentUser.assinatura !== null;
             document.getElementById('assinaturaExistente').style.display = has ? 'block' : 'none';
             document.getElementById('assinaturaForm').style.display = has ? 'none' : 'block';
         }
-
 
         function updateNotificationBadges() {
             const notifs = cachedNotificacoes.filter(n => n.paraId === currentUser.id && n.status === 'pendente');
@@ -2898,7 +2891,6 @@
 
         }
 
-
         function loadNotificacoes() {
             // Se for supervisor, buscar QRs pendentes e renderizar junto
             if (currentUser.tipos.includes('supervisor')) {
@@ -2913,13 +2905,13 @@
                     }).catch(() => {
                         renderQRNotifications([]);
                     });
+
             } else {
                 // Renderizar só notificações normais
                 renderQRNotifications([]);
             }
 
         }
-
 
         function abrirNotificacao(notifId) {
             const notif = cachedNotificacoes.find(n => n.id === notifId);
@@ -2937,7 +2929,6 @@
             openModal('modalAceitarTransfer');
         }
 
-
         async function aceitarTransferencia() {
             const assinatura = document.getElementById('aceitarTransferAssinatura').value;
             if (!currentUser.assinatura) { showToast('Configure sua assinatura primeiro!', 'error'); closeModal('modalAceitarTransfer'); navigateTo('assinatura'); return; }
@@ -2951,6 +2942,7 @@
                         para: currentNotification.para, paraId: currentNotification.paraId,
                         dataSolicitacao: currentNotification.data, dataAceite: new Date().toISOString(), status: 'aceita'
                     });
+
                     const updateData = { transferencias };
                     updateData[currentNotification.tipo + 'Id'] = currentNotification.paraId;
                     updateData[currentNotification.tipo] = currentNotification.para;
@@ -2964,7 +2956,6 @@
             } catch (error) { showToast('Erro ao aceitar: ' + error.message, 'error'); }
         }
 
-
         async function recusarTransferencia() {
             if (!confirm('Recusar transferência?')) return;
             try {
@@ -2973,7 +2964,6 @@
                 showToast('Transferência recusada.');
             } catch (error) { showToast('Erro ao recusar: ' + error.message, 'error'); }
         }
-
 
         function navigateTo(page, addToHistory = true) {
             document.getElementById('sidebar').classList.remove('open');
@@ -2993,6 +2983,7 @@
             document.querySelectorAll('.nav-link').forEach(link => {
                 if (link.getAttribute('onclick')?.includes("'" + page + "'")) link.classList.add('active');
             });
+
             if (addToHistory && navigationHistory[navigationHistory.length - 1] !== page) navigationHistory.push(page);
             updateBackButton();
             if (page === 'usuarios') loadUsuarios();
@@ -3008,7 +2999,6 @@
             window.scrollTo(0, 0);
         }
 
-
         function loadUsuarios() {
             document.getElementById('usuariosTableBody').innerHTML = cachedUsuarios.map(u => 
                 '<tr onclick="event.stopPropagation()"><td>' + u.nome + '</td><td>' + u.usuario + '</td><td>' + u.cargo + '</td><td>' + 
@@ -3016,7 +3006,6 @@
                 '<button class="btn btn-danger btn-xs" onclick="deleteUsuario(\'' + u.id + '\')">🗑️</button></td></tr>'
             ).join('');
         }
-
 
         async function salvarUsuario() {
             const tipos = [];
@@ -3032,23 +3021,23 @@
                     cargo: document.getElementById('novoCargo').value, empresa: document.getElementById('novoEmpresa').value,
                     tipos: tipos, assinatura: null
                 });
+
                 closeModal('modalNovoUsuario');
                 ['novoNome','novoUsuario','novoSenha','novoSetor','novoCargo','novoEmpresa'].forEach(id => document.getElementById(id).value = '');
                 ['tipoAdmin','tipoSupervisor','tipoAutorizador','tipoExecutor'].forEach(id => {
                     document.getElementById(id).checked = false;
                     document.getElementById(id).parentElement.classList.remove('checked');
                 });
+
                 showToast('Usuário cadastrado!');
             } catch (error) { showToast('Erro ao salvar: ' + error.message, 'error'); }
         }
-
 
         async function deleteUsuario(id) {
             if (!confirm('Excluir usuário?')) return;
             try { await deleteDoc('usuarios', id); showToast('Usuário excluído!'); }
             catch (error) { showToast('Erro ao excluir: ' + error.message, 'error'); }
         }
-
 
         async function salvarAssinatura() {
             const nova = document.getElementById('novaAssinatura').value;
@@ -3066,7 +3055,6 @@
             } catch (error) { showToast('Erro ao salvar: ' + error.message, 'error'); }
         }
 
-
         function toggleSignatureVisibility() {
             const d = document.getElementById('signatureDisplay');
             const t = document.getElementById('toggleText');
@@ -3074,12 +3062,10 @@
             else { d.textContent = '••••••'; t.textContent = '👁 Mostrar'; }
         }
 
-
         function showResetSignature() {
             document.getElementById('assinaturaExistente').style.display = 'none';
             document.getElementById('assinaturaForm').style.display = 'block';
         }
-
 
         function openSafetyModal(type) {
             currentSafetyType = type;
@@ -3091,7 +3077,6 @@
             openModal('modalSafety');
         }
 
-
         async function salvarSafetyItem() {
             const nome = document.getElementById('safetyInput').value.trim();
             if (!nome) { showToast('Digite um nome!', 'error'); return; }
@@ -3101,7 +3086,6 @@
                 showToast('Item cadastrado!');
             } catch (error) { showToast('Erro ao salvar: ' + error.message, 'error'); }
         }
-
 
         function loadSafetyLists() {
             const collections = {
@@ -3120,14 +3104,13 @@
                 }
 
             });
-        }
 
+        }
 
         async function deleteSafetyItem(type, id) {
             try { await deleteDoc(type, id); showToast('Removido!'); }
             catch (error) { showToast('Erro ao remover: ' + error.message, 'error'); }
         }
-
 
         function loadSelects() {
             ['autorizador', 'supervisor', 'executor'].forEach(tipo => {
@@ -3135,14 +3118,13 @@
                 const sel = document.getElementById('perm' + tipo.charAt(0).toUpperCase() + tipo.slice(1));
                 if (sel) sel.innerHTML = '<option value="">Selecione</option>' + users.map(u => '<option value="' + u.id + '">' + u.nome + '</option>').join('');
             });
-        }
 
+        }
 
         function toggleBloqueios() {
             const sim = document.querySelector('input[name="bloqueio"][value="sim"]');
             document.getElementById('bloqueiosContainer').style.display = sim && sim.checked ? 'block' : 'none';
         }
-
 
         function addExecutorToList() {
             const nome = document.getElementById('executorNome').value.trim();
@@ -3154,7 +3136,6 @@
             document.getElementById('executorNome').value = '';
             document.getElementById('executorCargo').value = '';
         }
-
 
         function addBloqueioToList() {
             const local = document.getElementById('bloqueioLocal').value.trim();
@@ -3169,7 +3150,6 @@
             document.getElementById('bloqueioCadeado').value = '';
         }
 
-
         function openSelectModal(type) {
             currentSelectType = type;
             selectedItems = [];
@@ -3182,13 +3162,11 @@
             openModal('modalSelectItems');
         }
 
-
         function toggleSelectItem(id, nome) {
             const idx = selectedItems.findIndex(i => i.id === id);
             if (idx === -1) selectedItems.push({ id, nome });
             else selectedItems.splice(idx, 1);
         }
-
 
         function confirmSelectItems() {
             const lists = {
@@ -3203,7 +3181,6 @@
             closeModal('modalSelectItems');
         }
 
-
         function renderTempList(listId, items, type) {
             const list = document.getElementById(listId);
             if (items.length === 0) { list.innerHTML = ''; return; }
@@ -3213,7 +3190,6 @@
                 return '<div class="item-list-item"><span>' + text + '</span><button class="btn-remove" onclick="removeFromTempList(\'' + type + '\',' + idx + ')">✕</button></div>';
             }).join('');
         }
-
 
         function removeFromTempList(type, idx) {
             const lists = {
@@ -3228,7 +3204,6 @@
             renderTempList(lists[type].listId, lists[type].temp, type);
         }
 
-
         function limparFormPermissao() {
             document.getElementById('formPermissao').reset();
             tempExecutores = []; tempEquipamentos = []; tempRiscos = []; tempEpi = []; tempMedidas = []; tempBloqueios = [];
@@ -3240,8 +3215,8 @@
                 item.classList.remove('checked');
                 if (item.dataset.value === 'nao') item.classList.add('checked');
             });
-        }
 
+        }
 
         function getSelectedTiposTrabalho() {
             const tipos = [];
@@ -3249,6 +3224,7 @@
                 const cb = item.querySelector('input[type="checkbox"]');
                 if (cb && cb.checked) tipos.push(item.dataset.value);
             });
+
             const outrosIdx = tipos.indexOf('Outros');
             if (outrosIdx !== -1) {
                 const outrosText = document.getElementById('permOutrosTipo').value.trim();
@@ -3257,7 +3233,6 @@
 
             return tipos;
         }
-
 
         document.getElementById('formPermissao').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -3297,6 +3272,7 @@
                     assinaturaTerminoExecutor: null, assinaturaTerminoSupervisor: null, assinaturaTerminoAutorizador: null,
                     equipamentoRetornou: true, justificativaNaoRetorno: ''
                 });
+
                 limparFormPermissao();
                 showToast('Permissão criada!');
                 navigateTo('solicitadas');
@@ -3329,7 +3305,6 @@
             '</div>';
         }
 
-
         function loadPermissoesSolicitadas() {
             const permissoes = cachedPermissoes.filter(p => p.status === 'Solicitada');
             const container = document.getElementById('listSolicitadas');
@@ -3337,7 +3312,6 @@
                 '<p style="color: var(--text-secondary); text-align: center; padding: 30px;">Nenhuma permissão solicitada</p>' :
                 permissoes.map(p => renderPermissionCard(p)).join('');
         }
-
 
         function loadPermissoesExecucao() {
             const permissoes = cachedPermissoes.filter(p => p.status === 'Em Execução' && !p.vencida);
@@ -3347,7 +3321,6 @@
                 permissoes.map(p => renderPermissionCard(p)).join('');
         }
 
-
         function loadPermissoesVencidas() {
             const permissoes = cachedPermissoes.filter(p => p.status === 'Em Execução' && p.vencida);
             const container = document.getElementById('listVencidas');
@@ -3356,7 +3329,6 @@
                 permissoes.map(p => renderPermissionCard(p, true)).join('');
         }
 
-
         function loadPermissoesEncerradas() {
             const permissoes = cachedPermissoes.filter(p => p.status === 'Encerrada');
             const container = document.getElementById('listEncerradas');
@@ -3364,7 +3336,6 @@
                 '<p style="color: var(--text-secondary); text-align: center; padding: 30px;">Nenhuma permissão encerrada</p>' :
                 permissoes.map(p => renderPermissionCard(p)).join('');
         }
-
 
         // View Permission - Com descrição completa de bloqueios
         function viewPermissao(id) {
@@ -3463,6 +3434,7 @@
                     content += '<p><strong>Nº Cadeado:</strong> ' + b.cadeado + '</p>';
                     content += '</div>';
                 });
+
             } else {
                 content += '<p style="color: var(--success);">✓ Não requer bloqueio</p>';
             }
@@ -3497,6 +3469,7 @@
 
                 content += '</div>';
             });
+
             content += '</div>';
             
             // E1 - Assinaturas de Início
@@ -3579,7 +3552,6 @@
             openModal('modalViewPermissao');
         }
 
-
         function openTransferModal(type, permissaoId) {
             transferType = type;
             transferPermissaoId = permissaoId;
@@ -3592,7 +3564,6 @@
             document.getElementById('transferAssinatura').value = '';
             openModal('modalTransfer');
         }
-
 
         async function solicitarTransferencia() {
             const novoId = document.getElementById('transferSelect').value;
@@ -3608,13 +3579,13 @@
                     deId: currentUser.id, de: currentUser.nome, paraId: novoId, para: novoUsuario.nome,
                     data: new Date().toISOString(), status: 'pendente'
                 });
+
                 closeModal('modalTransfer');
                 closeModal('modalViewPermissao');
                 document.getElementById('transferAssinatura').value = '';
                 showToast('Solicitação enviada!');
             } catch (error) { showToast('Erro: ' + error.message, 'error'); }
         }
-
 
         function signInicio(role) {
             const msgs = { autorizador: 'Confirmar bloqueios e condições de segurança?', supervisor: 'Conferir bloqueios e autorizar início?', executor: 'Iniciar o trabalho?' };
@@ -3632,7 +3603,6 @@
             openModal('modalAssinatura');
         }
 
-
         function signTermino(role) {
             if (role === 'autorizador') {
                 document.getElementById('assinaturaMessage').innerHTML = 'Equipamento/ferramenta retornou ao local de origem?<div style="margin-top: 12px;"><label class="radio-item checked" style="display: inline-flex; margin-right: 10px;"><input type="radio" name="equipRetornou" value="sim" checked><span>Sim</span></label><label class="radio-item" style="display: inline-flex;"><input type="radio" name="equipRetornou" value="nao"><span>Não</span></label><div id="justificativaContainer" style="display: none; margin-top: 10px;"><textarea id="justificativaNaoRetorno" rows="2" placeholder="Justifique o motivo..." style="width: 100%; padding: 10px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 0.9rem;"></textarea></div></div>';
@@ -3643,8 +3613,11 @@
                             document.querySelectorAll('input[name="equipRetornou"]').forEach(r => {
                                 r.parentElement.classList.toggle('checked', r.checked);
                             });
+
                         });
+
                     });
+
                 }, 100);
                 signatureCallback = async () => {
                     try {
@@ -3677,7 +3650,6 @@
             openModal('modalAssinatura');
         }
 
-
         function confirmarAssinatura() {
             const assinatura = document.getElementById('inputAssinatura').value;
             if (!currentUser.assinatura) { showToast('Configure assinatura!', 'error'); closeModal('modalAssinatura'); navigateTo('assinatura'); return; }
@@ -3686,7 +3658,6 @@
             document.getElementById('inputAssinatura').value = '';
             if (signatureCallback) { signatureCallback(); signatureCallback = null; }
         }
-
 
         function updateStats() {
             const vencidas = cachedPermissoes.filter(p => p.status === 'Em Execução' && p.vencida).length;
@@ -3697,7 +3668,6 @@
             document.getElementById('statEncerradas').textContent = cachedPermissoes.filter(p => p.status === 'Encerrada').length;
             document.getElementById('statTotal').textContent = cachedPermissoes.length;
         }
-
 
         let chartStatus, chartTipos, chartMensal, chartExecutores;
         function loadDashboard() {
@@ -3720,23 +3690,27 @@
                 type: 'doughnut', data: { labels: ['Solic.', 'Exec.', 'Venc.', 'Enc.'], datasets: [{ data: [sol, exe, venc, enc], backgroundColor: ['#ffaa00', '#00f0ff', '#ff3366', '#00ff88'], borderWidth: 0 }] },
                 options: { ...chartOpts, plugins: { legend: { position: 'bottom', labels: chartOpts.plugins.legend.labels } } }
             });
+
             const tiposCount = {};
             permissoes.forEach(p => { (p.tiposTrabalho || []).forEach(t => { tiposCount[t] = (tiposCount[t] || 0) + 1; }); });
             chartTipos = new Chart(document.getElementById('chartTipos').getContext('2d'), {
                 type: 'bar', data: { labels: Object.keys(tiposCount).map(l => l.substr(0,8)), datasets: [{ data: Object.values(tiposCount), backgroundColor: '#7b2dff', borderRadius: 4 }] },
                 options: { ...chartOpts, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#a0a0c0', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#a0a0c0' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
             });
+
             const monthlyCount = {};
             permissoes.forEach(p => { 
                 let d = p.criadoEm;
                 if (d && d.toDate) d = d.toDate();
                 if (d) { d = new Date(d); const k = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); monthlyCount[k] = (monthlyCount[k] || 0) + 1; }
             });
+
             const months = Object.keys(monthlyCount).sort();
             chartMensal = new Chart(document.getElementById('chartMensal').getContext('2d'), {
                 type: 'line', data: { labels: months.map(m => m.substr(5)), datasets: [{ data: months.map(m => monthlyCount[m]), borderColor: '#00f0ff', backgroundColor: 'rgba(0, 240, 255, 0.1)', fill: true, tension: 0.4 }] },
                 options: { ...chartOpts, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#a0a0c0' }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#a0a0c0' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
             });
+
             const execCount = {};
             permissoes.forEach(p => { if (p.executor) execCount[p.executor] = (execCount[p.executor] || 0) + 1; });
             const top = Object.entries(execCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
@@ -3744,8 +3718,8 @@
                 type: 'bar', data: { labels: top.map(e => e[0].split(' ')[0]), datasets: [{ data: top.map(e => e[1]), backgroundColor: '#ff00aa', borderRadius: 4 }] },
                 options: { ...chartOpts, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#a0a0c0' }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#a0a0c0', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
             });
-        }
 
+        }
 
         // Verificar vencidas periodicamente
         setInterval(() => {
@@ -3760,49 +3734,58 @@
             document.getElementById('cbOutros').addEventListener('change', function() {
                 document.getElementById('permOutrosTipo').style.display = this.checked ? 'block' : 'none';
             });
+
             document.querySelectorAll('#bloqueioGroup .radio-item').forEach(item => {
                 item.addEventListener('click', function() { setTimeout(toggleBloqueios, 50); });
             });
+
             document.querySelectorAll('input[name="bloqueio"]').forEach(radio => {
                 radio.addEventListener('change', toggleBloqueios);
             });
+
+            
+            // Verificar sessão salva PRIMEIRO
             const savedUser = localStorage.getItem('ptd_currentUser');
             if (savedUser) {
                 try {
                     currentUser = JSON.parse(savedUser);
-                    // Mostrar app imediatamente
-                    document.getElementById('loginPage').style.display = 'none';
-                    document.getElementById('loadingOverlay').classList.add('hidden'); document.getElementById('appContainer').style.display = 'block';
-                    updateUserInterface();
-                    navigationHistory = ['home'];
-                    updateBackButton();
                 } catch(e) {
                     localStorage.removeItem('ptd_currentUser');
                     currentUser = null;
                 }
             }
             
+            // Esconder loading e mostrar tela correta IMEDIATAMENTE
+            document.getElementById('loadingOverlay').classList.add('hidden');
+            if (currentUser) {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('appContainer').style.display = 'block';
+                updateUserInterface();
+                navigationHistory = ['home'];
+                updateBackButton();
+            } else {
+                document.getElementById('loginPage').style.display = 'flex';
+            }
+            
+            // Iniciar Firebase em background
             initFirebase().then(() => {
-                // Se já está logado, atualizar dados quando Firebase carregar
-                if (currentUser) {
-                    setTimeout(() => {
-                        if (cachedUsuarios.length > 0) {
-                            const userExists = cachedUsuarios.find(u => u.id === currentUser.id);
-                            if (userExists) {
-                                currentUser = userExists;
-                                localStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
-                                updateUserInterface();
-                                updateStats();
-                                updateNotificationBadges();
-                                setupQRListener();
-                            }
-                        }
-                    }, 1500);
+                if (currentUser && cachedUsuarios.length > 0) {
+                    const userExists = cachedUsuarios.find(u => u.id === currentUser.id);
+                    if (userExists) {
+                        currentUser = userExists;
+                        localStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
+                        updateUserInterface();
+                        updateStats();
+                        updateNotificationBadges();
+                        setupQRListener();
+                    }
                 }
             }).catch(err => {
-                console.log('Firebase erro:', err); document.getElementById('loadingOverlay').classList.add('hidden'); if (!currentUser) document.getElementById('loginPage').style.display = 'flex';
+                console.log('Firebase erro:', err);
             });
+
         });
+
     </script>
 </body>
 </html>
