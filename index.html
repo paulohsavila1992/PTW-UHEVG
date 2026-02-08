@@ -2479,7 +2479,7 @@
                 await initializeDefaultData();
                 setupRealtimeListeners();
                 document.getElementById('loadingOverlay').classList.add('hidden');
-                document.getElementById('loginPage').style.display = 'flex';
+                if (!currentUser) document.getElementById('loginPage').style.display = 'flex';
                 const statusEl = document.getElementById('firebaseStatus');
                 statusEl.textContent = '✅ Firebase conectado';
                 statusEl.className = 'firebase-status connected';
@@ -2492,7 +2492,7 @@
                 statusEl.className = 'firebase-status error';
                 setTimeout(() => {
                     document.getElementById('loadingOverlay').classList.add('hidden');
-                    document.getElementById('loginPage').style.display = 'flex';
+                    if (!currentUser) document.getElementById('loginPage').style.display = 'flex';
                 }, 2000);
             }
 
@@ -2827,7 +2827,7 @@
                     currentUser = user;
                     localStorage.setItem('ptd_currentUser', JSON.stringify(user));
                     document.getElementById('loginPage').style.display = 'none';
-                    document.getElementById('appContainer').style.display = 'block';
+                    document.getElementById('loadingOverlay').classList.add('hidden'); document.getElementById('appContainer').style.display = 'block';
                     updateUserInterface();
                     updateStats();
                     updateNotificationBadges(); setupQRListener();
@@ -3772,7 +3772,7 @@
                     currentUser = JSON.parse(savedUser);
                     // Mostrar app imediatamente
                     document.getElementById('loginPage').style.display = 'none';
-                    document.getElementById('appContainer').style.display = 'block';
+                    document.getElementById('loadingOverlay').classList.add('hidden'); document.getElementById('appContainer').style.display = 'block';
                     updateUserInterface();
                     navigationHistory = ['home'];
                     updateBackButton();
@@ -3800,7 +3800,7 @@
                     }, 1500);
                 }
             }).catch(err => {
-                console.log('Firebase erro:', err);
+                console.log('Firebase erro:', err); document.getElementById('loadingOverlay').classList.add('hidden'); if (!currentUser) document.getElementById('loginPage').style.display = 'flex';
             });
         });
     </script>
