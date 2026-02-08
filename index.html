@@ -2173,21 +2173,25 @@
         }
 
         async function initializeDefaultData() {
-            const usersRef = db.collection('usuarios');
-            const usersSnapshot = await usersRef.get();
-            if (usersSnapshot.empty) {
-                await usersRef.add({
-                    nome: 'Paulo Henrique Ávila', usuario: 'pauloavila', senha: 'paulo@2025',
-                    setor: 'Operação', cargo: 'Mantenedor', empresa: 'Enel',
-                    tipos: ['administrador', 'supervisor', 'autorizador', 'executor'], assinatura: null,
-                    criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                showToast('Usuário admin criado: pauloavila / paulo@2025', 'warning');
-            }
-            const counterRef = db.collection('config').doc('counters');
-            const counterDoc = await counterRef.get();
-            if (!counterDoc.exists) {
-                await counterRef.set({ permissaoNumero: 0 });
+            try {
+                const usersRef = db.collection('usuarios');
+                const usersSnapshot = await usersRef.get();
+                if (usersSnapshot.empty) {
+                    await usersRef.add({
+                        nome: 'Paulo Henrique Ávila', usuario: 'pauloavila', senha: 'paulo@2025',
+                        setor: 'Operação', cargo: 'Mantenedor', empresa: 'Enel',
+                        tipos: ['administrador', 'supervisor', 'autorizador', 'executor'], assinatura: null,
+                        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showToast('Usuário admin criado: pauloavila / paulo@2025', 'warning');
+                }
+                const counterRef = db.collection('config').doc('counters');
+                const counterDoc = await counterRef.get();
+                if (!counterDoc.exists) {
+                    await counterRef.set({ permissaoNumero: 0 });
+                }
+            } catch(err) {
+                console.log('Modo offline - dados serão sincronizados quando conectar');
             }
         }
 
