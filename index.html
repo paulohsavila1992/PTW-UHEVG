@@ -1921,12 +1921,12 @@
         // CONFIGURAÇÃO DO FIREBASE
         // ================================================================
         const firebaseConfig = {
-            apiKey: "AIzaSyDMCFLSKH-Ug61qb-x-b4IUMOP7E6_7r1M",
-            authDomain: "permissao-trabalho-uhevg-95a56.firebaseapp.com",
-            projectId: "permissao-trabalho-uhevg-95a56",
-            storageBucket: "permissao-trabalho-uhevg-95a56.firebasestorage.app",
-            messagingSenderId: "4949368740",
-            appId: "1:4949368740:web:0090e62d1fe1961e1c6b31"
+            apiKey: "AIzaSyC7TxxgjMVX3lsb4nget2gbdU6nR-3IcM",
+            authDomain: "permissao-trabalho-uhevg.firebaseapp.com",
+            projectId: "permissao-trabalho-uhevg",
+            storageBucket: "permissao-trabalho-uhevg.firebasestorage.app",
+            messagingSenderId: "236218702254",
+            appId: "1:236218702254:web:6e93684d044ff7c0ee503f"
         };
         // ================================================================
 
@@ -1951,35 +1951,44 @@
         let tempMedidas = [];
         let tempBloqueios = [];
 
+
         // ==================== QR CODE SYSTEM ====================
         let qrCodeInstance = null;
         let qrTimerInterval = null;
         let qrValidationListener = null;
         let currentQRToken = null;
         let html5QrCode = null;
+        let qrTipoAssinatura = 'inicio'; // 'inicio' ou 'termino'
 
         function setupQRListener() {
             if (!currentUser || !currentUser.tipos.includes('supervisor')) return;
         }
 
-        async function gerarQRCode() {
+        async function gerarQRCode(tipo) {
+            qrTipoAssinatura = tipo || 'inicio';
             const p = cachedPermissoes.find(perm => perm.id === editingPermissaoId);
             if (!p) return;
             
-            currentQRToken = 'QR_' + p.numero + '_' + Date.now();
+            currentQRToken = 'QR_' + p.numero + '_' + qrTipoAssinatura + '_' + Date.now();
             const expiresAt = new Date(Date.now() + 30000);
             
-            await db.collection('qr_validations').doc(currentQRToken).set({
-                permissaoId: editingPermissaoId,
-                permissaoNumero: p.numero,
-                executorId: currentUser.id,
-                executorNome: currentUser.nome,
-                supervisorId: p.supervisorId,
-                supervisorNome: p.supervisor,
-                createdAt: new Date().toISOString(),
-                expiresAt: expiresAt.toISOString(),
-                validated: false
-            });
+            try {
+                await db.collection('qr_validations').doc(currentQRToken).set({
+                    permissaoId: editingPermissaoId,
+                    permissaoNumero: p.numero,
+                    executorId: currentUser.id,
+                    executorNome: currentUser.nome,
+                    supervisorId: p.supervisorId,
+                    supervisorNome: p.supervisor,
+                    tipo: qrTipoAssinatura,
+                    createdAt: new Date().toISOString(),
+                    expiresAt: expiresAt.toISOString(),
+                    validated: false
+                });
+            } catch(e) {
+                showToast('Erro de conexão', 'error');
+                return;
+            }
             
             document.getElementById('qrCodeContainer').innerHTML = '';
             qrCodeInstance = new QRCode(document.getElementById('qrCodeContainer'), {
@@ -1988,13 +1997,15 @@
                 correctLevel: QRCode.CorrectLevel.H
             });
             
+            const tipoTexto = qrTipoAssinatura === 'inicio' ? 'INÍCIO' : 'ENCERRAMENTO';
             document.getElementById('qrStatus').className = 'qr-status waiting';
-            document.getElementById('qrStatus').textContent = '⏳ Aguardando ' + p.supervisor + ' validar...';
+            document.getElementById('qrStatus').textContent = '⏳ Aguardando ' + p.supervisor + ' validar ' + tipoTexto + '...';
             document.getElementById('qrTimer').className = 'qr-timer';
             
             let timeLeft = 30;
             document.getElementById('qrTimer').textContent = timeLeft;
             
+            if (qrTimerInterval) clearInterval(qrTimerInterval);
             qrTimerInterval = setInterval(() => {
                 timeLeft--;
                 document.getElementById('qrTimer').textContent = timeLeft;
@@ -2004,27 +2015,36 @@
                     document.getElementById('qrStatus').className = 'qr-status error';
                     document.getElementById('qrStatus').textContent = '❌ Tempo expirado!';
                     db.collection('qr_validations').doc(currentQRToken).delete().catch(() => {});
-                    if (qrValidationListener) qrValidationListener();
+                    if (qrValidationListener) { qrValidationListener(); qrValidationListener = null; }
                 }
             }, 1000);
             
+            if (qrValidationListener) { qrValidationListener(); qrValidationListener = null; }
             qrValidationListener = db.collection('qr_validations').doc(currentQRToken).onSnapshot(async (doc) => {
                 if (doc.exists && doc.data().validated) {
                     clearInterval(qrTimerInterval);
-                    if (qrValidationListener) qrValidationListener();
+                    if (qrValidationListener) { qrValidationListener(); qrValidationListener = null; }
                     
                     document.getElementById('qrTimer').textContent = '✓';
                     document.getElementById('qrTimer').className = 'qr-timer success';
                     document.getElementById('qrStatus').className = 'qr-status success';
                     document.getElementById('qrStatus').textContent = '✅ Validado por ' + doc.data().validatedBy + '!';
                     
-                    await updateDoc('permissoes', editingPermissaoId, {
-                        assinaturaInicioExecutor: new Date().toISOString(),
-                        validacaoPresencial: { supervisorNome: doc.data().validatedBy, validadoEm: doc.data().validatedAt },
-                        status: 'Em Execução'
-                    });
+                    // Atualizar permissão baseado no tipo
+                    const updateData = {};
+                    if (qrTipoAssinatura === 'inicio') {
+                        updateData.assinaturaInicioExecutor = new Date().toISOString();
+                        updateData.validacaoPresencialInicio = { supervisorNome: doc.data().validatedBy, validadoEm: doc.data().validatedAt };
+                        updateData.status = 'Em Execução';
+                    } else {
+                        updateData.assinaturaTerminoExecutor = new Date().toISOString();
+                        updateData.validacaoPresencialTermino = { supervisorNome: doc.data().validatedBy, validadoEm: doc.data().validatedAt };
+                    }
                     
-                    showToast('Trabalho iniciado!', 'success');
+                    await updateDoc('permissoes', editingPermissaoId, updateData);
+                    
+                    const msg = qrTipoAssinatura === 'inicio' ? 'Trabalho iniciado!' : 'Encerramento registrado!';
+                    showToast(msg, 'success');
                     setTimeout(() => { cancelarQRCode(); viewPermissao(editingPermissaoId); }, 1500);
                 }
             });
@@ -2033,9 +2053,12 @@
         }
 
         function cancelarQRCode() {
-            clearInterval(qrTimerInterval);
+            if (qrTimerInterval) { clearInterval(qrTimerInterval); qrTimerInterval = null; }
             if (qrValidationListener) { qrValidationListener(); qrValidationListener = null; }
-            if (currentQRToken) { db.collection('qr_validations').doc(currentQRToken).delete().catch(() => {}); currentQRToken = null; }
+            if (currentQRToken) { 
+                db.collection('qr_validations').doc(currentQRToken).delete().catch(() => {}); 
+                currentQRToken = null; 
+            }
             document.getElementById('modalQRCode').classList.remove('active');
             document.body.style.overflow = '';
         }
@@ -2045,49 +2068,93 @@
             openModal('modalScanner');
             
             setTimeout(() => {
-                html5QrCode = new Html5Qrcode("qr-reader");
-                html5QrCode.start(
-                    { facingMode: "environment" },
-                    { fps: 10, qrbox: { width: 250, height: 250 } },
-                    async (decodedText) => { await validarQRCode(decodedText); },
-                    () => {}
-                ).then(() => {
-                    document.getElementById('scannerResult').innerHTML = '<p style="color: var(--success);">📷 Câmera ativa</p>';
-                }).catch((err) => {
-                    document.getElementById('scannerResult').innerHTML = '<p style="color: var(--danger);">❌ Erro câmera: ' + err + '</p>';
-                });
+                try {
+                    html5QrCode = new Html5Qrcode("qr-reader");
+                    html5QrCode.start(
+                        { facingMode: "environment" },
+                        { fps: 10, qrbox: { width: 250, height: 250 } },
+                        (decodedText) => { validarQRCode(decodedText); },
+                        () => {}
+                    ).then(() => {
+                        document.getElementById('scannerResult').innerHTML = '<p style="color: var(--success);">📷 Câmera ativa</p>';
+                    }).catch((err) => {
+                        document.getElementById('scannerResult').innerHTML = '<p style="color: var(--danger);">❌ Erro câmera: ' + err + '</p>';
+                    });
+                } catch(e) {
+                    document.getElementById('scannerResult').innerHTML = '<p style="color: var(--danger);">❌ Erro ao iniciar câmera</p>';
+                }
             }, 300);
         }
 
         function fecharScanner() {
-            if (html5QrCode) { html5QrCode.stop().catch(() => {}); html5QrCode = null; }
+            // Parar câmera de forma assíncrona sem travar
+            if (html5QrCode) {
+                try {
+                    html5QrCode.stop().then(() => {
+                        html5QrCode = null;
+                    }).catch(() => {
+                        html5QrCode = null;
+                    });
+                } catch(e) {
+                    html5QrCode = null;
+                }
+            }
+            // Fechar modal imediatamente
             document.getElementById('modalScanner').classList.remove('active');
             document.body.style.overflow = '';
+            document.getElementById('scannerResult').innerHTML = '';
+            document.getElementById('qr-reader').innerHTML = '';
         }
 
         async function validarQRCode(token) {
-            if (html5QrCode) { html5QrCode.stop().catch(() => {}); }
+            // Parar câmera primeiro
+            if (html5QrCode) {
+                try { html5QrCode.stop().catch(() => {}); } catch(e) {}
+                html5QrCode = null;
+            }
+            
             document.getElementById('scannerResult').innerHTML = '<p style="color: var(--warning);">⏳ Validando...</p>';
             
             try {
                 const doc = await db.collection('qr_validations').doc(token).get();
-                if (!doc.exists) { document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ QR inválido!</div>'; return; }
+                if (!doc.exists) { 
+                    document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ QR inválido!</div>'; 
+                    return; 
+                }
                 
                 const data = doc.data();
-                if (new Date() > new Date(data.expiresAt)) { document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ QR expirado!</div>'; return; }
-                if (data.validated) { document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ Já validado!</div>'; return; }
-                if (currentUser.id !== data.supervisorId) { document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ Você não é o supervisor!</div>'; return; }
+                if (new Date() > new Date(data.expiresAt)) { 
+                    document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ QR expirado!</div>'; 
+                    return; 
+                }
+                if (data.validated) { 
+                    document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ Já validado!</div>'; 
+                    return; 
+                }
+                if (currentUser.id !== data.supervisorId) { 
+                    document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ Você não é o supervisor!</div>'; 
+                    return; 
+                }
                 
-                const assinatura = prompt('Digite sua assinatura digital:');
-                if (!assinatura || assinatura !== currentUser.assinatura) { document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ Assinatura inválida!</div>'; return; }
+                const tipoTexto = data.tipo === 'inicio' ? 'INÍCIO' : 'ENCERRAMENTO';
+                const assinatura = prompt('Digite sua assinatura digital para validar ' + tipoTexto + ':');
+                if (!assinatura || assinatura !== currentUser.assinatura) { 
+                    document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ Assinatura inválida!</div>'; 
+                    return; 
+                }
                 
                 await db.collection('qr_validations').doc(token).update({
                     validated: true, validatedBy: currentUser.nome, validatedAt: new Date().toISOString()
                 });
                 
-                document.getElementById('scannerResult').innerHTML = '<div class="qr-status success">✅ Validado!<br>PT #' + String(data.permissaoNumero).padStart(4, '0') + '</div>';
+                document.getElementById('scannerResult').innerHTML = '<div class="qr-status success">✅ ' + tipoTexto + ' Validado!<br>PT #' + String(data.permissaoNumero).padStart(4, '0') + '</div>';
                 showToast('Presença validada!', 'success');
-                setTimeout(() => fecharScanner(), 2000);
+                
+                // Fechar após 2 segundos
+                setTimeout(() => {
+                    fecharScanner();
+                }, 2000);
+                
             } catch (error) {
                 document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ Erro de conexão</div>';
             }
@@ -2095,8 +2162,15 @@
 
         function signInicioExecutorComQR() {
             if (!currentUser.assinatura) { showToast('Configure sua assinatura!', 'error'); return; }
-            document.getElementById('assinaturaMessage').textContent = 'Digite sua assinatura para gerar o QR Code';
-            signatureCallback = async () => { closeModal('modalAssinatura'); await gerarQRCode(); };
+            document.getElementById('assinaturaMessage').textContent = 'Digite sua assinatura para gerar o QR Code de INÍCIO';
+            signatureCallback = async () => { closeModal('modalAssinatura'); await gerarQRCode('inicio'); };
+            openModal('modalAssinatura');
+        }
+
+        function signTerminoExecutorComQR() {
+            if (!currentUser.assinatura) { showToast('Configure sua assinatura!', 'error'); return; }
+            document.getElementById('assinaturaMessage').textContent = 'Digite sua assinatura para gerar o QR Code de ENCERRAMENTO';
+            signatureCallback = async () => { closeModal('modalAssinatura'); await gerarQRCode('termino'); };
             openModal('modalAssinatura');
         }
 
@@ -2105,7 +2179,8 @@
             let html = '';
             pendingQRs.forEach(qr => {
                 if (new Date() < new Date(qr.expiresAt)) {
-                    html += '<div class="qr-pending-alert" onclick="abrirScanner(\'' + qr.id + '\')"><h4>📱 VALIDAR QR</h4><p>PT #' + String(qr.permissaoNumero).padStart(4, '0') + ' - ' + qr.executorNome + '</p></div>';
+                    const tipoTexto = qr.tipo === 'inicio' ? '🟢 INÍCIO' : '🔴 ENCERRAMENTO';
+                    html += '<div class="qr-pending-alert" onclick="abrirScanner(\'' + qr.id + '\')"><h4>📱 VALIDAR ' + tipoTexto + '</h4><p>PT #' + String(qr.permissaoNumero).padStart(4, '0') + ' - ' + qr.executorNome + '</p></div>';
                 }
             });
             const notifs = cachedNotificacoes.filter(n => n.paraId === currentUser.id && n.status === 'pendente');
@@ -3119,7 +3194,7 @@
                 if (p.assinaturaTerminoExecutor) content += '<span class="signature-timestamp">✓ Assinado em ' + formatDateTime(p.assinaturaTerminoExecutor) + '</span>';
                 content += '</div>';
                 if (!p.assinaturaTerminoExecutor && p.status === 'Em Execução' && currentUser.id === p.executorId) {
-                    content += '<button class="btn btn-success btn-xs" onclick="signTermino(\'executor\')">Assinar</button>';
+                    content += '<button class="btn btn-success btn-xs" onclick="signTerminoExecutorComQR()">📱 Assinar com QR</button>';
                 }
                 content += '</div>';
                 // Supervisor
