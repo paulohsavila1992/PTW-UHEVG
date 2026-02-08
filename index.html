@@ -33,6 +33,7 @@
             --glow-secondary: 0 0 20px rgba(255, 0, 170, 0.3);
             --sidebar-width: 280px;
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { font-size: 16px; }
         body {
@@ -43,6 +44,7 @@
             overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
         }
+
         body::before {
             content: '';
             position: fixed;
@@ -54,6 +56,7 @@
             pointer-events: none;
             z-index: -1;
         }
+
         .grid-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -64,6 +67,7 @@
             pointer-events: none;
             z-index: -1;
         }
+
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-dark); }
         ::-webkit-scrollbar-thumb { background: var(--primary-dark); border-radius: 3px; }
@@ -81,6 +85,7 @@
             align-items: center;
             z-index: 9999;
         }
+
         .loading-overlay.hidden { display: none; }
         .loading-spinner {
             width: 50px; height: 50px;
@@ -89,6 +94,7 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
+
         @keyframes spin { to { transform: rotate(360deg); } }
         .loading-text {
             margin-top: 20px;
@@ -96,6 +102,7 @@
             color: var(--primary);
             font-size: 0.9rem;
         }
+
         .sync-indicator {
             position: fixed;
             bottom: 20px;
@@ -111,6 +118,7 @@
             z-index: 100;
             transition: all 0.3s ease;
         }
+
         .sync-indicator.online { border-color: var(--success); }
         .sync-indicator.offline { border-color: var(--danger); }
         .sync-indicator.syncing { border-color: var(--warning); }
@@ -119,6 +127,7 @@
             border-radius: 50%;
             background: var(--success);
         }
+
         .sync-indicator.offline .sync-dot { background: var(--danger); }
         .sync-indicator.syncing .sync-dot { background: var(--warning); animation: pulse 1s infinite; }
         
@@ -130,6 +139,7 @@
             min-height: 100vh;
             padding: 20px;
         }
+
         .login-box {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -141,6 +151,7 @@
             overflow: hidden;
             animation: fadeInUp 0.6s ease;
         }
+
         .login-box::before {
             content: '';
             position: absolute;
@@ -148,10 +159,12 @@
             height: 3px;
             background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
         }
+
         .login-logo {
             text-align: center;
             margin-bottom: 30px;
         }
+
         .login-logo h1 {
             font-family: 'Orbitron', sans-serif;
             font-size: clamp(1.2rem, 4vw, 1.6rem);
@@ -162,12 +175,14 @@
             background-clip: text;
             margin-bottom: 8px;
         }
+
         .login-logo p {
             font-family: 'Share Tech Mono', monospace;
             color: var(--text-secondary);
             font-size: 0.85rem;
             letter-spacing: 2px;
         }
+
         .firebase-status {
             text-align: center;
             padding: 10px;
@@ -176,22 +191,26 @@
             font-size: 0.8rem;
             display: none;
         }
+
         .firebase-status.connected {
             display: block;
             background: rgba(0, 255, 136, 0.1);
             border: 1px solid var(--success);
             color: var(--success);
         }
+
         .firebase-status.error {
             display: block;
             background: rgba(255, 51, 102, 0.1);
             border: 1px solid var(--danger);
             color: var(--danger);
         }
+
         .form-group {
             margin-bottom: 20px;
             position: relative;
         }
+
         .form-group label {
             display: block;
             font-size: 0.8rem;
@@ -201,6 +220,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+
         .form-group input, .form-group select, .form-group textarea {
             width: 100%;
             padding: 14px 16px;
@@ -213,11 +233,13 @@
             transition: all 0.3s ease;
             -webkit-appearance: none;
         }
+
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: var(--glow-primary);
         }
+
         .form-group input::placeholder { color: var(--text-secondary); }
         .form-group select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2300f0ff' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; padding-right: 40px; }
         
@@ -238,33 +260,39 @@
             gap: 8px;
             touch-action: manipulation;
         }
+
         .btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: var(--bg-dark);
             width: 100%;
         }
+
         .btn-primary:hover:not(:disabled), .btn-primary:active:not(:disabled) { box-shadow: var(--glow-primary); transform: translateY(-2px); }
         .btn-secondary {
             background: transparent;
             border: 1px solid var(--primary);
             color: var(--primary);
         }
+
         .btn-secondary:hover, .btn-secondary:active { background: rgba(0, 240, 255, 0.1); }
         .btn-success {
             background: linear-gradient(135deg, var(--success), #00cc6a);
             color: var(--bg-dark);
         }
+
         .btn-success:hover, .btn-success:active { box-shadow: 0 0 20px rgba(0, 255, 136, 0.3); }
         .btn-danger {
             background: linear-gradient(135deg, var(--danger), #cc2952);
             color: var(--text-primary);
         }
+
         .btn-danger:hover, .btn-danger:active { box-shadow: 0 0 20px rgba(255, 51, 102, 0.3); }
         .btn-warning {
             background: linear-gradient(135deg, var(--warning), #cc8800);
             color: var(--bg-dark);
         }
+
         .btn-sm { padding: 10px 16px; font-size: 0.75rem; }
         .btn-xs { padding: 8px 12px; font-size: 0.7rem; }
         
@@ -282,6 +310,7 @@
             z-index: 200;
             flex-direction: column;
         }
+
         .mobile-header-top {
             display: flex;
             align-items: center;
@@ -289,6 +318,7 @@
             padding: 10px 12px;
             min-height: 56px;
         }
+
         .mobile-header-bottom {
             display: flex;
             align-items: center;
@@ -297,6 +327,7 @@
             background: rgba(0, 240, 255, 0.03);
             border-top: 1px solid var(--border-color);
         }
+
         .mobile-user-info {
             display: flex;
             align-items: center;
@@ -304,6 +335,7 @@
             flex: 1;
             min-width: 0;
         }
+
         .mobile-user-avatar {
             width: 32px; height: 32px;
             background: linear-gradient(135deg, var(--primary), var(--accent));
@@ -316,6 +348,7 @@
             font-size: 0.75rem;
             flex-shrink: 0;
         }
+
         .mobile-user-name {
             font-size: 0.85rem;
             font-weight: 600;
@@ -323,6 +356,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
         .mobile-logout {
             padding: 8px 14px;
             background: rgba(255, 51, 102, 0.15);
@@ -336,6 +370,7 @@
             transition: all 0.3s ease;
             white-space: nowrap;
         }
+
         .mobile-logout:hover, .mobile-logout:active { background: var(--danger); color: white; }
         .menu-toggle {
             width: 48px; height: 48px;
@@ -351,6 +386,7 @@
             transition: background 0.3s ease;
             flex-shrink: 0;
         }
+
         .menu-toggle:hover, .menu-toggle:active { background: rgba(0, 240, 255, 0.2); }
         .mobile-title {
             font-family: 'Orbitron', sans-serif;
@@ -363,6 +399,7 @@
             text-overflow: ellipsis;
             padding: 0 10px;
         }
+
         .btn-back {
             width: 48px; height: 48px;
             background: rgba(0, 240, 255, 0.1);
@@ -378,6 +415,7 @@
             transition: all 0.3s ease;
             flex-shrink: 0;
         }
+
         .btn-back:hover, .btn-back:active { background: rgba(0, 240, 255, 0.2); border-color: var(--primary); }
         .btn-back.hidden { visibility: hidden; }
         
@@ -394,6 +432,7 @@
             z-index: 300;
             transition: transform 0.3s ease;
         }
+
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -402,6 +441,7 @@
             background: rgba(0, 0, 0, 0.7);
             z-index: 250;
         }
+
         .sidebar-overlay.active { display: block; }
         .sidebar-logo {
             text-align: center;
@@ -409,6 +449,7 @@
             border-bottom: 1px solid var(--border-color);
             margin-bottom: 20px;
         }
+
         .sidebar-logo h2 {
             font-family: 'Orbitron', sans-serif;
             font-size: 1rem;
@@ -417,12 +458,14 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
         .sidebar-logo p {
             font-family: 'Share Tech Mono', monospace;
             font-size: 0.65rem;
             color: var(--text-secondary);
             margin-top: 5px;
         }
+
         .sidebar-close {
             display: none;
             position: absolute;
@@ -437,6 +480,7 @@
             align-items: center;
             justify-content: center;
         }
+
         .sidebar-close:hover { background: var(--danger); color: white; }
         .nav-menu { list-style: none; }
         .nav-item { margin-bottom: 4px; position: relative; }
@@ -453,12 +497,14 @@
             cursor: pointer;
             font-size: 0.95rem;
         }
+
         .nav-link:hover, .nav-link:active { background: rgba(0, 240, 255, 0.1); color: var(--primary); }
         .nav-link.active {
             background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(123, 45, 255, 0.1));
             color: var(--primary);
             border-left: 3px solid var(--primary);
         }
+
         .nav-section {
             font-size: 0.65rem;
             color: var(--text-secondary);
@@ -467,6 +513,7 @@
             padding: 18px 14px 8px;
             font-weight: 600;
         }
+
         .nav-badge {
             position: absolute;
             right: 12px;
@@ -482,6 +529,7 @@
             text-align: center;
             animation: pulse 2s infinite;
         }
+
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
         
         /* Main Content */
@@ -490,6 +538,7 @@
             min-height: 100vh;
             padding: 25px;
         }
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -500,11 +549,13 @@
             flex-wrap: wrap;
             gap: 15px;
         }
+
         .header h1 {
             font-family: 'Orbitron', sans-serif;
             font-size: clamp(1.2rem, 3vw, 1.6rem);
             font-weight: 600;
         }
+
         .user-info { display: flex; align-items: center; gap: 12px; }
         .user-avatar {
             width: 42px; height: 42px;
@@ -518,6 +569,7 @@
             font-size: 1rem;
             flex-shrink: 0;
         }
+
         .user-details h4 { font-size: 0.9rem; font-weight: 600; }
         .user-details p { font-size: 0.75rem; color: var(--text-secondary); }
         .btn-logout {
@@ -532,6 +584,7 @@
             font-size: 0.85rem;
             transition: all 0.3s ease;
         }
+
         .btn-logout:hover, .btn-logout:active { background: var(--danger); color: white; }
         
         /* Pages */
@@ -550,6 +603,7 @@
             position: relative;
             overflow: hidden;
         }
+
         .card::before {
             content: '';
             position: absolute;
@@ -557,6 +611,7 @@
             height: 2px;
             background: linear-gradient(90deg, var(--primary), transparent);
         }
+
         .card-title {
             font-family: 'Orbitron', sans-serif;
             font-size: 1rem;
@@ -567,6 +622,7 @@
             gap: 10px;
             flex-wrap: wrap;
         }
+
         
         /* Home Grid */
         .home-grid {
@@ -575,6 +631,7 @@
             gap: 15px;
             margin-top: 20px;
         }
+
         .home-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -585,6 +642,7 @@
             position: relative;
             overflow: hidden;
         }
+
         .home-card::before {
             content: '';
             position: absolute;
@@ -594,11 +652,13 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         }
+
         .home-card:hover, .home-card:active {
             transform: translateY(-3px);
             border-color: var(--primary);
             box-shadow: var(--glow-primary);
         }
+
         .home-card:hover::before, .home-card:active::before { opacity: 1; }
         .home-card-icon {
             width: 50px; height: 50px;
@@ -610,12 +670,14 @@
             margin-bottom: 15px;
             font-size: 1.5rem;
         }
+
         .home-card h3 {
             font-family: 'Orbitron', sans-serif;
             font-size: 0.85rem;
             font-weight: 600;
             margin-bottom: 8px;
         }
+
         .home-card p { color: var(--text-secondary); font-size: 0.8rem; line-height: 1.4; display: none; }
         .home-card .notif-count {
             position: absolute;
@@ -628,6 +690,7 @@
             padding: 4px 10px;
             border-radius: 12px;
         }
+
         
         /* Stats Grid */
         .stats-grid {
@@ -636,6 +699,7 @@
             gap: 12px;
             margin-bottom: 25px;
         }
+
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -643,6 +707,7 @@
             padding: 18px 15px;
             text-align: center;
         }
+
         .stat-value {
             font-family: 'Orbitron', sans-serif;
             font-size: clamp(1.5rem, 5vw, 2.2rem);
@@ -652,6 +717,7 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
         .stat-label { color: var(--text-secondary); font-size: 0.8rem; margin-top: 3px; }
         
         /* Permission List Cards */
@@ -664,10 +730,12 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
+
         .permission-card:hover {
             border-color: var(--primary);
             transform: translateX(5px);
         }
+
         .permission-card-header {
             display: flex;
             justify-content: space-between;
@@ -676,22 +744,26 @@
             flex-wrap: wrap;
             gap: 10px;
         }
+
         .permission-card-num {
             font-family: 'Orbitron', sans-serif;
             font-size: 1rem;
             color: var(--primary);
         }
+
         .permission-card-date {
             font-family: 'Share Tech Mono', monospace;
             font-size: 0.8rem;
             color: var(--text-secondary);
         }
+
         .permission-card-desc {
             font-size: 0.9rem;
             color: var(--text-primary);
             margin-bottom: 10px;
             line-height: 1.4;
         }
+
         .permission-card-footer {
             display: flex;
             justify-content: space-between;
@@ -699,10 +771,12 @@
             flex-wrap: wrap;
             gap: 8px;
         }
+
         .permission-card-info {
             font-size: 0.8rem;
             color: var(--text-secondary);
         }
+
         .permission-card-info strong { color: var(--text-primary); }
         .permission-card.expired { border-left: 4px solid var(--danger); }
         .permission-card.warning { border-left: 4px solid var(--warning); }
@@ -721,6 +795,7 @@
             background: rgba(0, 240, 255, 0.05);
             white-space: nowrap;
         }
+
         tr:hover, tr:active { background: rgba(0, 240, 255, 0.03); }
         tr { cursor: pointer; transition: background 0.3s ease; }
         
@@ -738,6 +813,7 @@
             padding: 20px;
             overflow-y: auto;
         }
+
         .modal-overlay.active { display: flex; }
         .modal {
             background: var(--bg-card);
@@ -749,6 +825,7 @@
             animation: modalIn 0.3s ease;
             margin: auto;
         }
+
         .modal-large { max-width: 700px; }
         .modal-xl { max-width: 900px; }
         @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
@@ -761,6 +838,7 @@
             background: linear-gradient(135deg, rgba(0, 240, 255, 0.05), rgba(123, 45, 255, 0.03));
             border-radius: 15px 15px 0 0;
         }
+
         .modal-header h3 { font-family: 'Orbitron', sans-serif; font-size: 1rem; }
         .modal-close {
             width: 38px; height: 38px;
@@ -776,6 +854,7 @@
             font-size: 1.1rem;
             flex-shrink: 0;
         }
+
         .modal-close:hover, .modal-close:active { background: var(--danger); color: white; }
         .modal-body { padding: 20px; max-height: 60vh; overflow-y: auto; }
         .modal-footer {
@@ -786,6 +865,7 @@
             gap: 10px;
             flex-wrap: wrap;
         }
+
         
         /* Sections */
         .section {
@@ -795,6 +875,7 @@
             padding: 18px;
             margin-bottom: 18px;
         }
+
         .section-title {
             font-family: 'Orbitron', sans-serif;
             font-size: 0.9rem;
@@ -807,6 +888,7 @@
             gap: 10px;
             flex-wrap: wrap;
         }
+
         .section-code {
             background: var(--primary);
             color: var(--bg-dark);
@@ -815,11 +897,13 @@
             font-size: 0.7rem;
             font-weight: 700;
         }
+
         .form-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 15px;
         }
+
         .form-group.full-width { grid-column: 1 / -1; }
         
         /* CHECKBOX GROUP */
@@ -828,6 +912,7 @@
             flex-wrap: wrap;
             gap: 10px;
         }
+
         .checkbox-item {
             display: flex;
             align-items: center;
@@ -843,11 +928,13 @@
             transition: all 0.2s ease;
             min-height: 48px;
         }
+
         .checkbox-item:active,
         .checkbox-item.checked {
             background: rgba(0, 240, 255, 0.15);
             border-color: var(--primary);
         }
+
         .checkbox-item input[type="checkbox"] {
             width: 24px;
             height: 24px;
@@ -857,6 +944,7 @@
             cursor: pointer;
             margin: 0;
         }
+
         
         /* RADIO GROUP */
         .radio-group {
@@ -864,6 +952,7 @@
             flex-wrap: wrap;
             gap: 10px;
         }
+
         .radio-item {
             display: flex;
             align-items: center;
@@ -879,11 +968,13 @@
             transition: all 0.2s ease;
             min-height: 48px;
         }
+
         .radio-item:active,
         .radio-item.checked {
             background: rgba(0, 240, 255, 0.15);
             border-color: var(--primary);
         }
+
         .radio-item input[type="radio"] {
             width: 24px;
             height: 24px;
@@ -893,6 +984,7 @@
             cursor: pointer;
             margin: 0;
         }
+
         
         /* Badges */
         .badge {
@@ -905,6 +997,7 @@
             letter-spacing: 0.5px;
             white-space: nowrap;
         }
+
         .badge-success { background: rgba(0, 255, 136, 0.15); color: var(--success); border: 1px solid var(--success); }
         .badge-warning { background: rgba(255, 170, 0, 0.15); color: var(--warning); border: 1px solid var(--warning); }
         .badge-danger { background: rgba(255, 51, 102, 0.15); color: var(--danger); border: 1px solid var(--danger); }
@@ -918,6 +1011,7 @@
             overflow-y: auto;
             margin-top: 10px;
         }
+
         .item-list-item {
             padding: 10px 12px;
             display: flex;
@@ -927,6 +1021,7 @@
             font-size: 0.9rem;
             gap: 10px;
         }
+
         .item-list-item:last-child { border-bottom: none; }
         .item-list-item:hover, .item-list-item:active { background: rgba(0, 240, 255, 0.05); }
         .item-list-item span { flex: 1; word-break: break-word; }
@@ -939,6 +1034,7 @@
             font-size: 1rem;
             flex-shrink: 0;
         }
+
         
         /* Password */
         .password-wrapper { position: relative; }
@@ -955,6 +1051,7 @@
             padding: 5px;
             font-size: 1.1rem;
         }
+
         .password-toggle:hover, .password-toggle:active { color: var(--primary); }
         
         /* Signature */
@@ -968,6 +1065,7 @@
             border-radius: 10px;
             margin: 15px 0;
         }
+
         .signature-dots { color: var(--primary); }
         
         /* Safety Grid */
@@ -977,6 +1075,7 @@
             gap: 12px;
             margin-bottom: 25px;
         }
+
         .safety-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -986,11 +1085,13 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
+
         .safety-card:hover, .safety-card:active {
             border-color: var(--primary);
             transform: translateY(-2px);
             box-shadow: var(--glow-primary);
         }
+
         .safety-card h4 { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; margin-top: 8px; }
         
         /* Charts */
@@ -1000,6 +1101,7 @@
             grid-template-columns: 1fr;
             gap: 15px;
         }
+
         
         /* Signature Box */
         .signature-box {
@@ -1014,6 +1116,7 @@
             flex-wrap: wrap;
             gap: 10px;
         }
+
         .signature-box.signed { border-color: var(--success); background: rgba(0, 255, 136, 0.05); }
         .signature-info { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 150px; }
         .signature-name { font-weight: 600; font-size: 0.9rem; }
@@ -1027,6 +1130,7 @@
             border-radius: 10px;
             margin-bottom: 12px;
         }
+
         .transfer-status.pending { border-left: 3px solid var(--warning); }
         .transfer-status.completed { border-left: 3px solid var(--success); }
         
@@ -1041,6 +1145,7 @@
             gap: 10px;
             max-width: calc(100% - 30px);
         }
+
         .toast {
             padding: 12px 18px;
             border-radius: 10px;
@@ -1052,6 +1157,7 @@
             gap: 10px;
             font-size: 0.9rem;
         }
+
         .toast-success { border-color: var(--success); }
         .toast-error { border-color: var(--danger); }
         .toast-warning { border-color: var(--warning); }
@@ -1064,6 +1170,7 @@
             border: 1px solid var(--border-color);
             border-radius: 10px;
         }
+
         .selectable-item {
             padding: 14px 16px;
             cursor: pointer;
@@ -1075,6 +1182,7 @@
             font-size: 0.95rem;
             min-height: 50px;
         }
+
         .selectable-item:last-child { border-bottom: none; }
         .selectable-item:hover, .selectable-item:active { background: rgba(0, 240, 255, 0.1); }
         .selectable-item input[type="checkbox"] { 
@@ -1084,6 +1192,7 @@
             min-width: 22px;
             min-height: 22px;
         }
+
         
         /* Notification Card */
         .notification-card {
@@ -1098,10 +1207,12 @@
             align-items: flex-start;
             gap: 12px;
         }
+
         .notification-card:hover, .notification-card:active {
             border-color: var(--primary);
             transform: translateX(3px);
         }
+
         .notification-card.pending { border-left: 4px solid var(--warning); }
         .notification-icon {
             width: 44px; height: 44px;
@@ -1113,23 +1224,27 @@
             font-size: 1.3rem;
             flex-shrink: 0;
         }
+
         .notification-content { flex: 1; min-width: 0; }
         .notification-content h4 {
             font-family: 'Orbitron', sans-serif;
             font-size: 0.85rem;
             margin-bottom: 4px;
         }
+
         .notification-content p {
             color: var(--text-secondary);
             font-size: 0.8rem;
             word-break: break-word;
         }
+
         .notification-time {
             font-family: 'Share Tech Mono', monospace;
             font-size: 0.7rem;
             color: var(--text-secondary);
             white-space: nowrap;
         }
+
         
         /* Bloqueio Detail */
         .bloqueio-item {
@@ -1139,6 +1254,7 @@
             padding: 12px;
             margin-bottom: 10px;
         }
+
         .bloqueio-item:last-child { margin-bottom: 0; }
         .bloqueio-item p { margin: 5px 0; font-size: 0.9rem; }
         .bloqueio-item strong { color: var(--primary); }
@@ -1152,12 +1268,14 @@
             .chart-grid { grid-template-columns: repeat(2, 1fr); }
             .toast-container { top: 140px; }
         }
+
         
         /* Responsive - Mobile */
         @media (max-width: 1024px) {
             .sidebar {
                 transform: translateX(-100%);
             }
+
             .sidebar.open { transform: translateX(0); }
             .sidebar-close { display: flex; }
             .main-content { margin-left: 0; padding-top: 130px; }
@@ -1165,6 +1283,7 @@
             .header { display: none; }
             .sync-indicator { bottom: 10px; left: 10px; font-size: 0.7rem; padding: 6px 12px; }
         }
+
         
         @media (max-width: 480px) {
             .login-box { padding: 30px 20px; }
@@ -1192,6 +1311,7 @@
             .checkbox-item { padding: 10px 12px; font-size: 0.9rem; }
             .radio-item { padding: 10px 12px; font-size: 0.9rem; }
         }
+
         
         /* Print Styles */
         @media print {
@@ -1199,15 +1319,18 @@
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
+
             body {
                 background: white !important;
                 color: black !important;
                 font-size: 12pt;
             }
+
             .grid-bg, .sidebar, .mobile-header, .header, .modal-close, .modal-footer, 
             .sync-indicator, .toast-container, .btn, .no-print { 
                 display: none !important; 
             }
+
             .modal-overlay {
                 position: static !important;
                 background: white !important;
@@ -1215,6 +1338,7 @@
                 padding: 0 !important;
                 overflow: visible !important;
             }
+
             .modal {
                 position: static !important;
                 max-width: 100% !important;
@@ -1223,20 +1347,24 @@
                 margin: 0 !important;
                 background: white !important;
             }
+
             .modal-header {
                 background: white !important;
                 border-bottom: 2px solid #333 !important;
                 padding: 10px 0 !important;
             }
+
             .modal-header h3 {
                 color: black !important;
                 font-size: 18pt !important;
             }
+
             .modal-body {
                 max-height: none !important;
                 overflow: visible !important;
                 padding: 10px 0 !important;
             }
+
             .section {
                 background: white !important;
                 border: 1px solid #ccc !important;
@@ -1244,26 +1372,32 @@
                 margin-bottom: 10px !important;
                 padding: 10px !important;
             }
+
             .section-title {
                 color: black !important;
                 border-bottom: 1px solid #ccc !important;
                 font-size: 12pt !important;
             }
+
             .section-code {
                 background: #333 !important;
                 color: white !important;
             }
+
             .signature-box {
                 background: #f5f5f5 !important;
                 border: 1px solid #ccc !important;
             }
+
             .signature-box.signed {
                 border-color: green !important;
             }
+
             .badge {
                 border: 1px solid #333 !important;
                 background: white !important;
             }
+
             .badge-success { color: green !important; border-color: green !important; }
             .badge-warning { color: orange !important; border-color: orange !important; }
             .badge-danger { color: red !important; border-color: red !important; }
@@ -1273,10 +1407,13 @@
                 background: #f5f5f5 !important;
                 border: 1px solid #ccc !important;
             }
+
             .transfer-status {
                 background: #f5f5f5 !important;
             }
+
         }
+
 
         /* QR Code Styles */
         .qr-container { text-align: center; padding: 20px; }
@@ -1287,12 +1424,14 @@
             border-radius: 15px;
             margin: 15px 0;
         }
+
         .qr-timer {
             font-family: 'Orbitron', sans-serif;
             font-size: 2.5rem;
             color: var(--warning);
             margin: 15px 0;
         }
+
         .qr-timer.expired { color: var(--danger); }
         .qr-timer.success { color: var(--success); }
         .qr-instructions { color: var(--text-secondary); font-size: 0.9rem; margin: 10px 0; }
@@ -1302,6 +1441,7 @@
             margin: 15px 0;
             font-weight: 600;
         }
+
         .qr-status.waiting { background: rgba(255, 170, 0, 0.1); border: 1px solid var(--warning); color: var(--warning); }
         .qr-status.success { background: rgba(0, 255, 136, 0.1); border: 1px solid var(--success); color: var(--success); }
         .qr-status.error { background: rgba(255, 51, 102, 0.1); border: 1px solid var(--danger); color: var(--danger); }
@@ -1316,10 +1456,12 @@
             cursor: pointer;
             animation: glow 1.5s ease-in-out infinite alternate;
         }
+
         @keyframes glow {
             from { box-shadow: 0 0 5px rgba(255, 170, 0, 0.3); }
             to { box-shadow: 0 0 20px rgba(255, 170, 0, 0.6); }
         }
+
         .qr-pending-alert h4 { color: var(--warning); margin-bottom: 5px; }
         .qr-pending-alert p { color: var(--text-secondary); font-size: 0.85rem; }
     </style>
@@ -1953,12 +2095,12 @@
         // CONFIGURAÇÃO DO FIREBASE
         // ================================================================
         const firebaseConfig = {
-            apiKey: "AIzaSyDMCFLSKH-Ug61qb-x-b4IUMOP7E6_7r1M",
-            authDomain: "permissao-trabalho-uhevg-95a56.firebaseapp.com",
-            projectId: "permissao-trabalho-uhevg-95a56",
-            storageBucket: "permissao-trabalho-uhevg-95a56.firebasestorage.app",
-            messagingSenderId: "4949368740",
-            appId: "1:4949368740:web:0090e62d1fe1961e1c6b31"
+            apiKey: "AIzaSyC7TxxgjMVX3lsb4nget2gbdU6nR-3IcM",
+            authDomain: "permissao-trabalho-uhevg.firebaseapp.com",
+            projectId: "permissao-trabalho-uhevg",
+            storageBucket: "permissao-trabalho-uhevg.firebasestorage.app",
+            messagingSenderId: "236218702254",
+            appId: "1:236218702254:web:6e93684d044ff7c0ee503f"
         };
         // ================================================================
 
@@ -2005,9 +2147,13 @@
                     // Se estiver na página de notificações, atualizar
                     if (document.getElementById('pageNotificacoes').classList.contains('active')) {
                         renderQRNotifications(pendingQRs);
+                    }).catch(() => {
+                        renderQRNotifications([]);
                     }
+
                 });
         }
+
 
         function updateQRBadge(count) {
             // Atualiza o badge de notificações se houver QRs pendentes
@@ -2024,7 +2170,9 @@
                 navBadge.style.display = 'none';
                 homeBadge.style.display = 'none';
             }
+
         }
+
 
         function renderQRNotifications(pendingQRs) {
             const container = document.getElementById('notificacoesList');
@@ -2041,6 +2189,7 @@
                         '<p style="color: var(--warning); font-size: 0.8rem; margin-top: 5px;">⏰ Clique para abrir a câmera</p>' +
                     '</div>';
                 }
+
             });
             
             // Depois as notificações normais de transferência
@@ -2060,9 +2209,11 @@
             if (html === '') {
                 html = '<p style="color: var(--text-secondary); text-align: center; padding: 30px;">Nenhuma notificação pendente</p>';
             }
+
             
             container.innerHTML = html;
         }
+
 
         // Executor: Gerar QR Code
         async function gerarQRCode() {
@@ -2119,6 +2270,7 @@
                     db.collection('qr_validations').doc(currentQRToken).delete();
                     if (qrValidationListener) qrValidationListener();
                 }
+
             }, 1000);
             
             // Escutar validação
@@ -2149,19 +2301,29 @@
                         viewPermissao(editingPermissaoId);
                     }, 1500);
                 }
+
             });
             
             openModal('modalQRCode');
         }
 
+
         function cancelarQRCode() {
-            clearInterval(qrTimerInterval);
-            if (qrValidationListener) qrValidationListener();
-            if (currentQRToken) {
-                db.collection('qr_validations').doc(currentQRToken).delete().catch(() => {});
-            }
-            closeModal('modalQRCode');
+            try {
+                clearInterval(qrTimerInterval);
+                if (qrValidationListener) {
+                    qrValidationListener();
+                    qrValidationListener = null;
+                }
+                if (currentQRToken) {
+                    db.collection('qr_validations').doc(currentQRToken).delete().catch(() => {});
+                    currentQRToken = null;
+                }
+            } catch(e) {}
+            document.getElementById('modalQRCode').classList.remove('active');
+            document.body.style.overflow = '';
         }
+
 
         // Supervisor: Abrir scanner
         function abrirScanner(qrId) {
@@ -2185,12 +2347,21 @@
             }, 300);
         }
 
+
         function fecharScanner() {
-            if (html5QrCode) {
-                html5QrCode.stop().catch(() => {});
-            }
-            closeModal('modalScanner');
+            try {
+                if (html5QrCode) {
+                    html5QrCode.stop().then(() => {
+                        html5QrCode = null;
+                    }).catch(() => {
+                        html5QrCode = null;
+                    });
+                }
+            } catch(e) {}
+            document.getElementById('modalScanner').classList.remove('active');
+            document.body.style.overflow = '';
         }
+
 
         async function validarQRCode(token) {
             if (html5QrCode) html5QrCode.stop().catch(() => {});
@@ -2205,6 +2376,7 @@
                     resultEl.innerHTML = '<div class="qr-status error">❌ QR Code inválido!</div>';
                     return;
                 }
+
                 
                 const data = doc.data();
                 
@@ -2212,16 +2384,19 @@
                     resultEl.innerHTML = '<div class="qr-status error">❌ QR Code expirado!</div>';
                     return;
                 }
+
                 
                 if (data.validated) {
                     resultEl.innerHTML = '<div class="qr-status warning">⚠️ Já foi validado!</div>';
                     return;
                 }
+
                 
                 if (currentUser.id !== data.supervisorId) {
                     resultEl.innerHTML = '<div class="qr-status error">❌ Você não é o supervisor desta PT!</div>';
                     return;
                 }
+
                 
                 // Pedir assinatura
                 const assinatura = prompt('Digite sua assinatura digital para confirmar:');
@@ -2229,6 +2404,7 @@
                     resultEl.innerHTML = '<div class="qr-status error">❌ Assinatura inválida!</div>';
                     return;
                 }
+
                 
                 // Validar!
                 await db.collection('qr_validations').doc(token).update({
@@ -2246,9 +2422,11 @@
                 setTimeout(() => fecharScanner(), 2000);
                 
             } catch (error) {
-                resultEl.innerHTML = '<div class="qr-status error">❌ Erro: ' + error.message + '</div>';
+                resultEl.innerHTML = '<div class="qr-status error">❌ Sem conexão. Verifique sua internet.</div>';
             }
+
         }
+
 
         // Modificar assinatura do executor para usar QR
         function signInicioExecutorComQR() {
@@ -2258,6 +2436,7 @@
                 navigateTo('assinatura');
                 return;
             }
+
             
             document.getElementById('assinaturaMessage').textContent = 'Digite sua assinatura para gerar o QR Code de validação presencial';
             signatureCallback = async () => {
@@ -2266,6 +2445,7 @@
             };
             openModal('modalAssinatura');
         }
+
 
         let cachedUsuarios = [];
         let cachedPermissoes = [];
@@ -2280,6 +2460,7 @@
                 if (firebaseConfig.apiKey === "SUA_API_KEY") {
                     throw new Error("Configure as credenciais do Firebase no código");
                 }
+
                 firebase.initializeApp(firebaseConfig);
                 db = firebase.firestore();
                 try {
@@ -2287,6 +2468,7 @@
                 } catch (err) {
                     console.log("Persistência offline não disponível:", err);
                 }
+
                 firebaseInitialized = true;
                 updateSyncStatus('online');
                 db.collection('_health').doc('check').onSnapshot(() => {
@@ -2313,7 +2495,9 @@
                     document.getElementById('loginPage').style.display = 'flex';
                 }, 2000);
             }
+
         }
+
 
         function updateSyncStatus(status) {
             const indicator = document.getElementById('syncIndicator');
@@ -2323,24 +2507,33 @@
             text.textContent = statusTexts[status] || status;
         }
 
+
         async function initializeDefaultData() {
-            const usersRef = db.collection('usuarios');
-            const usersSnapshot = await usersRef.get();
-            if (usersSnapshot.empty) {
-                await usersRef.add({
-                    nome: 'Paulo Henrique Ávila', usuario: 'pauloavila', senha: 'paulo@2025',
-                    setor: 'Operação', cargo: 'Mantenedor', empresa: 'Enel',
-                    tipos: ['administrador', 'supervisor', 'autorizador', 'executor'], assinatura: null,
-                    criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                showToast('Usuário admin criado: pauloavila / paulo@2025', 'warning');
+            try {
+                const usersRef = db.collection('usuarios');
+                const usersSnapshot = await usersRef.get();
+                if (usersSnapshot.empty) {
+                    await usersRef.add({
+                        nome: 'Paulo Henrique Ávila', usuario: 'pauloavila', senha: 'paulo@2025',
+                        setor: 'Operação', cargo: 'Mantenedor', empresa: 'Enel',
+                        tipos: ['administrador', 'supervisor', 'autorizador', 'executor'], assinatura: null,
+                        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showToast('Usuário admin criado: pauloavila / paulo@2025', 'warning');
+                }
+
+                const counterRef = db.collection('config').doc('counters');
+                const counterDoc = await counterRef.get();
+                if (!counterDoc.exists) {
+                    await counterRef.set({ permissaoNumero: 0 });
+                }
+
+            } catch (err) {
+                console.log('Modo offline - dados serão sincronizados quando online');
             }
-            const counterRef = db.collection('config').doc('counters');
-            const counterDoc = await counterRef.get();
-            if (!counterDoc.exists) {
-                await counterRef.set({ permissaoNumero: 0 });
-            }
+
         }
+
 
         function setupRealtimeListeners() {
             unsubscribers.forEach(unsub => unsub());
@@ -2352,11 +2545,13 @@
                         const updatedUser = cachedUsuarios.find(u => u.id === currentUser.id);
                         if (updatedUser) {
                             currentUser = updatedUser;
-                            sessionStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
+                            localStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
                         }
+
                         loadSelects();
                         if (document.getElementById('pageUsuarios').classList.contains('active')) loadUsuarios();
                     }
+
                 })
             );
             unsubscribers.push(
@@ -2378,6 +2573,7 @@
                         updateNotificationBadges(); setupQRListener();
                         if (document.getElementById('pageNotificacoes').classList.contains('active')) loadNotificacoes();
                     }
+
                 })
             );
             ['riscos', 'epi', 'medidas', 'equipamentos'].forEach(collection => {
@@ -2390,11 +2586,13 @@
                             case 'medidas': cachedMedidas = data; break;
                             case 'equipamentos': cachedEquipamentos = data; break;
                         }
+
                         if (document.getElementById('pageSeguranca').classList.contains('active')) loadSafetyLists();
                     })
                 );
             });
         }
+
 
         // Verificar permissões vencidas
         function checkVencidas() {
@@ -2406,10 +2604,13 @@
                         // Marcar como vencida no cache local
                         p.vencida = true;
                     }
+
                 }
+
             });
             updateVencidasBadges();
         }
+
 
         function updateVencidasBadges() {
             const vencidas = cachedPermissoes.filter(p => p.status === 'Em Execução' && p.vencida);
@@ -2425,7 +2626,9 @@
                 navBadge.style.display = 'none';
                 homeBadge.style.display = 'none';
             }
+
         }
+
 
         function getData(collection) {
             switch(collection) {
@@ -2438,7 +2641,9 @@
                 case 'equipamentos': return cachedEquipamentos;
                 default: return [];
             }
+
         }
+
 
         async function addDoc(collection, data) {
             updateSyncStatus('syncing');
@@ -2453,7 +2658,9 @@
                 updateSyncStatus('offline');
                 throw error;
             }
+
         }
+
 
         async function updateDoc(collection, id, data) {
             updateSyncStatus('syncing');
@@ -2467,7 +2674,9 @@
                 updateSyncStatus('offline');
                 throw error;
             }
+
         }
+
 
         async function deleteDoc(collection, id) {
             updateSyncStatus('syncing');
@@ -2478,7 +2687,9 @@
                 updateSyncStatus('offline');
                 throw error;
             }
+
         }
+
 
         async function getNextPermissaoNumber() {
             const counterRef = db.collection('config').doc('counters');
@@ -2490,6 +2701,7 @@
             });
             return result;
         }
+
         
         function showToast(msg, type = 'success') {
             const c = document.getElementById('toastContainer');
@@ -2501,16 +2713,19 @@
             setTimeout(() => t.remove(), 4000);
         }
 
+
         function formatDate(d) { 
             if (!d) return '-';
             if (d.toDate) d = d.toDate();
             return new Date(d).toLocaleDateString('pt-BR'); 
         }
+
         function formatDateTime(d) { 
             if (!d) return '-';
             if (d.toDate) d = d.toDate();
             return new Date(d).toLocaleString('pt-BR'); 
         }
+
         function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
         function togglePassword(id) { const i = document.getElementById(id); i.type = i.type === 'password' ? 'text' : 'password'; }
         function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow = 'hidden'; }
@@ -2520,6 +2735,7 @@
         function printPermissao() {
             window.print();
         }
+
 
         // CHECKBOX E RADIO HANDLERS
         function initCheckboxHandlers() {
@@ -2532,6 +2748,7 @@
                         updateCheckboxVisual(this, checkbox.checked);
                         checkbox.dispatchEvent(new Event('change', { bubbles: true }));
                     }
+
                 });
                 const checkbox = item.querySelector('input[type="checkbox"]');
                 if (checkbox) {
@@ -2539,6 +2756,7 @@
                         updateCheckboxVisual(item, this.checked);
                     });
                 }
+
             });
             document.querySelectorAll('.radio-item').forEach(function(item) {
                 item.addEventListener('click', function(e) {
@@ -2551,6 +2769,7 @@
                         this.classList.add('checked');
                         radio.dispatchEvent(new Event('change', { bubbles: true }));
                     }
+
                 });
                 const radio = item.querySelector('input[type="radio"]');
                 if (radio) {
@@ -2560,18 +2779,22 @@
                         if (this.checked) item.classList.add('checked');
                     });
                 }
+
             });
         }
+
         
         function updateCheckboxVisual(item, isChecked) {
             if (isChecked) item.classList.add('checked');
             else item.classList.remove('checked');
         }
 
+
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('sidebarOverlay').classList.toggle('active');
         }
+
 
         function goBack() {
             if (navigationHistory.length > 1) {
@@ -2579,13 +2802,16 @@
                 const prevPage = navigationHistory[navigationHistory.length - 1];
                 navigateTo(prevPage, false);
             }
+
         }
+
 
         function updateBackButton() {
             const btn = document.getElementById('btnBack');
             if (navigationHistory.length > 1) btn.classList.remove('hidden');
             else btn.classList.add('hidden');
         }
+
 
         // Login
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
@@ -2599,7 +2825,7 @@
                 const user = cachedUsuarios.find(x => x.usuario === u && x.senha === p);
                 if (user) {
                     currentUser = user;
-                    sessionStorage.setItem('ptd_currentUser', JSON.stringify(user));
+                    localStorage.setItem('ptd_currentUser', JSON.stringify(user));
                     document.getElementById('loginPage').style.display = 'none';
                     document.getElementById('appContainer').style.display = 'block';
                     updateUserInterface();
@@ -2611,22 +2837,25 @@
                 } else {
                     showToast('Usuário ou senha inválidos!', 'error');
                 }
+
             } catch (error) {
                 showToast('Erro ao fazer login: ' + error.message, 'error');
             }
+
             btn.disabled = false;
             btn.innerHTML = '🔐 Entrar';
         });
 
         function logout() {
             currentUser = null;
-            sessionStorage.removeItem('ptd_currentUser');
+            localStorage.removeItem('ptd_currentUser');
             document.getElementById('appContainer').style.display = 'none';
             document.getElementById('loginPage').style.display = 'flex';
             document.getElementById('loginUsername').value = '';
             document.getElementById('loginPassword').value = '';
             navigationHistory = ['home'];
         }
+
 
         function updateUserInterface() {
             if (!currentUser) return;
@@ -2646,11 +2875,13 @@
             checkAssinatura();
         }
 
+
         function checkAssinatura() {
             const has = currentUser.assinatura !== null;
             document.getElementById('assinaturaExistente').style.display = has ? 'block' : 'none';
             document.getElementById('assinaturaForm').style.display = has ? 'none' : 'block';
         }
+
 
         function updateNotificationBadges() {
             const notifs = cachedNotificacoes.filter(n => n.paraId === currentUser.id && n.status === 'pendente');
@@ -2664,7 +2895,9 @@
                 navBadge.style.display = 'none';
                 homeBadge.style.display = 'none';
             }
+
         }
+
 
         function loadNotificacoes() {
             // Se for supervisor, buscar QRs pendentes e renderizar junto
@@ -2677,12 +2910,16 @@
                         const pendingQRs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
                             .filter(qr => new Date() < new Date(qr.expiresAt));
                         renderQRNotifications(pendingQRs);
+                    }).catch(() => {
+                        renderQRNotifications([]);
                     });
             } else {
                 // Renderizar só notificações normais
                 renderQRNotifications([]);
             }
+
         }
+
 
         function abrirNotificacao(notifId) {
             const notif = cachedNotificacoes.find(n => n.id === notifId);
@@ -2699,6 +2936,7 @@
                 '<p style="margin-top: 12px; color: var(--warning); font-size: 0.85rem;">⚠️ Ao aceitar, você assume a responsabilidade.</p>';
             openModal('modalAceitarTransfer');
         }
+
 
         async function aceitarTransferencia() {
             const assinatura = document.getElementById('aceitarTransferAssinatura').value;
@@ -2718,12 +2956,14 @@
                     updateData[currentNotification.tipo] = currentNotification.para;
                     await updateDoc('permissoes', permissao.id, updateData);
                 }
+
                 await updateDoc('notificacoes', currentNotification.id, { status: 'aceita', dataAceite: new Date().toISOString() });
                 closeModal('modalAceitarTransfer');
                 document.getElementById('aceitarTransferAssinatura').value = '';
                 showToast('Transferência aceita!');
             } catch (error) { showToast('Erro ao aceitar: ' + error.message, 'error'); }
         }
+
 
         async function recusarTransferencia() {
             if (!confirm('Recusar transferência?')) return;
@@ -2733,6 +2973,7 @@
                 showToast('Transferência recusada.');
             } catch (error) { showToast('Erro ao recusar: ' + error.message, 'error'); }
         }
+
 
         function navigateTo(page, addToHistory = true) {
             document.getElementById('sidebar').classList.remove('open');
@@ -2767,6 +3008,7 @@
             window.scrollTo(0, 0);
         }
 
+
         function loadUsuarios() {
             document.getElementById('usuariosTableBody').innerHTML = cachedUsuarios.map(u => 
                 '<tr onclick="event.stopPropagation()"><td>' + u.nome + '</td><td>' + u.usuario + '</td><td>' + u.cargo + '</td><td>' + 
@@ -2774,6 +3016,7 @@
                 '<button class="btn btn-danger btn-xs" onclick="deleteUsuario(\'' + u.id + '\')">🗑️</button></td></tr>'
             ).join('');
         }
+
 
         async function salvarUsuario() {
             const tipos = [];
@@ -2799,11 +3042,13 @@
             } catch (error) { showToast('Erro ao salvar: ' + error.message, 'error'); }
         }
 
+
         async function deleteUsuario(id) {
             if (!confirm('Excluir usuário?')) return;
             try { await deleteDoc('usuarios', id); showToast('Usuário excluído!'); }
             catch (error) { showToast('Erro ao excluir: ' + error.message, 'error'); }
         }
+
 
         async function salvarAssinatura() {
             const nova = document.getElementById('novaAssinatura').value;
@@ -2813,13 +3058,14 @@
             try {
                 await updateDoc('usuarios', currentUser.id, { assinatura: nova });
                 currentUser.assinatura = nova;
-                sessionStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
+                localStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
                 document.getElementById('novaAssinatura').value = '';
                 document.getElementById('confirmarAssinatura').value = '';
                 checkAssinatura();
                 showToast('Assinatura salva!');
             } catch (error) { showToast('Erro ao salvar: ' + error.message, 'error'); }
         }
+
 
         function toggleSignatureVisibility() {
             const d = document.getElementById('signatureDisplay');
@@ -2828,10 +3074,12 @@
             else { d.textContent = '••••••'; t.textContent = '👁 Mostrar'; }
         }
 
+
         function showResetSignature() {
             document.getElementById('assinaturaExistente').style.display = 'none';
             document.getElementById('assinaturaForm').style.display = 'block';
         }
+
 
         function openSafetyModal(type) {
             currentSafetyType = type;
@@ -2843,6 +3091,7 @@
             openModal('modalSafety');
         }
 
+
         async function salvarSafetyItem() {
             const nome = document.getElementById('safetyInput').value.trim();
             if (!nome) { showToast('Digite um nome!', 'error'); return; }
@@ -2852,6 +3101,7 @@
                 showToast('Item cadastrado!');
             } catch (error) { showToast('Erro ao salvar: ' + error.message, 'error'); }
         }
+
 
         function loadSafetyLists() {
             const collections = {
@@ -2868,13 +3118,16 @@
                         data.map(item => '<div class="item-list-item"><span>' + item.nome + '</span>' +
                             '<button class="btn-remove" onclick="deleteSafetyItem(\'' + type + '\',\'' + item.id + '\')">✕</button></div>').join('');
                 }
+
             });
         }
+
 
         async function deleteSafetyItem(type, id) {
             try { await deleteDoc(type, id); showToast('Removido!'); }
             catch (error) { showToast('Erro ao remover: ' + error.message, 'error'); }
         }
+
 
         function loadSelects() {
             ['autorizador', 'supervisor', 'executor'].forEach(tipo => {
@@ -2884,10 +3137,12 @@
             });
         }
 
+
         function toggleBloqueios() {
             const sim = document.querySelector('input[name="bloqueio"][value="sim"]');
             document.getElementById('bloqueiosContainer').style.display = sim && sim.checked ? 'block' : 'none';
         }
+
 
         function addExecutorToList() {
             const nome = document.getElementById('executorNome').value.trim();
@@ -2899,6 +3154,7 @@
             document.getElementById('executorNome').value = '';
             document.getElementById('executorCargo').value = '';
         }
+
 
         function addBloqueioToList() {
             const local = document.getElementById('bloqueioLocal').value.trim();
@@ -2913,6 +3169,7 @@
             document.getElementById('bloqueioCadeado').value = '';
         }
 
+
         function openSelectModal(type) {
             currentSelectType = type;
             selectedItems = [];
@@ -2925,11 +3182,13 @@
             openModal('modalSelectItems');
         }
 
+
         function toggleSelectItem(id, nome) {
             const idx = selectedItems.findIndex(i => i.id === id);
             if (idx === -1) selectedItems.push({ id, nome });
             else selectedItems.splice(idx, 1);
         }
+
 
         function confirmSelectItems() {
             const lists = {
@@ -2944,6 +3203,7 @@
             closeModal('modalSelectItems');
         }
 
+
         function renderTempList(listId, items, type) {
             const list = document.getElementById(listId);
             if (items.length === 0) { list.innerHTML = ''; return; }
@@ -2953,6 +3213,7 @@
                 return '<div class="item-list-item"><span>' + text + '</span><button class="btn-remove" onclick="removeFromTempList(\'' + type + '\',' + idx + ')">✕</button></div>';
             }).join('');
         }
+
 
         function removeFromTempList(type, idx) {
             const lists = {
@@ -2967,6 +3228,7 @@
             renderTempList(lists[type].listId, lists[type].temp, type);
         }
 
+
         function limparFormPermissao() {
             document.getElementById('formPermissao').reset();
             tempExecutores = []; tempEquipamentos = []; tempRiscos = []; tempEpi = []; tempMedidas = []; tempBloqueios = [];
@@ -2980,6 +3242,7 @@
             });
         }
 
+
         function getSelectedTiposTrabalho() {
             const tipos = [];
             document.querySelectorAll('#tipoTrabalhoGroup .checkbox-item').forEach(item => {
@@ -2991,8 +3254,10 @@
                 const outrosText = document.getElementById('permOutrosTipo').value.trim();
                 if (outrosText) tipos[outrosIdx] = 'Outros: ' + outrosText;
             }
+
             return tipos;
         }
+
 
         document.getElementById('formPermissao').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -3064,6 +3329,7 @@
             '</div>';
         }
 
+
         function loadPermissoesSolicitadas() {
             const permissoes = cachedPermissoes.filter(p => p.status === 'Solicitada');
             const container = document.getElementById('listSolicitadas');
@@ -3071,6 +3337,7 @@
                 '<p style="color: var(--text-secondary); text-align: center; padding: 30px;">Nenhuma permissão solicitada</p>' :
                 permissoes.map(p => renderPermissionCard(p)).join('');
         }
+
 
         function loadPermissoesExecucao() {
             const permissoes = cachedPermissoes.filter(p => p.status === 'Em Execução' && !p.vencida);
@@ -3080,6 +3347,7 @@
                 permissoes.map(p => renderPermissionCard(p)).join('');
         }
 
+
         function loadPermissoesVencidas() {
             const permissoes = cachedPermissoes.filter(p => p.status === 'Em Execução' && p.vencida);
             const container = document.getElementById('listVencidas');
@@ -3088,6 +3356,7 @@
                 permissoes.map(p => renderPermissionCard(p, true)).join('');
         }
 
+
         function loadPermissoesEncerradas() {
             const permissoes = cachedPermissoes.filter(p => p.status === 'Encerrada');
             const container = document.getElementById('listEncerradas');
@@ -3095,6 +3364,7 @@
                 '<p style="color: var(--text-secondary); text-align: center; padding: 30px;">Nenhuma permissão encerrada</p>' :
                 permissoes.map(p => renderPermissionCard(p)).join('');
         }
+
 
         // View Permission - Com descrição completa de bloqueios
         function viewPermissao(id) {
@@ -3117,6 +3387,7 @@
             if (isExpired) {
                 content += '<p style="color: var(--danger); font-size: 0.85rem; margin-top: 8px;">⚠️ Esta permissão ultrapassou a data/hora de término programada!</p>';
             }
+
             content += '</div>';
             
             // A1 - Responsabilidades
@@ -3150,6 +3421,7 @@
                 p.executores.forEach(e => { content += '<li>' + e.nome + ' - ' + e.cargo + '</li>'; });
                 content += '</ul>';
             }
+
             content += '</div>';
             
             // B1 - Equipamentos
@@ -3157,24 +3429,28 @@
                 content += '<div class="section"><div class="section-title"><span class="section-code">B1</span> Equipamentos</div>';
                 content += '<p>' + p.equipamentosList.map(e => e.nome).join(', ') + '</p></div>';
             }
+
             
             // B2 - Riscos
             if (p.riscosList && p.riscosList.length > 0) {
                 content += '<div class="section"><div class="section-title"><span class="section-code">B2</span> Riscos Identificados</div>';
                 content += '<p>' + p.riscosList.map(r => r.nome).join(', ') + '</p></div>';
             }
+
             
             // B3 - EPIs
             if (p.epiList && p.epiList.length > 0) {
                 content += '<div class="section"><div class="section-title"><span class="section-code">B3</span> EPIs Requeridos</div>';
                 content += '<p>' + p.epiList.map(e => e.nome).join(', ') + '</p></div>';
             }
+
             
             // B4 - Medidas
             if (p.medidasList && p.medidasList.length > 0) {
                 content += '<div class="section"><div class="section-title"><span class="section-code">B4</span> Medidas de Segurança</div>';
                 content += '<p>' + p.medidasList.map(m => m.nome).join(', ') + '</p></div>';
             }
+
             
             // C1 - Bloqueios - DESCRIÇÃO COMPLETA
             content += '<div class="section"><div class="section-title"><span class="section-code">C1</span> Bloqueios</div>';
@@ -3190,6 +3466,7 @@
             } else {
                 content += '<p style="color: var(--success);">✓ Não requer bloqueio</p>';
             }
+
             content += '</div>';
             
             // C2 - Anotações
@@ -3197,6 +3474,7 @@
                 content += '<div class="section"><div class="section-title"><span class="section-code">C2</span> Anotações</div>';
                 content += '<p>' + p.anotacoes + '</p></div>';
             }
+
             
             // D1 - Transferências
             content += '<div class="section"><div class="section-title"><span class="section-code">D1</span> Transferências de Responsabilidade</div>';
@@ -3212,9 +3490,11 @@
                     const last = transfers[transfers.length - 1];
                     content += '<div style="margin-top: 8px; color: var(--success);">✓ Transferido de ' + last.de + ' em ' + formatDateTime(last.dataAceite) + '</div>';
                 }
+
                 if (p.status === 'Em Execução' && currentUser.id === p[tipo + 'Id'] && !pendingNotif) {
                     content += '<button class="btn btn-warning btn-xs" style="margin-top: 8px;" onclick="openTransferModal(\'' + tipo + '\', \'' + p.id + '\')">🔄 Transferir</button>';
                 }
+
                 content += '</div>';
             });
             content += '</div>';
@@ -3229,6 +3509,7 @@
                 if (!p.assinaturaInicioAutorizador && p.status === 'Solicitada' && currentUser.id === p.autorizadorId) {
                     content += '<button class="btn btn-success btn-xs" onclick="signInicio(\'autorizador\')">Assinar</button>';
                 }
+
                 content += '</div>';
                 // Supervisor
                 content += '<div class="signature-box ' + (p.assinaturaInicioSupervisor ? 'signed' : '') + '"><div class="signature-info"><span class="signature-name">' + p.supervisor + '</span><span class="signature-role">Supervisor - Confere bloqueios e condições</span>';
@@ -3237,6 +3518,7 @@
                 if (!p.assinaturaInicioSupervisor && p.assinaturaInicioAutorizador && p.status === 'Solicitada' && currentUser.id === p.supervisorId) {
                     content += '<button class="btn btn-success btn-xs" onclick="signInicio(\'supervisor\')">Assinar</button>';
                 }
+
                 content += '</div>';
                 // Executor
                 content += '<div class="signature-box ' + (p.assinaturaInicioExecutor ? 'signed' : '') + '"><div class="signature-info"><span class="signature-name">' + p.executor + '</span><span class="signature-role">Executor - Inicia o trabalho</span>';
@@ -3245,9 +3527,11 @@
                 if (!p.assinaturaInicioExecutor && p.assinaturaInicioSupervisor && p.status === 'Solicitada' && currentUser.id === p.executorId) {
                     content += '<button class="btn btn-success btn-xs" onclick="signInicioExecutorComQR()">📱 Assinar com QR</button>';
                 }
+
                 content += '</div>';
                 content += '</div>';
             }
+
             
             // E2 - Assinaturas de Término
             if (p.status === 'Em Execução' || p.status === 'Encerrada') {
@@ -3259,6 +3543,7 @@
                 if (!p.assinaturaTerminoExecutor && p.status === 'Em Execução' && currentUser.id === p.executorId) {
                     content += '<button class="btn btn-success btn-xs" onclick="signTermino(\'executor\')">Assinar</button>';
                 }
+
                 content += '</div>';
                 // Supervisor
                 content += '<div class="signature-box ' + (p.assinaturaTerminoSupervisor ? 'signed' : '') + '"><div class="signature-info"><span class="signature-name">' + p.supervisor + '</span><span class="signature-role">Supervisor - Confere término</span>';
@@ -3267,6 +3552,7 @@
                 if (!p.assinaturaTerminoSupervisor && p.assinaturaTerminoExecutor && p.status === 'Em Execução' && currentUser.id === p.supervisorId) {
                     content += '<button class="btn btn-success btn-xs" onclick="signTermino(\'supervisor\')">Assinar</button>';
                 }
+
                 content += '</div>';
                 // Autorizador
                 content += '<div class="signature-box ' + (p.assinaturaTerminoAutorizador ? 'signed' : '') + '"><div class="signature-info"><span class="signature-name">' + p.autorizador + '</span><span class="signature-role">Autorizador - Encerra permissão</span>';
@@ -3275,6 +3561,7 @@
                 if (!p.assinaturaTerminoAutorizador && p.assinaturaTerminoSupervisor && p.status === 'Em Execução' && currentUser.id === p.autorizadorId) {
                     content += '<button class="btn btn-success btn-xs" onclick="signTermino(\'autorizador\')">Assinar</button>';
                 }
+
                 content += '</div>';
                 // Equipamento não retornou
                 if (!p.equipamentoRetornou && p.status === 'Encerrada') {
@@ -3283,12 +3570,15 @@
                     content += '<p style="margin-top: 5px;">' + (p.justificativaNaoRetorno || 'Sem justificativa') + '</p>';
                     content += '</div>';
                 }
+
                 content += '</div>';
             }
+
             
             document.getElementById('viewPermissaoContent').innerHTML = content;
             openModal('modalViewPermissao');
         }
+
 
         function openTransferModal(type, permissaoId) {
             transferType = type;
@@ -3302,6 +3592,7 @@
             document.getElementById('transferAssinatura').value = '';
             openModal('modalTransfer');
         }
+
 
         async function solicitarTransferencia() {
             const novoId = document.getElementById('transferSelect').value;
@@ -3324,6 +3615,7 @@
             } catch (error) { showToast('Erro: ' + error.message, 'error'); }
         }
 
+
         function signInicio(role) {
             const msgs = { autorizador: 'Confirmar bloqueios e condições de segurança?', supervisor: 'Conferir bloqueios e autorizar início?', executor: 'Iniciar o trabalho?' };
             document.getElementById('assinaturaMessage').textContent = msgs[role];
@@ -3339,6 +3631,7 @@
             };
             openModal('modalAssinatura');
         }
+
 
         function signTermino(role) {
             if (role === 'autorizador') {
@@ -3380,8 +3673,10 @@
                     } catch (error) { showToast('Erro: ' + error.message, 'error'); }
                 };
             }
+
             openModal('modalAssinatura');
         }
+
 
         function confirmarAssinatura() {
             const assinatura = document.getElementById('inputAssinatura').value;
@@ -3392,6 +3687,7 @@
             if (signatureCallback) { signatureCallback(); signatureCallback = null; }
         }
 
+
         function updateStats() {
             const vencidas = cachedPermissoes.filter(p => p.status === 'Em Execução' && p.vencida).length;
             const execucao = cachedPermissoes.filter(p => p.status === 'Em Execução' && !p.vencida).length;
@@ -3401,6 +3697,7 @@
             document.getElementById('statEncerradas').textContent = cachedPermissoes.filter(p => p.status === 'Encerrada').length;
             document.getElementById('statTotal').textContent = cachedPermissoes.length;
         }
+
 
         let chartStatus, chartTipos, chartMensal, chartExecutores;
         function loadDashboard() {
@@ -3449,11 +3746,13 @@
             });
         }
 
+
         // Verificar vencidas periodicamente
         setInterval(() => {
             if (currentUser && cachedPermissoes.length > 0) {
                 checkVencidas();
             }
+
         }, 60000); // Verificar a cada minuto
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -3467,25 +3766,41 @@
             document.querySelectorAll('input[name="bloqueio"]').forEach(radio => {
                 radio.addEventListener('change', toggleBloqueios);
             });
-            const savedUser = sessionStorage.getItem('ptd_currentUser');
-            if (savedUser) currentUser = JSON.parse(savedUser);
-            initFirebase().then(() => {
-                if (currentUser) {
-                    const userExists = cachedUsuarios.find(u => u.id === currentUser.id);
-                    if (userExists) {
-                        currentUser = userExists;
-                        document.getElementById('loginPage').style.display = 'none';
-                        document.getElementById('appContainer').style.display = 'block';
-                        updateUserInterface();
-                        updateStats();
-                        updateNotificationBadges(); setupQRListener();
-                        navigationHistory = ['home'];
-                        updateBackButton();
-                    } else {
-                        sessionStorage.removeItem('ptd_currentUser');
-                        currentUser = null;
-                    }
+            const savedUser = localStorage.getItem('ptd_currentUser');
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    // Mostrar app imediatamente
+                    document.getElementById('loginPage').style.display = 'none';
+                    document.getElementById('appContainer').style.display = 'block';
+                    updateUserInterface();
+                    navigationHistory = ['home'];
+                    updateBackButton();
+                } catch(e) {
+                    localStorage.removeItem('ptd_currentUser');
+                    currentUser = null;
                 }
+            }
+            
+            initFirebase().then(() => {
+                // Se já está logado, atualizar dados quando Firebase carregar
+                if (currentUser) {
+                    setTimeout(() => {
+                        if (cachedUsuarios.length > 0) {
+                            const userExists = cachedUsuarios.find(u => u.id === currentUser.id);
+                            if (userExists) {
+                                currentUser = userExists;
+                                localStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
+                                updateUserInterface();
+                                updateStats();
+                                updateNotificationBadges();
+                                setupQRListener();
+                            }
+                        }
+                    }, 1500);
+                }
+            }).catch(err => {
+                console.log('Firebase erro:', err);
             });
         });
     </script>
