@@ -2138,7 +2138,12 @@
                 
                 const tipoTexto = data.tipo === 'inicio' ? 'INÍCIO' : 'ENCERRAMENTO';
                 const assinatura = prompt('Digite sua assinatura digital para validar ' + tipoTexto + ':');
-                if (!assinatura || assinatura !== currentUser.assinatura) { 
+                if (!assinatura) { 
+                    document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ Assinatura não informada!</div>'; 
+                    return; 
+                }
+                const assinaturaValida = await verificarSenha(assinatura, currentUser.assinatura);
+                if (!assinaturaValida) { 
                     document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ Assinatura inválida!</div>'; 
                     return; 
                 }
@@ -2159,7 +2164,6 @@
                 document.getElementById('scannerResult').innerHTML = '<div class="qr-status error">❌ Erro de conexão</div>';
             }
         }
-
         function signInicioExecutorComQR() {
             if (!currentUser.assinatura) { showToast('Configure sua assinatura!', 'error'); return; }
             document.getElementById('assinaturaMessage').textContent = 'Digite sua assinatura para gerar o QR Code de INÍCIO';
@@ -2440,6 +2444,54 @@
             return new Date(d).toLocaleString('pt-BR'); 
         }
         function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
+
+        // ==================== SEGURANÇA - HASH DE SENHAS ====================
+        async function hashSenha(senha) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(senha + '_PTD_SALT_2024');
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        
+        function isHash(str) {
+            return str && str.length === 64 && /^[a-f0-9]+$/.test(str);
+        }
+        
+        async function verificarSenha(senhaDigitada, senhaArmazenada) {
+            // Se a senha armazenada já é hash, compara hashes
+            if (isHash(senhaArmazenada)) {
+                const hashDigitada = await hashSenha(senhaDigitada);
+                return hashDigitada === senhaArmazenada;
+            }
+            // Senão, compara texto (compatibilidade com senhas antigas)
+            return senhaDigitada === senhaArmazenada;
+        }
+        
+        async function migrarSenhaParaHash(userId, senhaAtual) {
+            // Migra senha em texto plano para hash
+            if (!isHash(senhaAtual)) {
+                const hash = await hashSenha(senhaAtual);
+                await updateDoc('usuarios', userId, { senha: hash });
+                return hash;
+            }
+            return senhaAtual;
+        }
+
+        async function migrarAssinaturaParaHash(userId, assinaturaAtual) {
+            // Migra assinatura em texto plano para hash
+            if (!isHash(assinaturaAtual)) {
+                const hash = await hashSenha(assinaturaAtual);
+                await updateDoc('usuarios', userId, { assinatura: hash });
+                // Atualizar currentUser também
+                if (currentUser && currentUser.id === userId) {
+                    currentUser.assinatura = hash;
+                    localStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
+                }
+                return hash;
+            }
+            return assinaturaAtual;
+        }
         function togglePassword(id) { const i = document.getElementById(id); i.type = i.type === 'password' ? 'text' : 'password'; }
         function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow = 'hidden'; }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); document.body.style.overflow = ''; }
@@ -2533,7 +2585,18 @@
                 btn.textContent = 'Aguarde...';
             }
             
-            const user = cachedUsuarios.find(x => x.usuario === u && x.senha === p);
+            // Verificar credenciais com hash
+            let user = null;
+            for (const usr of cachedUsuarios) {
+                if (usr.usuario === u) {
+                    const senhaValida = await verificarSenha(p, usr.senha);
+                    if (senhaValida) {
+                        user = usr;
+                        if (!isHash(usr.senha)) { await migrarSenhaParaHash(usr.id, p); }
+                        break;
+                    }
+                }
+            }
             if (user) {
                 currentUser = user;
                 localStorage.setItem('ptd_currentUser', JSON.stringify(user));
@@ -2640,7 +2703,8 @@
         async function aceitarTransferencia() {
             const assinatura = document.getElementById('aceitarTransferAssinatura').value;
             if (!currentUser.assinatura) { showToast('Configure sua assinatura primeiro!', 'error'); closeModal('modalAceitarTransfer'); navigateTo('assinatura'); return; }
-            if (assinatura !== currentUser.assinatura) { showToast('Assinatura inválida!', 'error'); return; }
+            const assinaturaValida = await verificarSenha(assinatura, currentUser.assinatura);
+            if (!assinaturaValida) { showToast('Assinatura inválida!', 'error'); return; }
             try {
                 const permissao = cachedPermissoes.find(p => p.id === currentNotification.permissaoId);
                 if (permissao) {
@@ -2661,7 +2725,6 @@
                 showToast('Transferência aceita!');
             } catch (error) { showToast('Erro ao aceitar: ' + error.message, 'error'); }
         }
-
         async function recusarTransferencia() {
             if (!confirm('Recusar transferência?')) return;
             try {
@@ -2720,9 +2783,10 @@
             if (document.getElementById('tipoExecutor').checked) tipos.push('executor');
             if (tipos.length === 0) { showToast('Selecione um tipo!', 'error'); return; }
             try {
+                const senhaHash = await hashSenha(document.getElementById('novoSenha').value);
                 await addDoc('usuarios', {
                     nome: document.getElementById('novoNome').value, usuario: document.getElementById('novoUsuario').value,
-                    senha: document.getElementById('novoSenha').value, setor: document.getElementById('novoSetor').value,
+                    senha: senhaHash, setor: document.getElementById('novoSetor').value,
                     cargo: document.getElementById('novoCargo').value, empresa: document.getElementById('novoEmpresa').value,
                     tipos: tipos, assinatura: null
                 });
@@ -2735,7 +2799,6 @@
                 showToast('Usuário cadastrado!');
             } catch (error) { showToast('Erro ao salvar: ' + error.message, 'error'); }
         }
-
         async function deleteUsuario(id) {
             if (!confirm('Excluir usuário?')) return;
             try { await deleteDoc('usuarios', id); showToast('Usuário excluído!'); }
@@ -2748,8 +2811,9 @@
             if (!/^\d{6,}$/.test(nova)) { showToast('Mínimo 6 dígitos numéricos!', 'error'); return; }
             if (nova !== confirmar) { showToast('Assinaturas não coincidem!', 'error'); return; }
             try {
-                await updateDoc('usuarios', currentUser.id, { assinatura: nova });
-                currentUser.assinatura = nova;
+                const assinaturaHash = await hashSenha(nova);
+                await updateDoc('usuarios', currentUser.id, { assinatura: assinaturaHash });
+                currentUser.assinatura = assinaturaHash;
                 localStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
                 document.getElementById('novaAssinatura').value = '';
                 document.getElementById('confirmarAssinatura').value = '';
@@ -2761,8 +2825,9 @@
         function toggleSignatureVisibility() {
             const d = document.getElementById('signatureDisplay');
             const t = document.getElementById('toggleText');
-            if (d.textContent.includes('•')) { d.textContent = currentUser.assinatura; t.textContent = '🙈 Ocultar'; }
-            else { d.textContent = '••••••'; t.textContent = '👁 Mostrar'; }
+            // Assinatura agora é hash, não mostrar
+            d.textContent = '••••••••';
+            t.textContent = '🔒 Protegida';
         }
 
         function showResetSignature() {
@@ -3245,7 +3310,8 @@
             const assinatura = document.getElementById('transferAssinatura').value;
             if (!novoId) { showToast('Selecione!', 'error'); return; }
             if (!currentUser.assinatura) { showToast('Configure assinatura!', 'error'); closeModal('modalTransfer'); navigateTo('assinatura'); return; }
-            if (assinatura !== currentUser.assinatura) { showToast('Assinatura inválida!', 'error'); return; }
+            const assinaturaValida = await verificarSenha(assinatura, currentUser.assinatura);
+            if (!assinaturaValida) { showToast('Assinatura inválida!', 'error'); return; }
             try {
                 const p = cachedPermissoes.find(perm => perm.id === transferPermissaoId);
                 const novoUsuario = cachedUsuarios.find(u => u.id === novoId);
@@ -3260,7 +3326,6 @@
                 showToast('Solicitação enviada!');
             } catch (error) { showToast('Erro: ' + error.message, 'error'); }
         }
-
         function signInicio(role) {
             const msgs = { autorizador: 'Confirmar bloqueios e condições de segurança?', supervisor: 'Conferir bloqueios e autorizar início?', executor: 'Iniciar o trabalho?' };
             document.getElementById('assinaturaMessage').textContent = msgs[role];
@@ -3320,10 +3385,15 @@
             openModal('modalAssinatura');
         }
 
-        function confirmarAssinatura() {
+        async function confirmarAssinatura() {
             const assinatura = document.getElementById('inputAssinatura').value;
             if (!currentUser.assinatura) { showToast('Configure assinatura!', 'error'); closeModal('modalAssinatura'); navigateTo('assinatura'); return; }
-            if (assinatura !== currentUser.assinatura) { showToast('Assinatura inválida!', 'error'); return; }
+            const valida = await verificarSenha(assinatura, currentUser.assinatura);
+            if (!valida) { showToast('Assinatura inválida!', 'error'); return; }
+            // Migrar assinatura para hash se ainda não for
+            if (!isHash(currentUser.assinatura)) {
+                await migrarAssinaturaParaHash(currentUser.id, assinatura);
+            }
             closeModal('modalAssinatura');
             document.getElementById('inputAssinatura').value = '';
             if (signatureCallback) { signatureCallback(); signatureCallback = null; }
