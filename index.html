@@ -1323,7 +1323,7 @@
             <form id="loginForm">
                 <div class="form-group">
                     <label>Usuário</label>
-                    <input type="text" id="loginUsername" placeholder="Digite seu usuário" required autocomplete="username">
+                    <input type="email" id="loginEmail" placeholder="Digite seu email" required autocomplete="email">
                 </div>
                 <div class="form-group">
                     <label>Senha</label>
@@ -1504,7 +1504,7 @@
                     <div class="table-container">
                         <table>
                             <thead>
-                                <tr><th>Nome</th><th>Usuário</th><th>Cargo</th><th>Tipos</th><th>Ações</th></tr>
+                                <tr><th>Nome</th><th>Email</th><th>Cargo</th><th>Tipos</th><th>Ações</th></tr>
                             </thead>
                             <tbody id="usuariosTableBody"></tbody>
                         </table>
@@ -1737,7 +1737,7 @@
             <div class="modal-body">
                 <div class="form-grid">
                     <div class="form-group full-width"><label>Nome</label><input type="text" id="novoNome"></div>
-                    <div class="form-group"><label>Usuário</label><input type="text" id="novoUsuario" autocomplete="off"></div>
+                    <div class="form-group"><label>Email</label><input type="email" id="novoEmail" autocomplete="off" placeholder="email@exemplo.com"></div>
                     <div class="form-group"><label>Senha</label><input type="password" id="novoSenha" autocomplete="new-password"></div>
                     <div class="form-group"><label>Setor</label><input type="text" id="novoSetor"></div>
                     <div class="form-group"><label>Cargo</label><input type="text" id="novoCargo"></div>
@@ -1921,16 +1921,17 @@
         // CONFIGURAÇÃO DO FIREBASE
         // ================================================================
         const firebaseConfig = {
-            apiKey: "AIzaSyDMCFLSKH-Ug61qb-x-b4IUMOP7E6_7r1M",
-            authDomain: "permissao-trabalho-uhevg-95a56.firebaseapp.com",
-            projectId: "permissao-trabalho-uhevg-95a56",
-            storageBucket: "permissao-trabalho-uhevg-95a56.firebasestorage.app",
-            messagingSenderId: "4949368740",
-            appId: "1:4949368740:web:0090e62d1fe1961e1c6b31"
+            apiKey: "AIzaSyC7TxxgjMVX3lsb4nget2gbdU6nR-3IcM",
+            authDomain: "permissao-trabalho-uhevg.firebaseapp.com",
+            projectId: "permissao-trabalho-uhevg",
+            storageBucket: "permissao-trabalho-uhevg.firebasestorage.app",
+            messagingSenderId: "236218702254",
+            appId: "1:236218702254:web:6e93684d044ff7c0ee503f"
         };
         // ================================================================
 
         let db = null;
+        let auth = null;
         let firebaseInitialized = false;
         let unsubscribers = [];
 
@@ -2210,6 +2211,8 @@
                 }
                 firebase.initializeApp(firebaseConfig);
                 db = firebase.firestore();
+                auth = firebase.auth();
+                
                 try {
                     await db.enablePersistence({ synchronizeTabs: true });
                 } catch (err) {
@@ -2222,27 +2225,55 @@
                 }, () => {
                     updateSyncStatus('offline');
                 });
+                
                 await initializeDefaultData();
                 setupRealtimeListeners();
-                document.getElementById('loadingOverlay').classList.add('hidden');
-                if (!currentUser) document.getElementById('loginPage').style.display = 'flex';
+                
+                // Configurar listener de autenticação
+                auth.onAuthStateChanged(async (user) => {
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                    
+                    if (user) {
+                        // Usuário logado - buscar dados no Firestore
+                        try {
+                            const userDoc = await db.collection('usuarios').doc(user.uid).get();
+                            if (userDoc.exists) {
+                                currentUser = { id: user.uid, email: user.email, ...userDoc.data() };
+                                localStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
+                                document.getElementById('loginPage').style.display = 'none';
+                                document.getElementById('appContainer').style.display = 'block';
+                                updateUserInterface();
+                                updateStats();
+                                updateNotificationBadges();
+                                navigationHistory = ['home'];
+                                updateBackButton();
+                            } else {
+                                await auth.signOut();
+                            }
+                        } catch(e) {
+                            console.log('Erro ao buscar dados do usuário:', e);
+                        }
+                    } else {
+                        // Não logado
+                        currentUser = null;
+                        localStorage.removeItem('ptd_currentUser');
+                        document.getElementById('loginPage').style.display = 'flex';
+                        document.getElementById('appContainer').style.display = 'none';
+                    }
+                });
+                
                 const statusEl = document.getElementById('firebaseStatus');
                 statusEl.textContent = '✅ Firebase conectado';
                 statusEl.className = 'firebase-status connected';
             } catch (error) {
                 console.error("Erro ao inicializar Firebase:", error);
-                document.getElementById('loadingOverlay').querySelector('.loading-text').textContent = 'Erro: ' + error.message;
-                document.getElementById('loadingOverlay').querySelector('.loading-text').style.color = 'var(--danger)';
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                document.getElementById('loginPage').style.display = 'flex';
                 const statusEl = document.getElementById('firebaseStatus');
                 statusEl.textContent = '❌ ' + error.message;
                 statusEl.className = 'firebase-status error';
-                setTimeout(() => {
-                    document.getElementById('loadingOverlay').classList.add('hidden');
-                    if (!currentUser) document.getElementById('loginPage').style.display = 'flex';
-                }, 2000);
             }
         }
-
         function updateSyncStatus(status) {
             const indicator = document.getElementById('syncIndicator');
             const text = document.getElementById('syncText');
@@ -2253,17 +2284,7 @@
 
         async function initializeDefaultData() {
             try {
-                const usersRef = db.collection('usuarios');
-                const usersSnapshot = await usersRef.get();
-                if (usersSnapshot.empty) {
-                    await usersRef.add({
-                        nome: 'Paulo Henrique Ávila', usuario: 'pauloavila', senha: 'paulo@2025',
-                        setor: 'Operação', cargo: 'Mantenedor', empresa: 'Enel',
-                        tipos: ['administrador', 'supervisor', 'autorizador', 'executor'], assinatura: null,
-                        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    showToast('Usuário admin criado: pauloavila / paulo@2025', 'warning');
-                }
+                // Apenas inicializar contador de permissões
                 const counterRef = db.collection('config').doc('counters');
                 const counterDoc = await counterRef.get();
                 if (!counterDoc.exists) {
@@ -2273,7 +2294,6 @@
                 console.log('Modo offline - dados serão sincronizados quando conectar');
             }
         }
-
         function setupRealtimeListeners() {
             unsubscribers.forEach(unsub => unsub());
             unsubscribers = [];
@@ -2574,62 +2594,56 @@
             btn.disabled = true;
             btn.textContent = 'Entrando...';
             
-            const u = document.getElementById('loginUsername').value.trim();
-            const p = document.getElementById('loginPassword').value;
+            const email = document.getElementById('loginEmail').value.trim();
+            const senha = document.getElementById('loginPassword').value;
             
-            // Esperar dados carregarem (máximo 5 segundos)
-            let tentativas = 0;
-            while (cachedUsuarios.length === 0 && tentativas < 10) {
-                await new Promise(r => setTimeout(r, 500));
-                tentativas++;
-                btn.textContent = 'Aguarde...';
-            }
-            
-            // Verificar credenciais com hash
-            let user = null;
-            for (const usr of cachedUsuarios) {
-                if (usr.usuario === u) {
-                    const senhaValida = await verificarSenha(p, usr.senha);
-                    if (senhaValida) {
-                        user = usr;
-                        if (!isHash(usr.senha)) { await migrarSenhaParaHash(usr.id, p); }
-                        break;
-                    }
-                }
-            }
-            if (user) {
-                currentUser = user;
-                localStorage.setItem('ptd_currentUser', JSON.stringify(user));
-                document.getElementById('loginPage').style.display = 'none';
-                document.getElementById('appContainer').style.display = 'block';
-                updateUserInterface();
-                updateStats();
-                updateNotificationBadges();
-                navigationHistory = ['home'];
-                navigateTo('home', false);
+            try {
+                await auth.signInWithEmailAndPassword(email, senha);
+                // O onAuthStateChanged vai cuidar do resto
                 showToast('Login realizado!');
-            } else {
-                if (cachedUsuarios.length === 0) {
-                    showToast('Sem conexão. Tente novamente.', 'error');
-                } else {
-                    showToast('Usuário ou senha inválidos!', 'error');
+            } catch (error) {
+                let mensagem = 'Erro ao fazer login';
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        mensagem = 'Usuário não encontrado';
+                        break;
+                    case 'auth/wrong-password':
+                        mensagem = 'Senha incorreta';
+                        break;
+                    case 'auth/invalid-email':
+                        mensagem = 'Email inválido';
+                        break;
+                    case 'auth/invalid-credential':
+                        mensagem = 'Email ou senha inválidos';
+                        break;
+                    case 'auth/too-many-requests':
+                        mensagem = 'Muitas tentativas. Aguarde um momento';
+                        break;
+                    case 'auth/network-request-failed':
+                        mensagem = 'Sem conexão com internet';
+                        break;
                 }
+                showToast(mensagem, 'error');
             }
             
             btn.disabled = false;
             btn.innerHTML = '🔐 Entrar';
         });
 
-        function logout() {
-            currentUser = null;
-            localStorage.removeItem('ptd_currentUser');
-            document.getElementById('appContainer').style.display = 'none';
-            if (!currentUser) document.getElementById('loginPage').style.display = 'flex';
-            document.getElementById('loginUsername').value = '';
-            document.getElementById('loginPassword').value = '';
-            navigationHistory = ['home'];
+        async function logout() {
+            try {
+                await auth.signOut();
+                currentUser = null;
+                localStorage.removeItem('ptd_currentUser');
+                document.getElementById('appContainer').style.display = 'none';
+                document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                navigationHistory = ['home'];
+            } catch (error) {
+                showToast('Erro ao sair', 'error');
+            }
         }
-
         function updateUserInterface() {
             if (!currentUser) return;
             const initials = currentUser.nome.split(' ').map(n => n[0]).join('').substr(0, 2);
@@ -2769,7 +2783,7 @@
 
         function loadUsuarios() {
             document.getElementById('usuariosTableBody').innerHTML = cachedUsuarios.map(u => 
-                '<tr onclick="event.stopPropagation()"><td>' + u.nome + '</td><td>' + u.usuario + '</td><td>' + u.cargo + '</td><td>' + 
+                '<tr onclick="event.stopPropagation()"><td>' + u.nome + '</td><td>' + (u.email || 'N/A') + '</td><td>' + u.cargo + '</td><td>' + 
                 u.tipos.map(t => '<span class="badge badge-info">' + t.substr(0,3) + '</span>').join(' ') + '</td><td>' +
                 '<button class="btn btn-danger btn-xs" onclick="deleteUsuario(\'' + u.id + '\')">🗑️</button></td></tr>'
             ).join('');
@@ -2782,22 +2796,63 @@
             if (document.getElementById('tipoAutorizador').checked) tipos.push('autorizador');
             if (document.getElementById('tipoExecutor').checked) tipos.push('executor');
             if (tipos.length === 0) { showToast('Selecione um tipo!', 'error'); return; }
+            
+            const email = document.getElementById('novoEmail').value.trim();
+            const senha = document.getElementById('novoSenha').value;
+            const nome = document.getElementById('novoNome').value;
+            
+            if (!email || !senha || !nome) {
+                showToast('Preencha todos os campos obrigatórios!', 'error');
+                return;
+            }
+            if (senha.length < 6) {
+                showToast('Senha deve ter no mínimo 6 caracteres!', 'error');
+                return;
+            }
+            
             try {
-                const senhaHash = await hashSenha(document.getElementById('novoSenha').value);
-                await addDoc('usuarios', {
-                    nome: document.getElementById('novoNome').value, usuario: document.getElementById('novoUsuario').value,
-                    senha: senhaHash, setor: document.getElementById('novoSetor').value,
-                    cargo: document.getElementById('novoCargo').value, empresa: document.getElementById('novoEmpresa').value,
-                    tipos: tipos, assinatura: null
+                // Criar usuário no Firebase Auth
+                const userCredential = await auth.createUserWithEmailAndPassword(email, senha);
+                const uid = userCredential.user.uid;
+                
+                // Salvar dados no Firestore
+                await db.collection('usuarios').doc(uid).set({
+                    nome: nome,
+                    email: email,
+                    setor: document.getElementById('novoSetor').value,
+                    cargo: document.getElementById('novoCargo').value,
+                    empresa: document.getElementById('novoEmpresa').value,
+                    tipos: tipos,
+                    assinatura: null,
+                    criadoEm: firebase.firestore.FieldValue.serverTimestamp()
                 });
+                
                 closeModal('modalNovoUsuario');
-                ['novoNome','novoUsuario','novoSenha','novoSetor','novoCargo','novoEmpresa'].forEach(id => document.getElementById(id).value = '');
+                ['novoNome','novoEmail','novoSenha','novoSetor','novoCargo','novoEmpresa'].forEach(id => document.getElementById(id).value = '');
                 ['tipoAdmin','tipoSupervisor','tipoAutorizador','tipoExecutor'].forEach(id => {
                     document.getElementById(id).checked = false;
                     document.getElementById(id).parentElement.classList.remove('checked');
                 });
-                showToast('Usuário cadastrado!');
-            } catch (error) { showToast('Erro ao salvar: ' + error.message, 'error'); }
+                
+                showToast('Usuário cadastrado! Faça login novamente.', 'warning');
+                // O Firebase Auth automaticamente loga o novo usuário
+                // O onAuthStateChanged vai atualizar a interface
+                
+            } catch (error) {
+                let mensagem = 'Erro ao criar usuário';
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        mensagem = 'Este email já está em uso';
+                        break;
+                    case 'auth/invalid-email':
+                        mensagem = 'Email inválido';
+                        break;
+                    case 'auth/weak-password':
+                        mensagem = 'Senha muito fraca (mínimo 6 caracteres)';
+                        break;
+                }
+                showToast(mensagem, 'error');
+            }
         }
         async function deleteUsuario(id) {
             if (!confirm('Excluir usuário?')) return;
@@ -3475,38 +3530,8 @@
                 radio.addEventListener('change', toggleBloqueios);
             });
             
-            // Verificar sessão salva
-            const savedUser = localStorage.getItem('ptd_currentUser');
-            if (savedUser) {
-                try {
-                    currentUser = JSON.parse(savedUser);
-                    // Mostrar app imediatamente
-                    document.getElementById('loadingOverlay').classList.add('hidden');
-                    document.getElementById('loginPage').style.display = 'none';
-                    document.getElementById('appContainer').style.display = 'block';
-                    updateUserInterface();
-                    navigationHistory = ['home'];
-                    updateBackButton();
-                } catch(e) {
-                    localStorage.removeItem('ptd_currentUser');
-                    currentUser = null;
-                }
-            }
-            
-            // Iniciar Firebase
-            initFirebase().then(() => {
-                // Atualizar dados do usuário se logado
-                if (currentUser && cachedUsuarios.length > 0) {
-                    const userExists = cachedUsuarios.find(u => u.id === currentUser.id);
-                    if (userExists) {
-                        currentUser = userExists;
-                        localStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
-                        updateUserInterface();
-                        updateStats();
-                        updateNotificationBadges();
-                    }
-                }
-            });
+            // Iniciar Firebase (o Auth vai cuidar da sessão)
+            initFirebase();
         });
     </script>
 </body>
