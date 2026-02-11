@@ -1921,7 +1921,6 @@
         // CONFIGURAÇÃO DO FIREBASE
         // ================================================================
         const firebaseConfig = {
-            const firebaseConfig = {
             apiKey: "AIzaSyDMCFLSKH-Ug61qb-x-b4IUMOP7E6_7r1M",
             authDomain: "permissao-trabalho-uhevg-95a56.firebaseapp.com",
             projectId: "permissao-trabalho-uhevg-95a56",
@@ -2522,173 +2521,85 @@
             const p = cachedPermissoes.find(perm => perm.id === editingPermissaoId);
             if (!p) return;
             
-            const numeroFormatado = String(p.numero).padStart(4, '0');
-            const now = new Date();
-            const termino = new Date(p.dataTermino + 'T' + (p.horaTermino || '23:59'));
-            const isExpired = p.status === 'Em Execução' && now > termino;
+            const num = String(p.numero).padStart(4, '0');
+            const w = window.open('', '_blank', 'width=800,height=600');
             
-            let statusTexto = p.status;
-            if (isExpired) statusTexto = 'VENCIDA';
+            let html = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
+            html += '<title>PT #' + num + '</title>';
+            html += '<style>';
+            html += 'body{font-family:Arial,sans-serif;font-size:11pt;padding:20px;max-width:800px;margin:0 auto}';
+            html += 'h1{text-align:center;border-bottom:2px solid #000;padding-bottom:10px}';
+            html += '.section{margin:15px 0;padding:10px;border:1px solid #ccc;border-radius:5px}';
+            html += '.section-title{font-weight:bold;background:#f0f0f0;padding:5px;margin:-10px -10px 10px -10px;border-radius:5px 5px 0 0}';
+            html += '.row{display:flex;margin:5px 0}.row label{width:150px;font-weight:bold}.row span{flex:1}';
+            html += '.sig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}';
+            html += '.sig-box{border:1px dashed #999;padding:10px;text-align:center;min-height:60px}';
+            html += '.sig-box.ok{border-color:green;background:#f0fff0}';
+            html += '.sig-line{border-bottom:1px solid #000;height:30px;margin-bottom:5px}';
+            html += '@media print{body{padding:0}}';
+            html += '</style></head><body>';
             
-            let executoresHTML = '-';
-            if (p.executores && p.executores.length > 0) {
-                executoresHTML = p.executores.map(e => e.nome + ' (' + e.cargo + ')').join(', ');
-            }
+            html += '<h1>PERMISSÃO DE TRABALHO #' + num + '</h1>';
+            html += '<p style="text-align:center"><strong>Status:</strong> ' + p.status + '</p>';
             
-            let bloqueiosHTML = '<p class="check-ok">✓ Não requer bloqueio</p>';
-            if (p.temBloqueio && p.bloqueios && p.bloqueios.length > 0) {
-                bloqueiosHTML = '<p class="check-alert">⚠ REQUER BLOQUEIO</p><table class="mini-table"><tr><th>Local</th><th>Descrição</th><th>Nº Cadeado</th></tr>';
+            // Responsáveis
+            html += '<div class="section"><div class="section-title">RESPONSABILIDADES</div>';
+            html += '<div class="row"><label>Autorizador:</label><span>' + (p.autorizador||'-') + '</span></div>';
+            html += '<div class="row"><label>Supervisor:</label><span>' + (p.supervisor||'-') + '</span></div>';
+            html += '<div class="row"><label>Executor:</label><span>' + (p.executor||'-') + '</span></div></div>';
+            
+            // Trabalho
+            html += '<div class="section"><div class="section-title">DESCRIÇÃO DO TRABALHO</div>';
+            html += '<div class="row"><label>Local:</label><span>' + (p.local||'-') + '</span></div>';
+            html += '<div class="row"><label>Equipamento:</label><span>' + (p.equipamento||'-') + '</span></div>';
+            html += '<div class="row"><label>Descrição:</label><span>' + (p.descricao||'-') + '</span></div>';
+            if(p.ordemTrabalho) html += '<div class="row"><label>Ordem Trabalho:</label><span>' + p.ordemTrabalho + '</span></div>';
+            html += '</div>';
+            
+            // Programação
+            html += '<div class="section"><div class="section-title">PROGRAMAÇÃO</div>';
+            html += '<div class="row"><label>Início:</label><span>' + formatDate(p.dataInicio) + ' ' + (p.horaInicio||'') + '</span></div>';
+            html += '<div class="row"><label>Término:</label><span>' + formatDate(p.dataTermino) + ' ' + (p.horaTermino||'') + '</span></div></div>';
+            
+            // Segurança
+            html += '<div class="section"><div class="section-title">SEGURANÇA</div>';
+            if(p.riscosList && p.riscosList.length) html += '<div class="row"><label>Riscos:</label><span>' + p.riscosList.map(r=>r.nome).join(', ') + '</span></div>';
+            if(p.epiList && p.epiList.length) html += '<div class="row"><label>EPIs:</label><span>' + p.epiList.map(e=>e.nome).join(', ') + '</span></div>';
+            if(p.medidasList && p.medidasList.length) html += '<div class="row"><label>Medidas:</label><span>' + p.medidasList.map(m=>m.nome).join(', ') + '</span></div>';
+            html += '</div>';
+            
+            // Bloqueios
+            if(p.temBloqueio && p.bloqueios && p.bloqueios.length) {
+                html += '<div class="section"><div class="section-title">BLOQUEIOS</div>';
                 p.bloqueios.forEach(b => {
-                    bloqueiosHTML += '<tr><td>' + b.local + '</td><td>' + b.descricao + '</td><td>' + b.cadeado + '</td></tr>';
+                    html += '<div class="row"><label>Local:</label><span>' + b.local + ' - ' + b.descricao + ' (Cadeado: ' + b.cadeado + ')</span></div>';
                 });
-                bloqueiosHTML += '</table>';
-            }
-            
-            function fmtAss(data, nome, validacao) {
-                if (!data) return '<div class="assinatura-box"><div class="assinatura-linha"></div><p>' + nome + '</p><p class="assinatura-pendente">PENDENTE</p></div>';
-                let html = '<div class="assinatura-box assinada"><div class="assinatura-linha">✓</div><p>' + nome + '</p><p class="assinatura-data">' + formatDateTime(data) + '</p>';
-                if (validacao) html += '<p class="assinatura-qr">📱 QR validado</p>';
                 html += '</div>';
-                return html;
             }
             
-            let transferenciasHTML = '';
-            if (p.transferencias && p.transferencias.length > 0) {
-                transferenciasHTML = '<div class="section"><div class="section-header"><span class="section-code">D3</span> HISTÓRICO DE TRANSFERÊNCIAS</div><div class="section-body"><table class="mini-table"><tr><th>Tipo</th><th>De</th><th>Para</th><th>Data</th></tr>';
-                p.transferencias.forEach(t => {
-                    transferenciasHTML += '<tr><td>' + t.tipo + '</td><td>' + t.de + '</td><td>' + t.para + '</td><td>' + formatDateTime(t.dataAceite) + '</td></tr>';
-                });
-                transferenciasHTML += '</table></div></div>';
-            }
+            // Assinaturas Início
+            html += '<div class="section"><div class="section-title">ASSINATURAS - INÍCIO</div>';
+            html += '<div class="sig-grid">';
+            html += '<div class="sig-box ' + (p.assinaturaInicioAutorizador?'ok':'') + '"><div class="sig-line">' + (p.assinaturaInicioAutorizador?'✓':'') + '</div><small>Autorizador</small></div>';
+            html += '<div class="sig-box ' + (p.assinaturaInicioSupervisor?'ok':'') + '"><div class="sig-line">' + (p.assinaturaInicioSupervisor?'✓':'') + '</div><small>Supervisor</small></div>';
+            html += '<div class="sig-box ' + (p.assinaturaInicioExecutor?'ok':'') + '"><div class="sig-line">' + (p.assinaturaInicioExecutor?'✓':'') + '</div><small>Executor</small></div>';
+            html += '</div></div>';
             
-            let tiposTrabalhoHTML = '';
-            if (p.tiposTrabalho && p.tiposTrabalho.length > 0) {
-                tiposTrabalhoHTML = '<div style="margin-top: 2mm;"><label style="font-size: 8pt; color: #666;">Tipos de Trabalho</label><div class="tag-list">' + p.tiposTrabalho.map(t => '<span class="tag">' + t + '</span>').join('') + '</div></div>';
-            }
+            // Assinaturas Término
+            html += '<div class="section"><div class="section-title">ASSINATURAS - TÉRMINO</div>';
+            html += '<div class="sig-grid">';
+            html += '<div class="sig-box ' + (p.assinaturaTerminoAutorizador?'ok':'') + '"><div class="sig-line">' + (p.assinaturaTerminoAutorizador?'✓':'') + '</div><small>Autorizador</small></div>';
+            html += '<div class="sig-box ' + (p.assinaturaTerminoSupervisor?'ok':'') + '"><div class="sig-line">' + (p.assinaturaTerminoSupervisor?'✓':'') + '</div><small>Supervisor</small></div>';
+            html += '<div class="sig-box ' + (p.assinaturaTerminoExecutor?'ok':'') + '"><div class="sig-line">' + (p.assinaturaTerminoExecutor?'✓':'') + '</div><small>Executor</small></div>';
+            html += '</div></div>';
             
-            const printWindow = window.open('', '_blank');
-            const htmlContent = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>PT #' + numeroFormatado + '</title><style>' +
-                '* { margin: 0; padding: 0; box-sizing: border-box; }' +
-                '@page { size: A4; margin: 10mm; }' +
-                'body { font-family: Arial, sans-serif; font-size: 10pt; line-height: 1.3; color: #000; background: #fff; }' +
-                '.page { width: 190mm; min-height: 277mm; margin: 0 auto; padding: 5mm; background: #fff; page-break-after: always; }' +
-                '.page:last-child { page-break-after: avoid; }' +
-                '.header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 3mm; margin-bottom: 3mm; }' +
-                '.header-left h1 { font-size: 14pt; font-weight: bold; }' +
-                '.header-left p { font-size: 9pt; color: #555; }' +
-                '.header-right { text-align: right; }' +
-                '.header-right .pt-numero { font-size: 18pt; font-weight: bold; }' +
-                '.header-right .pt-status { display: inline-block; padding: 2mm 4mm; font-size: 9pt; font-weight: bold; border-radius: 3px; margin-top: 2mm; }' +
-                '.status-solicitada { background: #fff3cd; color: #856404; border: 1px solid #856404; }' +
-                '.status-em-execucao { background: #cce5ff; color: #004085; border: 1px solid #004085; }' +
-                '.status-encerrada { background: #d4edda; color: #155724; border: 1px solid #155724; }' +
-                '.status-vencida { background: #f8d7da; color: #721c24; border: 1px solid #721c24; }' +
-                '.section { margin-bottom: 3mm; border: 1px solid #ccc; border-radius: 2px; }' +
-                '.section-header { background: #f0f0f0; padding: 2mm 3mm; font-weight: bold; font-size: 10pt; border-bottom: 1px solid #ccc; }' +
-                '.section-code { display: inline-block; background: #333; color: #fff; padding: 0.5mm 2mm; border-radius: 2px; margin-right: 2mm; font-size: 8pt; }' +
-                '.section-body { padding: 2mm 3mm; }' +
-                '.info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2mm; }' +
-                '.info-grid.three-col { grid-template-columns: repeat(3, 1fr); }' +
-                '.info-item { padding: 1mm 0; }' +
-                '.info-item label { font-size: 8pt; color: #666; display: block; }' +
-                '.info-item span { font-size: 10pt; font-weight: 500; }' +
-                '.info-full { grid-column: 1 / -1; }' +
-                '.mini-table { width: 100%; border-collapse: collapse; font-size: 9pt; }' +
-                '.mini-table th, .mini-table td { border: 1px solid #ccc; padding: 1.5mm 2mm; text-align: left; }' +
-                '.mini-table th { background: #f5f5f5; font-weight: bold; }' +
-                '.tag-list { display: flex; flex-wrap: wrap; gap: 2mm; }' +
-                '.tag { display: inline-block; background: #e9ecef; padding: 1mm 2mm; border-radius: 2px; font-size: 9pt; }' +
-                '.check-ok { color: #155724; }' +
-                '.check-alert { color: #856404; font-weight: bold; }' +
-                '.assinaturas-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; margin-top: 2mm; }' +
-                '.assinatura-box { text-align: center; padding: 2mm; border: 1px dashed #ccc; min-height: 20mm; }' +
-                '.assinatura-box.assinada { border: 1px solid #155724; background: #f8fff8; }' +
-                '.assinatura-linha { border-bottom: 1px solid #000; height: 8mm; margin-bottom: 1mm; display: flex; align-items: flex-end; justify-content: center; font-size: 14pt; color: #155724; }' +
-                '.assinatura-box p { font-size: 8pt; margin-top: 1mm; }' +
-                '.assinatura-pendente { color: #856404; font-weight: bold; }' +
-                '.assinatura-data { color: #155724; }' +
-                '.assinatura-qr { font-size: 7pt; color: #004085; }' +
-                '.footer { margin-top: 3mm; padding-top: 2mm; border-top: 1px solid #ccc; font-size: 8pt; color: #666; display: flex; justify-content: space-between; }' +
-                '@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .page { margin: 0; padding: 0; } }' +
-                '</style></head><body>' +
-                '<div class="page">' +
-                '<div class="header"><div class="header-left"><h1>PERMISSÃO DE TRABALHO</h1><p>Documento de Autorização para Execução de Serviços</p></div>' +
-                '<div class="header-right"><div class="pt-numero">PT #' + numeroFormatado + '</div>' +
-                '<div class="pt-status status-' + statusTexto.toLowerCase().replace(' ', '-').replace('ã', 'a') + '">' + statusTexto + '</div></div></div>' +
-                '<div class="section"><div class="section-header"><span class="section-code">A1</span> RESPONSABILIDADES</div>' +
-                '<div class="section-body"><div class="info-grid three-col">' +
-                '<div class="info-item"><label>Autorizador</label><span>' + (p.autorizador || '-') + '</span></div>' +
-                '<div class="info-item"><label>Supervisor</label><span>' + (p.supervisor || '-') + '</span></div>' +
-                '<div class="info-item"><label>Executor Principal</label><span>' + (p.executor || '-') + '</span></div>' +
-                '</div></div></div>' +
-                '<div class="section"><div class="section-header"><span class="section-code">A2</span> DESCRIÇÃO DO TRABALHO</div>' +
-                '<div class="section-body"><div class="info-grid">' +
-                '<div class="info-item"><label>Local</label><span>' + (p.local || '-') + '</span></div>' +
-                '<div class="info-item"><label>Equipamento</label><span>' + (p.equipamento || '-') + '</span></div>' +
-                '<div class="info-item info-full"><label>Descrição do Serviço</label><span>' + (p.descricao || '-') + '</span></div>' +
-                '<div class="info-item"><label>Condição Requerida</label><span>' + (p.condicao || '-') + '</span></div>' +
-                '<div class="info-item"><label>Ordem de Trabalho</label><span>' + (p.ordemTrabalho || '-') + '</span></div>' +
-                '</div>' + tiposTrabalhoHTML + '</div></div>' +
-                '<div class="section"><div class="section-header"><span class="section-code">A3</span> PROGRAMAÇÃO</div>' +
-                '<div class="section-body"><div class="info-grid">' +
-                '<div class="info-item"><label>Data Início</label><span>' + formatDate(p.dataInicio) + ' às ' + (p.horaInicio || '-') + '</span></div>' +
-                '<div class="info-item"><label>Data Término</label><span>' + formatDate(p.dataTermino) + ' às ' + (p.horaTermino || '-') + '</span></div>' +
-                '<div class="info-item"><label>Tempo de Retorno</label><span>' + (p.tempoRetorno ? p.tempoRetorno + ' hora(s)' : '-') + '</span></div>' +
-                '<div class="info-item"><label>Data de Criação</label><span>' + (p.criadoEm ? formatDateTime(p.criadoEm) : '-') + '</span></div>' +
-                '</div></div></div>' +
-                '<div class="section"><div class="section-header"><span class="section-code">A4</span> EMPRESA E EXECUTORES</div>' +
-                '<div class="section-body"><div class="info-grid">' +
-                '<div class="info-item"><label>Empresa</label><span>' + (p.empresa || '-') + '</span></div>' +
-                '<div class="info-item info-full"><label>Executores</label><span>' + executoresHTML + '</span></div>' +
-                '</div></div></div>' +
-                '<div class="section"><div class="section-header"><span class="section-code">B</span> SEGURANÇA DO TRABALHO</div>' +
-                '<div class="section-body"><div class="info-grid">' +
-                '<div class="info-item info-full"><label>B1 - Equipamentos</label><span>' + (p.equipamentosList && p.equipamentosList.length > 0 ? p.equipamentosList.map(e => e.nome).join(', ') : '-') + '</span></div>' +
-                '<div class="info-item info-full"><label>B2 - Riscos Identificados</label><span>' + (p.riscosList && p.riscosList.length > 0 ? p.riscosList.map(r => r.nome).join(', ') : '-') + '</span></div>' +
-                '<div class="info-item info-full"><label>B3 - EPIs Requeridos</label><span>' + (p.epiList && p.epiList.length > 0 ? p.epiList.map(e => e.nome).join(', ') : '-') + '</span></div>' +
-                '<div class="info-item info-full"><label>B4 - Medidas de Segurança</label><span>' + (p.medidasList && p.medidasList.length > 0 ? p.medidasList.map(m => m.nome).join(', ') : '-') + '</span></div>' +
-                '</div></div></div>' +
-                '<div class="section"><div class="section-header"><span class="section-code">C1</span> BLOQUEIOS</div>' +
-                '<div class="section-body">' + bloqueiosHTML + '</div></div>' +
-                '<div class="footer"><span>Documento gerado em ' + formatDateTime(new Date()) + '</span><span>Página 1 de 2</span></div>' +
-                '</div>' +
-                '<div class="page">' +
-                '<div class="header"><div class="header-left"><h1>PERMISSÃO DE TRABALHO</h1><p>Assinaturas e Autorizações</p></div>' +
-                '<div class="header-right"><div class="pt-numero">PT #' + numeroFormatado + '</div></div></div>' +
-                '<div class="section"><div class="section-header"><span class="section-code">C2</span> ANOTAÇÕES E OBSERVAÇÕES</div>' +
-                '<div class="section-body"><p>' + (p.anotacoes || 'Nenhuma anotação registrada.') + '</p></div></div>' +
-                '<div class="section"><div class="section-header"><span class="section-code">D1</span> AUTORIZAÇÃO PARA INÍCIO DOS TRABALHOS</div>' +
-                '<div class="section-body"><p style="font-size: 9pt; color: #666; margin-bottom: 3mm;">As assinaturas abaixo autorizam o início da execução dos serviços descritos nesta permissão.</p>' +
-                '<div class="assinaturas-grid">' +
-                fmtAss(p.assinaturaInicioAutorizador, 'AUTORIZADOR<br>' + (p.autorizador || ''), false) +
-                fmtAss(p.assinaturaInicioSupervisor, 'SUPERVISOR<br>' + (p.supervisor || ''), false) +
-                fmtAss(p.assinaturaInicioExecutor, 'EXECUTOR<br>' + (p.executor || ''), p.validacaoPresencialInicio) +
-                '</div></div></div>' +
-                '<div class="section"><div class="section-header"><span class="section-code">D2</span> ENCERRAMENTO DOS TRABALHOS</div>' +
-                '<div class="section-body"><p style="font-size: 9pt; color: #666; margin-bottom: 3mm;">As assinaturas abaixo confirmam o encerramento e a conclusão dos serviços.</p>' +
-                '<div class="assinaturas-grid">' +
-                fmtAss(p.assinaturaTerminoAutorizador, 'AUTORIZADOR<br>' + (p.autorizador || ''), false) +
-                fmtAss(p.assinaturaTerminoSupervisor, 'SUPERVISOR<br>' + (p.supervisor || ''), false) +
-                fmtAss(p.assinaturaTerminoExecutor, 'EXECUTOR<br>' + (p.executor || ''), p.validacaoPresencialTermino) +
-                '</div></div></div>' +
-                transferenciasHTML +
-                '<div class="section"><div class="section-header"><span class="section-code">E</span> TERMOS E CONDIÇÕES</div>' +
-                '<div class="section-body" style="font-size: 8pt; color: #555;">' +
-                '<p><strong>1.</strong> Esta permissão é válida apenas para o período, local e serviço especificados.</p>' +
-                '<p><strong>2.</strong> Todos os executores devem estar cientes dos riscos e medidas de segurança.</p>' +
-                '<p><strong>3.</strong> O trabalho deve ser interrompido imediatamente caso surjam condições inseguras.</p>' +
-                '<p><strong>4.</strong> O não cumprimento das normas de segurança implica no cancelamento desta permissão.</p>' +
-                '<p><strong>5.</strong> As assinaturas digitais têm validade legal conforme legislação vigente.</p>' +
-                '</div></div>' +
-                '<div class="footer"><span>Sistema de Permissão de Trabalho Digital</span><span>Página 2 de 2</span></div>' +
-                '</div>' +
-                '<scr' + 'ipt>window.onload = function() { window.print(); }</sc' + 'ript>' +
-                '</body></html>';
+            html += '<p style="text-align:center;margin-top:20px;font-size:9pt;color:#666">Documento gerado em ' + formatDateTime(new Date()) + '</p>';
+            html += '<scr'+'ipt>window.onload=function(){window.print();}<\/scr'+'ipt>';
+            html += '</body></html>';
             
-            printWindow.document.write(htmlContent);
-            printWindow.document.close();
+            w.document.write(html);
+            w.document.close();
         }
-
         // CHECKBOX E RADIO HANDLERS
         function initCheckboxHandlers() {
             document.querySelectorAll('.checkbox-item').forEach(function(item) {
