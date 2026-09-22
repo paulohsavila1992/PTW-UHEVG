@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Permissão de Trabalho Digital - UHE Volta Grande</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- Fontes clássicas do sistema: Arial e Times New Roman -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -15,28 +15,29 @@
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
         :root {
-            --primary: #00f0ff;
-            --primary-dark: #00b8c4;
-            --secondary: #ff00aa;
-            --accent: #7b2dff;
-            --success: #00ff88;
-            --warning: #ffaa00;
-            --danger: #ff3366;
-            --bg-dark: #0a0a1a;
-            --bg-card: #12122a;
-            --bg-card-hover: #1a1a3a;
-            --bg-input: #1e1e3e;
-            --text-primary: #ffffff;
-            --text-secondary: #a0a0c0;
-            --border-color: #2a2a5a;
-            --glow-primary: 0 0 20px rgba(0, 240, 255, 0.3);
-            --glow-secondary: 0 0 20px rgba(255, 0, 170, 0.3);
+            --primary: #1a3c6e;
+            --primary-dark: #0f2847;
+            --secondary: #7a1f3d;
+            --accent: #4a5a8a;
+            --success: #1e6b3c;
+            --warning: #a15c00;
+            --danger: #a13030;
+            --bg-dark: #ffffff;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f7f6f2;
+            --bg-input: #fbfaf7;
+            --text-primary: #1c1c1c;
+            --text-secondary: #666660;
+            --border-color: #d8d5cc;
+            --glow-primary: 0 2px 10px rgba(26, 60, 110, 0.15);
+            --glow-secondary: 0 2px 10px rgba(122, 31, 61, 0.15);
+            --card-shadow: 0 1px 3px rgba(20, 20, 15, 0.08), 0 1px 2px rgba(20, 20, 15, 0.05);
             --sidebar-width: 280px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { font-size: 16px; }
         body {
-            font-family: 'Rajdhani', sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             background: var(--bg-dark);
             color: var(--text-primary);
             min-height: 100vh;
@@ -47,25 +48,19 @@
             content: '';
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: 
-                radial-gradient(ellipse at 20% 20%, rgba(0, 240, 255, 0.05) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(123, 45, 255, 0.05) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 50%, rgba(255, 0, 170, 0.03) 0%, transparent 70%);
+            background: #ffffff;
             pointer-events: none;
             z-index: -1;
         }
         .grid-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
+            background: #fdfcfa;
             pointer-events: none;
             z-index: -1;
         }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-track { background: #f0efe9; }
         ::-webkit-scrollbar-thumb { background: var(--primary-dark); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
         
@@ -92,7 +87,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .loading-text {
             margin-top: 20px;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             color: var(--primary);
             font-size: 0.9rem;
         }
@@ -134,6 +129,7 @@
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 20px;
+            box-shadow: var(--card-shadow);
             padding: 40px 30px;
             width: 100%;
             max-width: 400px;
@@ -153,7 +149,7 @@
             margin-bottom: 30px;
         }
         .login-logo h1 {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: clamp(1.2rem, 4vw, 1.6rem);
             font-weight: 700;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -163,7 +159,7 @@
             margin-bottom: 8px;
         }
         .login-logo p {
-            font-family: 'Share Tech Mono', monospace;
+            font-family: 'Courier New', Courier, monospace;
             color: var(--text-secondary);
             font-size: 0.85rem;
             letter-spacing: 2px;
@@ -178,13 +174,13 @@
         }
         .firebase-status.connected {
             display: block;
-            background: rgba(0, 255, 136, 0.1);
+            background: rgba(30, 107, 60, 0.1);
             border: 1px solid var(--success);
             color: var(--success);
         }
         .firebase-status.error {
             display: block;
-            background: rgba(255, 51, 102, 0.1);
+            background: rgba(161, 48, 48, 0.1);
             border: 1px solid var(--danger);
             color: var(--danger);
         }
@@ -208,7 +204,7 @@
             border: 1px solid var(--border-color);
             border-radius: 10px;
             color: var(--text-primary);
-            font-family: 'Rajdhani', sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             font-size: 1rem;
             transition: all 0.3s ease;
             -webkit-appearance: none;
@@ -219,13 +215,13 @@
             box-shadow: var(--glow-primary);
         }
         .form-group input::placeholder { color: var(--text-secondary); }
-        .form-group select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2300f0ff' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; padding-right: 40px; }
+        .form-group select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%231a3c6e' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; padding-right: 40px; }
         
         .btn {
             padding: 14px 24px;
             border: none;
             border-radius: 10px;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
@@ -250,19 +246,19 @@
             border: 1px solid var(--primary);
             color: var(--primary);
         }
-        .btn-secondary:hover, .btn-secondary:active { background: rgba(0, 240, 255, 0.1); }
+        .btn-secondary:hover, .btn-secondary:active { background: rgba(26, 60, 110, 0.1); }
         .btn-success {
-            background: linear-gradient(135deg, var(--success), #00cc6a);
+            background: linear-gradient(135deg, var(--success), #164f2c);
             color: var(--bg-dark);
         }
-        .btn-success:hover, .btn-success:active { box-shadow: 0 0 20px rgba(0, 255, 136, 0.3); }
+        .btn-success:hover, .btn-success:active { box-shadow: 0 4px 14px rgba(30, 107, 60, 0.35); transform: translateY(-2px); }
         .btn-danger {
-            background: linear-gradient(135deg, var(--danger), #cc2952);
+            background: linear-gradient(135deg, var(--danger), #7a2323);
             color: var(--text-primary);
         }
-        .btn-danger:hover, .btn-danger:active { box-shadow: 0 0 20px rgba(255, 51, 102, 0.3); }
+        .btn-danger:hover, .btn-danger:active { box-shadow: 0 4px 14px rgba(161, 48, 48, 0.35); transform: translateY(-2px); }
         .btn-warning {
-            background: linear-gradient(135deg, var(--warning), #cc8800);
+            background: linear-gradient(135deg, var(--warning), #7a4600);
             color: var(--bg-dark);
         }
         .btn-sm { padding: 10px 16px; font-size: 0.75rem; }
@@ -294,7 +290,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 8px 12px;
-            background: rgba(0, 240, 255, 0.03);
+            background: rgba(26, 60, 110, 0.03);
             border-top: 1px solid var(--border-color);
         }
         .mobile-user-info {
@@ -311,9 +307,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-weight: 700;
             font-size: 0.75rem;
+            color: #ffffff;
             flex-shrink: 0;
         }
         .mobile-user-name {
@@ -325,12 +322,12 @@
         }
         .mobile-logout {
             padding: 8px 14px;
-            background: rgba(255, 51, 102, 0.15);
+            background: rgba(161, 48, 48, 0.15);
             border: 1px solid var(--danger);
             color: var(--danger);
             border-radius: 8px;
             cursor: pointer;
-            font-family: 'Rajdhani', sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             font-weight: 600;
             font-size: 0.8rem;
             transition: all 0.3s ease;
@@ -339,7 +336,7 @@
         .mobile-logout:hover, .mobile-logout:active { background: var(--danger); color: white; }
         .menu-toggle {
             width: 48px; height: 48px;
-            background: rgba(0, 240, 255, 0.1);
+            background: rgba(26, 60, 110, 0.1);
             border: 1px solid var(--primary);
             color: var(--primary);
             font-size: 1.5rem;
@@ -351,9 +348,9 @@
             transition: background 0.3s ease;
             flex-shrink: 0;
         }
-        .menu-toggle:hover, .menu-toggle:active { background: rgba(0, 240, 255, 0.2); }
+        .menu-toggle:hover, .menu-toggle:active { background: rgba(26, 60, 110, 0.2); }
         .mobile-title {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: 1rem;
             color: var(--primary);
             text-align: center;
@@ -365,7 +362,7 @@
         }
         .btn-back {
             width: 48px; height: 48px;
-            background: rgba(0, 240, 255, 0.1);
+            background: rgba(26, 60, 110, 0.1);
             border: 1px solid var(--border-color);
             color: var(--primary);
             font-size: 1.8rem;
@@ -378,7 +375,7 @@
             transition: all 0.3s ease;
             flex-shrink: 0;
         }
-        .btn-back:hover, .btn-back:active { background: rgba(0, 240, 255, 0.2); border-color: var(--primary); }
+        .btn-back:hover, .btn-back:active { background: rgba(26, 60, 110, 0.2); border-color: var(--primary); }
         .btn-back.hidden { visibility: hidden; }
         
         /* Sidebar */
@@ -389,6 +386,7 @@
             height: 100vh;
             background: var(--bg-card);
             border-right: 1px solid var(--border-color);
+            box-shadow: 2px 0 8px rgba(20,20,15,0.05);
             padding: 20px;
             overflow-y: auto;
             z-index: 300;
@@ -410,7 +408,7 @@
             margin-bottom: 20px;
         }
         .sidebar-logo h2 {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: 1rem;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
@@ -418,7 +416,7 @@
             background-clip: text;
         }
         .sidebar-logo p {
-            font-family: 'Share Tech Mono', monospace;
+            font-family: 'Courier New', Courier, monospace;
             font-size: 0.65rem;
             color: var(--text-secondary);
             margin-top: 5px;
@@ -428,7 +426,7 @@
             position: absolute;
             top: 15px; right: 15px;
             width: 40px; height: 40px;
-            background: rgba(255, 51, 102, 0.1);
+            background: rgba(161, 48, 48, 0.1);
             border: 1px solid var(--danger);
             border-radius: 8px;
             color: var(--danger);
@@ -453,9 +451,9 @@
             cursor: pointer;
             font-size: 0.95rem;
         }
-        .nav-link:hover, .nav-link:active { background: rgba(0, 240, 255, 0.1); color: var(--primary); }
+        .nav-link:hover, .nav-link:active { background: rgba(26, 60, 110, 0.1); color: var(--primary); }
         .nav-link.active {
-            background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(123, 45, 255, 0.1));
+            background: linear-gradient(135deg, rgba(26, 60, 110, 0.2), rgba(74, 90, 138, 0.1));
             color: var(--primary);
             border-left: 3px solid var(--primary);
         }
@@ -501,7 +499,7 @@
             gap: 15px;
         }
         .header h1 {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: clamp(1.2rem, 3vw, 1.6rem);
             font-weight: 600;
         }
@@ -513,21 +511,22 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-weight: 700;
             font-size: 1rem;
+            color: #ffffff;
             flex-shrink: 0;
         }
         .user-details h4 { font-size: 0.9rem; font-weight: 600; }
         .user-details p { font-size: 0.75rem; color: var(--text-secondary); }
         .btn-logout {
             padding: 10px 16px;
-            background: rgba(255, 51, 102, 0.1);
+            background: rgba(161, 48, 48, 0.1);
             border: 1px solid var(--danger);
             color: var(--danger);
             border-radius: 8px;
             cursor: pointer;
-            font-family: 'Rajdhani', sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             font-weight: 600;
             font-size: 0.85rem;
             transition: all 0.3s ease;
@@ -549,6 +548,7 @@
             margin-bottom: 20px;
             position: relative;
             overflow: hidden;
+            box-shadow: var(--card-shadow);
         }
         .card::before {
             content: '';
@@ -558,7 +558,7 @@
             background: linear-gradient(90deg, var(--primary), transparent);
         }
         .card-title {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: 1rem;
             font-weight: 600;
             margin-bottom: 15px;
@@ -584,6 +584,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            box-shadow: var(--card-shadow);
         }
         .home-card::before {
             content: '';
@@ -602,7 +603,7 @@
         .home-card:hover::before, .home-card:active::before { opacity: 1; }
         .home-card-icon {
             width: 50px; height: 50px;
-            background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(123, 45, 255, 0.1));
+            background: linear-gradient(135deg, rgba(26, 60, 110, 0.2), rgba(74, 90, 138, 0.1));
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -611,7 +612,7 @@
             font-size: 1.5rem;
         }
         .home-card h3 {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: 0.85rem;
             font-weight: 600;
             margin-bottom: 8px;
@@ -642,9 +643,10 @@
             border-radius: 12px;
             padding: 18px 15px;
             text-align: center;
+            box-shadow: var(--card-shadow);
         }
         .stat-value {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: clamp(1.5rem, 5vw, 2.2rem);
             font-weight: 700;
             background: linear-gradient(135deg, var(--primary), var(--accent));
@@ -663,6 +665,7 @@
             padding: 15px;
             cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: var(--card-shadow);
         }
         .permission-card:hover {
             border-color: var(--primary);
@@ -677,12 +680,12 @@
             gap: 10px;
         }
         .permission-card-num {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: 1rem;
             color: var(--primary);
         }
         .permission-card-date {
-            font-family: 'Share Tech Mono', monospace;
+            font-family: 'Courier New', Courier, monospace;
             font-size: 0.8rem;
             color: var(--text-secondary);
         }
@@ -712,16 +715,16 @@
         table { width: 100%; border-collapse: collapse; min-width: 500px; }
         th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; }
         th {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: 0.7rem;
             font-weight: 600;
             color: var(--primary);
             text-transform: uppercase;
             letter-spacing: 1px;
-            background: rgba(0, 240, 255, 0.05);
+            background: rgba(26, 60, 110, 0.05);
             white-space: nowrap;
         }
-        tr:hover, tr:active { background: rgba(0, 240, 255, 0.03); }
+        tr:hover, tr:active { background: rgba(26, 60, 110, 0.03); }
         tr { cursor: pointer; transition: background 0.3s ease; }
         
         /* Modal */
@@ -729,8 +732,8 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(10, 10, 26, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(25, 25, 22, 0.55);
+            backdrop-filter: blur(3px);
             display: none;
             justify-content: center;
             align-items: flex-start;
@@ -748,6 +751,7 @@
             position: relative;
             animation: modalIn 0.3s ease;
             margin: auto;
+            box-shadow: 0 8px 30px rgba(20,20,15,0.18);
         }
         .modal-large { max-width: 700px; }
         .modal-xl { max-width: 900px; }
@@ -758,13 +762,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(135deg, rgba(0, 240, 255, 0.05), rgba(123, 45, 255, 0.03));
+            background: linear-gradient(135deg, rgba(26, 60, 110, 0.05), rgba(74, 90, 138, 0.03));
             border-radius: 15px 15px 0 0;
         }
-        .modal-header h3 { font-family: 'Orbitron', sans-serif; font-size: 1rem; }
+        .modal-header h3 { font-family: 'Times New Roman', Times, serif; font-size: 1rem; }
         .modal-close {
             width: 38px; height: 38px;
-            background: rgba(255, 51, 102, 0.1);
+            background: rgba(161, 48, 48, 0.1);
             border: 1px solid var(--danger);
             border-radius: 8px;
             color: var(--danger);
@@ -789,14 +793,14 @@
         
         /* Sections */
         .section {
-            background: rgba(0, 240, 255, 0.02);
+            background: rgba(26, 60, 110, 0.02);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 18px;
             margin-bottom: 18px;
         }
         .section-title {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: 0.9rem;
             color: var(--primary);
             margin-bottom: 15px;
@@ -845,7 +849,7 @@
         }
         .checkbox-item:active,
         .checkbox-item.checked {
-            background: rgba(0, 240, 255, 0.15);
+            background: rgba(26, 60, 110, 0.15);
             border-color: var(--primary);
         }
         .checkbox-item input[type="checkbox"] {
@@ -881,7 +885,7 @@
         }
         .radio-item:active,
         .radio-item.checked {
-            background: rgba(0, 240, 255, 0.15);
+            background: rgba(26, 60, 110, 0.15);
             border-color: var(--primary);
         }
         .radio-item input[type="radio"] {
@@ -905,10 +909,10 @@
             letter-spacing: 0.5px;
             white-space: nowrap;
         }
-        .badge-success { background: rgba(0, 255, 136, 0.15); color: var(--success); border: 1px solid var(--success); }
-        .badge-warning { background: rgba(255, 170, 0, 0.15); color: var(--warning); border: 1px solid var(--warning); }
-        .badge-danger { background: rgba(255, 51, 102, 0.15); color: var(--danger); border: 1px solid var(--danger); }
-        .badge-info { background: rgba(0, 240, 255, 0.15); color: var(--primary); border: 1px solid var(--primary); }
+        .badge-success { background: rgba(30, 107, 60, 0.15); color: var(--success); border: 1px solid var(--success); }
+        .badge-warning { background: rgba(161, 92, 0, 0.15); color: var(--warning); border: 1px solid var(--warning); }
+        .badge-danger { background: rgba(161, 48, 48, 0.15); color: var(--danger); border: 1px solid var(--danger); }
+        .badge-info { background: rgba(26, 60, 110, 0.15); color: var(--primary); border: 1px solid var(--primary); }
         
         /* Item Lists */
         .item-list {
@@ -928,7 +932,7 @@
             gap: 10px;
         }
         .item-list-item:last-child { border-bottom: none; }
-        .item-list-item:hover, .item-list-item:active { background: rgba(0, 240, 255, 0.05); }
+        .item-list-item:hover, .item-list-item:active { background: rgba(26, 60, 110, 0.05); }
         .item-list-item span { flex: 1; word-break: break-word; }
         .item-list-item .btn-remove {
             background: none;
@@ -959,7 +963,7 @@
         
         /* Signature */
         .signature-display {
-            font-family: 'Share Tech Mono', monospace;
+            font-family: 'Courier New', Courier, monospace;
             font-size: 1.8rem;
             letter-spacing: 8px;
             text-align: center;
@@ -985,13 +989,14 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: var(--card-shadow);
         }
         .safety-card:hover, .safety-card:active {
             border-color: var(--primary);
             transform: translateY(-2px);
             box-shadow: var(--glow-primary);
         }
-        .safety-card h4 { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; margin-top: 8px; }
+        .safety-card h4 { font-family: 'Times New Roman', Times, serif; font-size: 0.75rem; margin-top: 8px; }
         
         /* Charts */
         .chart-container { position: relative; height: 250px; margin: 15px 0; }
@@ -1014,11 +1019,11 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        .signature-box.signed { border-color: var(--success); background: rgba(0, 255, 136, 0.05); }
+        .signature-box.signed { border-color: var(--success); background: rgba(30, 107, 60, 0.05); }
         .signature-info { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 150px; }
         .signature-name { font-weight: 600; font-size: 0.9rem; }
         .signature-role { font-size: 0.8rem; color: var(--text-secondary); }
-        .signature-timestamp { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--success); }
+        .signature-timestamp { font-family: 'Courier New', Courier, monospace; font-size: 0.75rem; color: var(--success); }
         
         /* Transfer Status */
         .transfer-status {
@@ -1046,6 +1051,7 @@
             border-radius: 10px;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
             animation: slideIn 0.3s ease;
             display: flex;
             align-items: center;
@@ -1076,7 +1082,7 @@
             min-height: 50px;
         }
         .selectable-item:last-child { border-bottom: none; }
-        .selectable-item:hover, .selectable-item:active { background: rgba(0, 240, 255, 0.1); }
+        .selectable-item:hover, .selectable-item:active { background: rgba(26, 60, 110, 0.1); }
         .selectable-item input[type="checkbox"] { 
             accent-color: var(--primary); 
             width: 22px; 
@@ -1097,6 +1103,7 @@
             display: flex;
             align-items: flex-start;
             gap: 12px;
+            box-shadow: var(--card-shadow);
         }
         .notification-card:hover, .notification-card:active {
             border-color: var(--primary);
@@ -1105,7 +1112,7 @@
         .notification-card.pending { border-left: 4px solid var(--warning); }
         .notification-icon {
             width: 44px; height: 44px;
-            background: linear-gradient(135deg, rgba(255, 170, 0, 0.2), rgba(255, 170, 0, 0.1));
+            background: linear-gradient(135deg, rgba(161, 92, 0, 0.2), rgba(161, 92, 0, 0.1));
             border-radius: 10px;
             display: flex;
             align-items: center;
@@ -1115,7 +1122,7 @@
         }
         .notification-content { flex: 1; min-width: 0; }
         .notification-content h4 {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: 0.85rem;
             margin-bottom: 4px;
         }
@@ -1125,7 +1132,7 @@
             word-break: break-word;
         }
         .notification-time {
-            font-family: 'Share Tech Mono', monospace;
+            font-family: 'Courier New', Courier, monospace;
             font-size: 0.7rem;
             color: var(--text-secondary);
             white-space: nowrap;
@@ -1280,18 +1287,18 @@
 
         /* QR Code Styles */
         .qr-container { text-align: center; padding: 20px; }
-        .qr-code-box { display: inline-block; padding: 20px; background: white; border-radius: 15px; margin: 15px 0; }
-        .qr-timer { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; color: var(--warning); margin: 15px 0; }
+        .qr-code-box { display: inline-block; padding: 20px; background: white; border: 1px solid var(--border-color); border-radius: 15px; margin: 15px 0; }
+        .qr-timer { font-family: 'Times New Roman', Times, serif; font-size: 2.5rem; color: var(--warning); margin: 15px 0; }
         .qr-timer.expired { color: var(--danger); }
         .qr-timer.success { color: var(--success); }
         .qr-status { padding: 15px; border-radius: 10px; margin: 15px 0; font-weight: 600; }
-        .qr-status.waiting { background: rgba(255, 170, 0, 0.1); border: 1px solid var(--warning); color: var(--warning); }
-        .qr-status.success { background: rgba(0, 255, 136, 0.1); border: 1px solid var(--success); color: var(--success); }
-        .qr-status.error { background: rgba(255, 51, 102, 0.1); border: 1px solid var(--danger); color: var(--danger); }
+        .qr-status.waiting { background: rgba(161, 92, 0, 0.1); border: 1px solid var(--warning); color: var(--warning); }
+        .qr-status.success { background: rgba(30, 107, 60, 0.1); border: 1px solid var(--success); color: var(--success); }
+        .qr-status.error { background: rgba(161, 48, 48, 0.1); border: 1px solid var(--danger); color: var(--danger); }
         #qr-reader { width: 100%; max-width: 350px; margin: 0 auto; }
         #qr-reader video { border-radius: 10px; }
-        .qr-pending-alert { background: linear-gradient(135deg, rgba(255, 170, 0, 0.2), rgba(255, 170, 0, 0.1)); border: 2px solid var(--warning); border-radius: 12px; padding: 15px; margin-bottom: 15px; cursor: pointer; animation: qrglow 1.5s ease-in-out infinite alternate; }
-        @keyframes qrglow { from { box-shadow: 0 0 5px rgba(255, 170, 0, 0.3); } to { box-shadow: 0 0 20px rgba(255, 170, 0, 0.6); } }
+        .qr-pending-alert { background: linear-gradient(135deg, rgba(161, 92, 0, 0.2), rgba(161, 92, 0, 0.1)); border: 2px solid var(--warning); border-radius: 12px; padding: 15px; margin-bottom: 15px; cursor: pointer; animation: qrglow 1.5s ease-in-out infinite alternate; }
+        @keyframes qrglow { from { box-shadow: 0 0 5px rgba(161, 92, 0, 0.3); } to { box-shadow: 0 0 20px rgba(161, 92, 0, 0.6); } }
         .qr-pending-alert h4 { color: var(--warning); margin-bottom: 5px; }
         .qr-pending-alert p { color: var(--text-secondary); font-size: 0.85rem; }
     </style>
@@ -1921,12 +1928,12 @@
         // CONFIGURAÇÃO DO FIREBASE
         // ================================================================
         const firebaseConfig = {
-            apiKey: "AIzaSyDMCFLSKH-Ug61qb-x-b4IUMOP7E6_7r1M",
-            authDomain: "permissao-trabalho-uhevg-95a56.firebaseapp.com",
-            projectId: "permissao-trabalho-uhevg-95a56",
-            storageBucket: "permissao-trabalho-uhevg-95a56.firebasestorage.app",
-            messagingSenderId: "4949368740",
-            appId: "1:4949368740:web:0090e62d1fe1961e1c6b31"
+            apiKey: "AIzaSyC7TxxgjMVX3lsb4nget2gbdU6nR-3IcM",
+            authDomain: "permissao-trabalho-uhevg.firebaseapp.com",
+            projectId: "permissao-trabalho-uhevg",
+            storageBucket: "permissao-trabalho-uhevg.firebasestorage.app",
+            messagingSenderId: "236218702254",
+            appId: "1:236218702254:web:6e93684d044ff7c0ee503f"
         };
         // ================================================================
 
@@ -2522,78 +2529,161 @@
             if (!p) return;
             
             const num = String(p.numero).padStart(4, '0');
-            const w = window.open('', '_blank', 'width=800,height=600');
+            const w = window.open('', '_blank', 'width=900,height=700');
+            
+            function fmtList(list) {
+                if (!list || !list.length) return '<span class="empty">Nenhum item informado</span>';
+                return list.map(i => i.nome).join(' &nbsp;•&nbsp; ');
+            }
+            
+            function sigBox(data, label, validado) {
+                if (data) {
+                    let extra = validado ? '<div class="sig-qr">📱 Presença validada por QR Code</div>' : '';
+                    return '<div class="sig-box sig-ok"><div class="sig-check">✓</div><div class="sig-label">' + label + '</div><div class="sig-date">' + formatDateTime(data) + '</div>' + extra + '</div>';
+                }
+                return '<div class="sig-box sig-pending"><div class="sig-line"></div><div class="sig-label">' + label + '</div><div class="sig-pend-text">Pendente</div></div>';
+            }
+            
+            let statusColor = '#8a6d00';
+            let statusBg = '#fdf6e3';
+            if (p.status === 'Em Execução') { statusColor = '#1a4d8f'; statusBg = '#eaf1fb'; }
+            if (p.status === 'Encerrada') { statusColor = '#1e6b3c'; statusBg = '#eaf7ee'; }
             
             let html = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
             html += '<title>PT #' + num + '</title>';
             html += '<style>';
-            html += 'body{font-family:Arial,sans-serif;font-size:11pt;padding:20px;max-width:800px;margin:0 auto}';
-            html += 'h1{text-align:center;border-bottom:2px solid #000;padding-bottom:10px}';
-            html += '.section{margin:15px 0;padding:10px;border:1px solid #ccc;border-radius:5px}';
-            html += '.section-title{font-weight:bold;background:#f0f0f0;padding:5px;margin:-10px -10px 10px -10px;border-radius:5px 5px 0 0}';
-            html += '.row{display:flex;margin:5px 0}.row label{width:150px;font-weight:bold}.row span{flex:1}';
-            html += '.sig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}';
-            html += '.sig-box{border:1px dashed #999;padding:10px;text-align:center;min-height:60px}';
-            html += '.sig-box.ok{border-color:green;background:#f0fff0}';
-            html += '.sig-line{border-bottom:1px solid #000;height:30px;margin-bottom:5px}';
-            html += '@media print{body{padding:0}}';
+            html += '@page { size: A4; margin: 14mm 16mm; }';
+            html += '* { box-sizing: border-box; }';
+            html += 'body { font-family: "Times New Roman", Times, serif; font-size: 11.5pt; line-height: 1.5; color: #1a1a1a; background: #ffffff; max-width: 800px; margin: 0 auto; padding: 10px 6px; }';
+            html += '.doc-header { text-align: center; border-bottom: 3px double #1a1a1a; padding-bottom: 12px; margin-bottom: 18px; }';
+            html += '.doc-header .brand { font-family: Arial, sans-serif; font-size: 9pt; letter-spacing: 2px; color: #555; text-transform: uppercase; margin-bottom: 6px; }';
+            html += '.doc-header h1 { font-size: 20pt; font-weight: bold; letter-spacing: 0.5px; margin-bottom: 8px; }';
+            html += '.doc-header .pt-num { font-family: Arial, sans-serif; font-size: 15pt; font-weight: bold; color: #1a3c6e; }';
+            html += '.status-pill { display: inline-block; font-family: Arial, sans-serif; font-size: 9pt; font-weight: bold; padding: 4px 14px; border-radius: 12px; margin-top: 8px; letter-spacing: 0.5px; }';
+            html += '.section { margin: 0 0 16px 0; page-break-inside: avoid; }';
+            html += '.section-title { font-family: Arial, sans-serif; font-size: 10.5pt; font-weight: bold; color: #1a3c6e; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1.5px solid #1a3c6e; padding-bottom: 4px; margin-bottom: 10px; }';
+            html += '.field-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px; row-gap: 8px; }';
+            html += '.field-grid.full { grid-template-columns: 1fr; }';
+            html += '.field { padding-bottom: 4px; }';
+            html += '.field.span2 { grid-column: 1 / -1; }';
+            html += '.field label { display: block; font-family: Arial, sans-serif; font-size: 8pt; color: #777; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }';
+            html += '.field .value { font-size: 11.5pt; border-bottom: 1px solid #ccc; padding-bottom: 3px; min-height: 18px; }';
+            html += '.empty { color: #aaa; font-style: italic; }';
+            html += 'table.lock-table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 10pt; }';
+            html += 'table.lock-table th { font-family: Arial, sans-serif; font-size: 8.5pt; text-transform: uppercase; letter-spacing: 0.5px; background: #f4f4f2; border: 1px solid #ccc; padding: 6px 8px; text-align: left; color: #555; }';
+            html += 'table.lock-table td { border: 1px solid #ccc; padding: 6px 8px; }';
+            html += '.alert-line { color: #a15c00; font-weight: bold; font-family: Arial, sans-serif; font-size: 10pt; }';
+            html += '.ok-line { color: #1e6b3c; font-weight: bold; font-family: Arial, sans-serif; font-size: 10pt; }';
+            html += '.sig-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 4px; }';
+            html += '.sig-box { border: 1px solid #ccc; border-radius: 3px; padding: 10px 8px; text-align: center; min-height: 72px; display: flex; flex-direction: column; justify-content: center; }';
+            html += '.sig-box.sig-ok { border: 1.5px solid #1e6b3c; background: #f5fbf6; }';
+            html += '.sig-box.sig-pending { border: 1px dashed #bbb; background: #fafafa; }';
+            html += '.sig-check { font-size: 20pt; color: #1e6b3c; line-height: 1; margin-bottom: 4px; }';
+            html += '.sig-line { border-bottom: 1px solid #999; height: 22px; margin-bottom: 6px; }';
+            html += '.sig-label { font-family: Arial, sans-serif; font-size: 8.5pt; font-weight: bold; color: #333; }';
+            html += '.sig-date { font-family: Arial, sans-serif; font-size: 7.5pt; color: #1e6b3c; margin-top: 2px; }';
+            html += '.sig-pend-text { font-family: Arial, sans-serif; font-size: 8pt; color: #a15c00; font-weight: bold; margin-top: 3px; }';
+            html += '.sig-qr { font-family: Arial, sans-serif; font-size: 7pt; color: #1a4d8f; margin-top: 2px; }';
+            html += '.doc-footer { margin-top: 24px; padding-top: 10px; border-top: 1px solid #ccc; display: flex; justify-content: space-between; font-family: Arial, sans-serif; font-size: 8pt; color: #888; }';
+            html += '.page-break { page-break-before: always; }';
+            html += '@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }';
             html += '</style></head><body>';
             
-            html += '<h1>PERMISSÃO DE TRABALHO #' + num + '</h1>';
-            html += '<p style="text-align:center"><strong>Status:</strong> ' + p.status + '</p>';
-            
-            // Responsáveis
-            html += '<div class="section"><div class="section-title">RESPONSABILIDADES</div>';
-            html += '<div class="row"><label>Autorizador:</label><span>' + (p.autorizador||'-') + '</span></div>';
-            html += '<div class="row"><label>Supervisor:</label><span>' + (p.supervisor||'-') + '</span></div>';
-            html += '<div class="row"><label>Executor:</label><span>' + (p.executor||'-') + '</span></div></div>';
-            
-            // Trabalho
-            html += '<div class="section"><div class="section-title">DESCRIÇÃO DO TRABALHO</div>';
-            html += '<div class="row"><label>Local:</label><span>' + (p.local||'-') + '</span></div>';
-            html += '<div class="row"><label>Equipamento:</label><span>' + (p.equipamento||'-') + '</span></div>';
-            html += '<div class="row"><label>Descrição:</label><span>' + (p.descricao||'-') + '</span></div>';
-            if(p.ordemTrabalho) html += '<div class="row"><label>Ordem Trabalho:</label><span>' + p.ordemTrabalho + '</span></div>';
+            // Cabeçalho
+            html += '<div class="doc-header">';
+            html += '<div class="brand">Documento Oficial de Segurança do Trabalho</div>';
+            html += '<h1>PERMISSÃO DE TRABALHO</h1>';
+            html += '<div class="pt-num">Nº ' + num + '</div>';
+            html += '<div class="status-pill" style="color:' + statusColor + ';background:' + statusBg + ';border:1px solid ' + statusColor + '">' + p.status.toUpperCase() + '</div>';
             html += '</div>';
+            
+            // Responsabilidades
+            html += '<div class="section"><div class="section-title">Responsabilidades</div><div class="field-grid">';
+            html += '<div class="field"><label>Autorizador</label><div class="value">' + (p.autorizador || '<span class="empty">Não definido</span>') + '</div></div>';
+            html += '<div class="field"><label>Supervisor</label><div class="value">' + (p.supervisor || '<span class="empty">Não definido</span>') + '</div></div>';
+            html += '<div class="field span2"><label>Executor Principal</label><div class="value">' + (p.executor || '<span class="empty">Não definido</span>') + '</div></div>';
+            if (p.executores && p.executores.length) {
+                html += '<div class="field span2"><label>Equipe Executora</label><div class="value">' + p.executores.map(e => e.nome + ' (' + e.cargo + ')').join(', ') + '</div></div>';
+            }
+            html += '</div></div>';
+            
+            // Descrição do Trabalho
+            html += '<div class="section"><div class="section-title">Descrição do Trabalho</div><div class="field-grid">';
+            html += '<div class="field"><label>Local</label><div class="value">' + (p.local || '-') + '</div></div>';
+            html += '<div class="field"><label>Equipamento</label><div class="value">' + (p.equipamento || '-') + '</div></div>';
+            html += '<div class="field span2"><label>Descrição do Serviço</label><div class="value">' + (p.descricao || '-') + '</div></div>';
+            html += '<div class="field"><label>Empresa Executante</label><div class="value">' + (p.empresa || '-') + '</div></div>';
+            if (p.ordemTrabalho) html += '<div class="field"><label>Ordem de Trabalho</label><div class="value">' + p.ordemTrabalho + '</div></div>';
+            html += '</div></div>';
             
             // Programação
-            html += '<div class="section"><div class="section-title">PROGRAMAÇÃO</div>';
-            html += '<div class="row"><label>Início:</label><span>' + formatDate(p.dataInicio) + ' ' + (p.horaInicio||'') + '</span></div>';
-            html += '<div class="row"><label>Término:</label><span>' + formatDate(p.dataTermino) + ' ' + (p.horaTermino||'') + '</span></div></div>';
+            html += '<div class="section"><div class="section-title">Programação</div><div class="field-grid">';
+            html += '<div class="field"><label>Data e Hora de Início</label><div class="value">' + formatDate(p.dataInicio) + ' às ' + (p.horaInicio || '-') + '</div></div>';
+            html += '<div class="field"><label>Data e Hora de Término</label><div class="value">' + formatDate(p.dataTermino) + ' às ' + (p.horaTermino || '-') + '</div></div>';
+            html += '</div></div>';
             
-            // Segurança
-            html += '<div class="section"><div class="section-title">SEGURANÇA</div>';
-            if(p.riscosList && p.riscosList.length) html += '<div class="row"><label>Riscos:</label><span>' + p.riscosList.map(r=>r.nome).join(', ') + '</span></div>';
-            if(p.epiList && p.epiList.length) html += '<div class="row"><label>EPIs:</label><span>' + p.epiList.map(e=>e.nome).join(', ') + '</span></div>';
-            if(p.medidasList && p.medidasList.length) html += '<div class="row"><label>Medidas:</label><span>' + p.medidasList.map(m=>m.nome).join(', ') + '</span></div>';
-            html += '</div>';
+            // Segurança do Trabalho
+            html += '<div class="section"><div class="section-title">Segurança do Trabalho</div><div class="field-grid full">';
+            html += '<div class="field"><label>Riscos Identificados</label><div class="value">' + fmtList(p.riscosList) + '</div></div>';
+            html += '<div class="field"><label>Equipamentos de Proteção (EPIs)</label><div class="value">' + fmtList(p.epiList) + '</div></div>';
+            html += '<div class="field"><label>Medidas de Controle</label><div class="value">' + fmtList(p.medidasList) + '</div></div>';
+            html += '</div></div>';
             
             // Bloqueios
-            if(p.temBloqueio && p.bloqueios && p.bloqueios.length) {
-                html += '<div class="section"><div class="section-title">BLOQUEIOS</div>';
+            html += '<div class="section"><div class="section-title">Bloqueio e Etiquetagem (LOTO)</div>';
+            if (p.temBloqueio && p.bloqueios && p.bloqueios.length) {
+                html += '<div class="alert-line">⚠ Esta atividade requer bloqueio de energia</div>';
+                html += '<table class="lock-table"><tr><th>Local</th><th>Descrição</th><th>Nº do Cadeado</th></tr>';
                 p.bloqueios.forEach(b => {
-                    html += '<div class="row"><label>Local:</label><span>' + b.local + ' - ' + b.descricao + ' (Cadeado: ' + b.cadeado + ')</span></div>';
+                    html += '<tr><td>' + b.local + '</td><td>' + b.descricao + '</td><td>' + b.cadeado + '</td></tr>';
                 });
-                html += '</div>';
+                html += '</table>';
+            } else {
+                html += '<div class="ok-line">✓ Não requer bloqueio de energia</div>';
+            }
+            html += '</div>';
+            
+            if (p.anotacoes) {
+                html += '<div class="section"><div class="section-title">Anotações e Observações</div>';
+                html += '<div class="value" style="border:none;">' + p.anotacoes + '</div></div>';
             }
             
-            // Assinaturas Início
-            html += '<div class="section"><div class="section-title">ASSINATURAS - INÍCIO</div>';
+            // Página 2 - Assinaturas
+            html += '<div class="page-break"></div>';
+            
+            html += '<div class="doc-header" style="margin-bottom:22px;">';
+            html += '<div class="brand">Documento Oficial de Segurança do Trabalho</div>';
+            html += '<h1 style="font-size:16pt;">TERMO DE ASSINATURAS</h1>';
+            html += '<div class="pt-num">PT Nº ' + num + '</div>';
+            html += '</div>';
+            
+            html += '<div class="section"><div class="section-title">Autorização para Início dos Trabalhos</div>';
+            html += '<p style="font-family:Arial,sans-serif;font-size:9pt;color:#777;margin-bottom:10px;">As assinaturas abaixo autorizam formalmente o início da execução dos serviços descritos neste documento.</p>';
             html += '<div class="sig-grid">';
-            html += '<div class="sig-box ' + (p.assinaturaInicioAutorizador?'ok':'') + '"><div class="sig-line">' + (p.assinaturaInicioAutorizador?'✓':'') + '</div><small>Autorizador</small></div>';
-            html += '<div class="sig-box ' + (p.assinaturaInicioSupervisor?'ok':'') + '"><div class="sig-line">' + (p.assinaturaInicioSupervisor?'✓':'') + '</div><small>Supervisor</small></div>';
-            html += '<div class="sig-box ' + (p.assinaturaInicioExecutor?'ok':'') + '"><div class="sig-line">' + (p.assinaturaInicioExecutor?'✓':'') + '</div><small>Executor</small></div>';
+            html += sigBox(p.assinaturaInicioAutorizador, 'AUTORIZADOR', false);
+            html += sigBox(p.assinaturaInicioSupervisor, 'SUPERVISOR', false);
+            html += sigBox(p.assinaturaInicioExecutor, 'EXECUTOR', p.validacaoPresencialInicio);
             html += '</div></div>';
             
-            // Assinaturas Término
-            html += '<div class="section"><div class="section-title">ASSINATURAS - TÉRMINO</div>';
+            html += '<div class="section"><div class="section-title">Encerramento dos Trabalhos</div>';
+            html += '<p style="font-family:Arial,sans-serif;font-size:9pt;color:#777;margin-bottom:10px;">As assinaturas abaixo confirmam formalmente o encerramento e a conclusão dos serviços.</p>';
             html += '<div class="sig-grid">';
-            html += '<div class="sig-box ' + (p.assinaturaTerminoAutorizador?'ok':'') + '"><div class="sig-line">' + (p.assinaturaTerminoAutorizador?'✓':'') + '</div><small>Autorizador</small></div>';
-            html += '<div class="sig-box ' + (p.assinaturaTerminoSupervisor?'ok':'') + '"><div class="sig-line">' + (p.assinaturaTerminoSupervisor?'✓':'') + '</div><small>Supervisor</small></div>';
-            html += '<div class="sig-box ' + (p.assinaturaTerminoExecutor?'ok':'') + '"><div class="sig-line">' + (p.assinaturaTerminoExecutor?'✓':'') + '</div><small>Executor</small></div>';
+            html += sigBox(p.assinaturaTerminoAutorizador, 'AUTORIZADOR', false);
+            html += sigBox(p.assinaturaTerminoSupervisor, 'SUPERVISOR', false);
+            html += sigBox(p.assinaturaTerminoExecutor, 'EXECUTOR', p.validacaoPresencialTermino);
             html += '</div></div>';
             
-            html += '<p style="text-align:center;margin-top:20px;font-size:9pt;color:#666">Documento gerado em ' + formatDateTime(new Date()) + '</p>';
+            html += '<div class="section" style="margin-top:26px;"><div class="section-title">Termos e Condições</div>';
+            html += '<div style="font-family:Arial,sans-serif;font-size:8pt;color:#666;line-height:1.7;">';
+            html += '<p>1. Esta permissão é válida apenas para o período, local e serviço especificados neste documento.</p>';
+            html += '<p>2. Todos os executores devem estar cientes dos riscos envolvidos e das medidas de segurança exigidas.</p>';
+            html += '<p>3. O trabalho deve ser imediatamente interrompido caso surjam condições inseguras não previstas.</p>';
+            html += '<p>4. O descumprimento das normas de segurança implica no cancelamento imediato desta permissão.</p>';
+            html += '<p>5. As assinaturas digitais registradas possuem validade conforme a legislação vigente.</p>';
+            html += '</div></div>';
+            
+            html += '<div class="doc-footer"><span>Documento gerado em ' + formatDateTime(new Date()) + '</span><span>PT Nº ' + num + '</span></div>';
+            
             html += '<scr'+'ipt>window.onload=function(){window.print();}<\/scr'+'ipt>';
             html += '</body></html>';
             
@@ -3559,16 +3649,16 @@
             if (chartTipos) chartTipos.destroy();
             if (chartMensal) chartMensal.destroy();
             if (chartExecutores) chartExecutores.destroy();
-            const chartOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#a0a0c0', boxWidth: 12, font: { size: 11 } } } } };
+            const chartOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#555550', boxWidth: 12, font: { size: 11, family: 'Arial' } } } } };
             chartStatus = new Chart(document.getElementById('chartStatus').getContext('2d'), {
-                type: 'doughnut', data: { labels: ['Solic.', 'Exec.', 'Venc.', 'Enc.'], datasets: [{ data: [sol, exe, venc, enc], backgroundColor: ['#ffaa00', '#00f0ff', '#ff3366', '#00ff88'], borderWidth: 0 }] },
+                type: 'doughnut', data: { labels: ['Solic.', 'Exec.', 'Venc.', 'Enc.'], datasets: [{ data: [sol, exe, venc, enc], backgroundColor: ['#a15c00', '#1a3c6e', '#a13030', '#1e6b3c'], borderWidth: 0 }] },
                 options: { ...chartOpts, plugins: { legend: { position: 'bottom', labels: chartOpts.plugins.legend.labels } } }
             });
             const tiposCount = {};
             permissoes.forEach(p => { (p.tiposTrabalho || []).forEach(t => { tiposCount[t] = (tiposCount[t] || 0) + 1; }); });
             chartTipos = new Chart(document.getElementById('chartTipos').getContext('2d'), {
-                type: 'bar', data: { labels: Object.keys(tiposCount).map(l => l.substr(0,8)), datasets: [{ data: Object.values(tiposCount), backgroundColor: '#7b2dff', borderRadius: 4 }] },
-                options: { ...chartOpts, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#a0a0c0', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#a0a0c0' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+                type: 'bar', data: { labels: Object.keys(tiposCount).map(l => l.substr(0,8)), datasets: [{ data: Object.values(tiposCount), backgroundColor: '#4a5a8a', borderRadius: 3 }] },
+                options: { ...chartOpts, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#555550', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.06)' } }, y: { ticks: { color: '#555550' }, grid: { color: 'rgba(0,0,0,0.06)' } } } }
             });
             const monthlyCount = {};
             permissoes.forEach(p => { 
@@ -3578,15 +3668,15 @@
             });
             const months = Object.keys(monthlyCount).sort();
             chartMensal = new Chart(document.getElementById('chartMensal').getContext('2d'), {
-                type: 'line', data: { labels: months.map(m => m.substr(5)), datasets: [{ data: months.map(m => monthlyCount[m]), borderColor: '#00f0ff', backgroundColor: 'rgba(0, 240, 255, 0.1)', fill: true, tension: 0.4 }] },
-                options: { ...chartOpts, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#a0a0c0' }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#a0a0c0' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+                type: 'line', data: { labels: months.map(m => m.substr(5)), datasets: [{ data: months.map(m => monthlyCount[m]), borderColor: '#1a3c6e', backgroundColor: 'rgba(26, 60, 110, 0.1)', fill: true, tension: 0.3 }] },
+                options: { ...chartOpts, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#555550' }, grid: { color: 'rgba(0,0,0,0.06)' } }, y: { ticks: { color: '#555550' }, grid: { color: 'rgba(0,0,0,0.06)' } } } }
             });
             const execCount = {};
             permissoes.forEach(p => { if (p.executor) execCount[p.executor] = (execCount[p.executor] || 0) + 1; });
             const top = Object.entries(execCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
             chartExecutores = new Chart(document.getElementById('chartExecutores').getContext('2d'), {
-                type: 'bar', data: { labels: top.map(e => e[0].split(' ')[0]), datasets: [{ data: top.map(e => e[1]), backgroundColor: '#ff00aa', borderRadius: 4 }] },
-                options: { ...chartOpts, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#a0a0c0' }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#a0a0c0', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+                type: 'bar', data: { labels: top.map(e => e[0].split(' ')[0]), datasets: [{ data: top.map(e => e[1]), backgroundColor: '#7a1f3d', borderRadius: 3 }] },
+                options: { ...chartOpts, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#555550' }, grid: { color: 'rgba(0,0,0,0.06)' } }, y: { ticks: { color: '#555550', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.06)' } } } }
             });
         }
 
