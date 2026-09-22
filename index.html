@@ -2227,57 +2227,38 @@
                 }
                 firebaseInitialized = true;
                 updateSyncStatus('online');
+                db.collection('_health').doc('check').onSnapshot(() => {
+                    updateSyncStatus('online');
+                }, () => {
+                    updateSyncStatus('offline');
+                });
                 
-                let listenersIniciados = false;
+                await initializeDefaultData();
+                setupRealtimeListeners();
                 
                 // Configurar listener de autenticação
                 auth.onAuthStateChanged(async (user) => {
                     document.getElementById('loadingOverlay').classList.add('hidden');
                     
                     if (user) {
-                        // Usuário logado - buscar dados no Firestore (forçando servidor, com retry)
-                        let userDoc = null;
-                        let lastError = null;
-                        for (let tentativa = 0; tentativa < 3; tentativa++) {
-                            try {
-                                userDoc = await db.collection('usuarios').doc(user.uid).get({ source: 'server' });
-                                lastError = null;
-                                break;
-                            } catch(e) {
-                                lastError = e;
-                                await new Promise(r => setTimeout(r, 1000 * (tentativa + 1)));
+                        // Usuário logado - buscar dados no Firestore
+                        try {
+                            const userDoc = await db.collection('usuarios').doc(user.uid).get();
+                            if (userDoc.exists) {
+                                currentUser = { id: user.uid, email: user.email, ...userDoc.data() };
+                                localStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
+                                document.getElementById('loginPage').style.display = 'none';
+                                document.getElementById('appContainer').style.display = 'block';
+                                updateUserInterface();
+                                updateStats();
+                                updateNotificationBadges();
+                                navigationHistory = ['home'];
+                                updateBackButton();
+                            } else {
+                                await auth.signOut();
                             }
-                        }
-                        
-                        if (lastError) {
-                            console.error('Erro ao buscar dados do usuário após tentativas:', lastError);
-                            showToast('Erro ao buscar dados do usuário: ' + (lastError.code || lastError.message), 'error');
-                        } else if (userDoc && userDoc.exists) {
-                            currentUser = { id: user.uid, email: user.email, ...userDoc.data() };
-                            localStorage.setItem('ptd_currentUser', JSON.stringify(currentUser));
-                            document.getElementById('loginPage').style.display = 'none';
-                            document.getElementById('appContainer').style.display = 'block';
-                            updateUserInterface();
-                            updateStats();
-                            updateNotificationBadges();
-                            navigationHistory = ['home'];
-                            updateBackButton();
-                            
-                            // Só agora (autenticado) iniciamos listeners e checagens que dependem de permissão
-                            if (!listenersIniciados) {
-                                listenersIniciados = true;
-                                db.collection('_health').doc('check').onSnapshot(() => {
-                                    updateSyncStatus('online');
-                                }, () => {
-                                    updateSyncStatus('offline');
-                                });
-                                try { await initializeDefaultData(); } catch(e) { console.log('Erro initializeDefaultData:', e); }
-                                setupRealtimeListeners();
-                            }
-                        } else {
-                            console.error('Usuário autenticado mas sem documento no Firestore. UID:', user.uid);
-                            showToast('Login ok, mas não há cadastro no banco de dados para este usuário (UID: ' + user.uid + ')', 'error');
-                            await auth.signOut();
+                        } catch(e) {
+                            console.log('Erro ao buscar dados do usuário:', e);
                         }
                     } else {
                         // Não logado
