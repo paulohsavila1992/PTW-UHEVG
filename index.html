@@ -2791,7 +2791,17 @@
                     case 'auth/network-request-failed':
                         mensagem = 'Sem conexão com internet';
                         break;
+                    case 'auth/operation-not-allowed':
+                        mensagem = 'Login por Email/Senha não está ativado no Firebase Console';
+                        break;
+                    case 'auth/api-key-not-valid.-please-pass-a-valid-api-key.':
+                    case 'auth/invalid-api-key':
+                        mensagem = 'API Key do Firebase inválida';
+                        break;
+                    default:
+                        mensagem = 'Erro: ' + (error.code || error.message || 'desconhecido');
                 }
+                console.error('Erro de login completo:', error);
                 showToast(mensagem, 'error');
             }
             
